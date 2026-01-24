@@ -1,0 +1,28 @@
+# Core dependencies
+fastapi==0.115.6
+uvicorn[standard]==0.36.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.1
+psycopg2-binary==2.9.9  # PostgreSQL driver
+
+# Data validation
+pydantic==2.12.5
+pydantic-settings==2.12.0
+email-validator==2.1.2
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Logging
+loguru==0.7.2
+
+# Environment configuration
+python-dotenv==1.0.0
+
+# CORS support (built into FastAPI)
+# Optional: SQLite support (built-in, no extra package needed)
+# For development only - production should use PostgreSQL

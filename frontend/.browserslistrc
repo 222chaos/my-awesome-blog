@@ -1,0 +1,12 @@
+# Browsers that we support (these values are used by autoprefixer and babel)
+
+# Production
+> 0.5%
+last 2 versions
+not dead
+not Explorer <= 11
+
+# Development
+last 1 chrome version
+last 1 firefox version
+last 1 safari version
