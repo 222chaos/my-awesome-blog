@@ -1,5 +1,7 @@
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+
+import { cn } from '@/lib/utils';
 
 interface PostCardProps {
   id: string;
@@ -7,7 +9,9 @@ interface PostCardProps {
   excerpt: string;
   date: string;
   readTime: string;
+  category?: string;
   href?: string;
+  className?: string;
 }
 
 export default function PostCard({ 
@@ -16,27 +20,50 @@ export default function PostCard({
   excerpt, 
   date, 
   readTime,
-  href = `/posts/${id}`
+  category,
+  href = `/posts/${id}`,
+  className
 }: PostCardProps) {
   return (
-    <article className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="p-6">
+    <article className={cn("glass-card-secondary glass-hover group overflow-hidden", className)}>
+      <div className="p-6 md:p-8">
+        {category && (
+          <span className="inline-block px-3 py-1 text-xs font-semibold text-tech-cyan bg-glass/50 rounded-full mb-4">
+            {category}
+          </span>
+        )}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-tech-lightcyan transition-colors">
             {title}
           </h2>
-          <p className="text-secondary-600 dark:text-secondary-300 mb-4">
+          <p className="text-gray-300 mb-4 line-clamp-3">
             {excerpt}
           </p>
         </div>
         
         <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-secondary-500 dark:text-secondary-400">
+          <div className="text-sm text-gray-400">
             <time>{date}</time> • {readTime}
           </div>
           
-          <Button asChild>
-            <Link href={href as any}>Read More</Link>
+          <Button asChild variant="ghost" className="text-tech-cyan hover:text-tech-lightcyan group">
+            <Link href={href as any} aria-label={`阅读文章: ${title}`}>
+              阅读更多
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
           </Button>
         </div>
       </div>

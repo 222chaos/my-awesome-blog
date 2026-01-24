@@ -1,6 +1,9 @@
+'use client';
+
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -9,12 +12,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        outline:
+          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         glass: 'bg-glass text-white border border-glass-border hover:bg-glass/80 hover:border-glass-border/40',
+        'glass-light': 'bg-glass-light text-gray-900 border border-glass-light-border hover:bg-glass-light/80 hover:border-glass-light-border/40',
       },
       size: {
         default: 'h-10 px-4 py-2',
@@ -37,14 +44,17 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
+        className={cn(buttonVariants({ variant, size, className }), "ripple-effect")}
+        ref={asChild ? undefined : ref}
+        {...(asChild ? {} : { type: 'button' })}
         {...props}
-      />
+      >
+        {children}
+      </Comp>
     );
   }
 );

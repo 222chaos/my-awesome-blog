@@ -15,6 +15,7 @@
     --card: #ffffff;
     --card-foreground: #0a0a0a;
     --border: #e2e8f0;
+    --glass-light-border: rgba(0, 0, 0, 0.1);
     --radius: 0.5rem;
   }
 
@@ -30,6 +31,7 @@
     --card: #0a0a0a;
     --card-foreground: #f8fafc;
     --border: #334155;
+    --glass-light-border: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -39,25 +41,83 @@
   }
 }
 
-/* Glass morphism effect */
+/* 轻度磨砂玻璃 - 可读性优先 */
 .glass-card {
-  background: rgba(15, 23, 42, 0.6); /* Dark blue glass */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(34, 211, 238, 0.2); /* Cyan border */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius, 0.5rem);
+  background: rgba(15, 23, 42, 0.5); /* 降低透明度 */
+  backdrop-filter: blur(16px); /* 增加模糊 */
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(34, 211, 238, 0.15); /* 降低边框透明度 */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-hover {
+/* 主题感知的玻璃效果 */
+.glass {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  border-radius: 1rem;
   transition: all 0.3s ease;
 }
 
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* 深色模式下的玻璃效果调整 */
+.dark .glass {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+}
+
+/* 浅色模式下的玻璃效果调整 */
+.light .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 悬停增强效果 */
+.glass-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
 .glass-hover:hover {
-  background: rgba(30, 58, 138, 0.7); /* Deep blue on hover */
-  border: 1px solid rgba(6, 182, 212, 0.4); /* Stronger cyan border */
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); /* Cyan glow */
-  transform: translateY(-5px);
+  background: rgba(30, 58, 138, 0.6);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4),
+              0 0 30px rgba(6, 182, 212, 0.3);
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 轻微悬停效果 - 用于较小的元素 */
+.glass-hover-subtle {
+  transition: all 0.2s ease;
+}
+
+.glass-hover-subtle:hover {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2),
+              0 0 15px rgba(6, 182, 212, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 发光效果 */
+.glass-glow {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+.glass-glow:hover {
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
 }
 
 /* Gradient backgrounds */
@@ -131,4 +191,257 @@
 
 .prose :where(img):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply rounded-lg;
+}
+
+/* 淡入上移动画 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* 淡入动画 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+/* 从左侧滑入 */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out forwards;
+}
+
+/* 缩放淡入 */
+@keyframes scale-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-fade-in {
+  animation: scale-fade-in 0.5s ease-out forwards;
+}
+
+/* 按钮涟漪效果 */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 1;
+  animation: ripple 0.6s ease-out;
+}
+
+/* 下划线展开动画 */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #06B6D4, #22D3EE);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* 文本渐变 */
+.text-gradient {
+  background: linear-gradient(135deg, #06B6D4, #22D3EE, #0EA5E9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 发光边框 */
+.glow-border {
+  position: relative;
+}
+
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #06B6D4, #22D3EE, #0EA5E9, #06B6D4);
+  border-radius: inherit;
+  z-index: -1;
+  background-size: 400% 400%;
+  animation: gradient-move 3s ease infinite;
+}
+
+/* 平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 改进的玻璃浮动动画 */
+@keyframes float-improved {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+  }
+  25% {
+    transform: translateY(-15px) translateX(5px) scale(1.02);
+  }
+  50% {
+    transform: translateY(-20px) translateX(-5px) scale(1.05);
+  }
+  75% {
+    transform: translateY(-10px) translateX(3px) scale(1.02);
+  }
+}
+
+.animate-float-improved {
+  animation: float-improved 8s ease-in-out infinite;
+}
+
+/* 渐入缩放动画 - 用于卡片 */
+@keyframes fade-scale-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-scale-up {
+  animation: fade-scale-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 从右侧滑入 */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+}
+
+/* 发光脉冲动画 - 用于重要元素 */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3),
+                0 0 40px rgba(6, 182, 212, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.5),
+                0 0 60px rgba(6, 182, 212, 0.2);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* 自定义滚动条 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.5);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.7);
+}
+
+/* 动画延迟类 */
+.animate-delay-50 { animation-delay: 50ms; }
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-150 { animation-delay: 150ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-250 { animation-delay: 250ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+
+/* 玻璃卡片变体 */
+.glass-card-primary {
+  @apply bg-glass/50 backdrop-blur-xl border border-glass-border rounded-2xl;
+}
+
+.glass-card-secondary {
+  @apply bg-glass/30 backdrop-blur-lg border border-glass-border/50 rounded-xl;
+}
+
+/* 文本渐变变体 */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #06B6D4, #22D3EE, #0EA5E9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

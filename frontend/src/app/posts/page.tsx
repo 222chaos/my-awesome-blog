@@ -1,61 +1,76 @@
 import PostCard from '@/components/blog/PostCard';
+import GlassCard from '@/components/ui/GlassCard';
 
 export default function PostsPage() {
   // Sample posts data - in a real app, this would come from a CMS or content directory
   const samplePosts = [
     {
       id: 'getting-started-with-nextjs',
-      title: 'Getting Started with Next.js 14',
-      excerpt: 'Learn how to build modern web applications with Next.js 14 and the new App Router.',
-      date: 'January 15, 2024',
-      readTime: '5 min read',
+      title: 'Next.js 14 入门指南',
+      excerpt: '学习如何使用 Next.js 14 和新的 App Router 构建现代化网页应用。',
+      date: '2024年1月15日',
+      readTime: '5分钟阅读',
+      category: '开发',
     },
     {
       id: 'tailwind-css-tips',
-      title: 'Advanced Tailwind CSS Techniques',
-      excerpt: 'Discover advanced techniques for building beautiful and responsive UIs with Tailwind CSS.',
-      date: 'January 10, 2024',
-      readTime: '8 min read',
+      title: '高级 Tailwind CSS 技巧',
+      excerpt: '探索使用 Tailwind CSS 构建美观响应式用户界面的高级技巧。',
+      date: '2024年1月10日',
+      readTime: '8分钟阅读',
+      category: '设计',
     },
     {
       id: 'typescript-best-practices',
-      title: 'TypeScript Best Practices for React Developers',
-      excerpt: 'Essential TypeScript patterns and practices every React developer should know.',
-      date: 'January 5, 2024',
-      readTime: '6 min read',
+      title: 'React 开发者的 TypeScript 最佳实践',
+      excerpt: '每个 React 开发者都应该知道的重要 TypeScript 模式和实践。',
+      date: '2024年1月5日',
+      readTime: '6分钟阅读',
+      category: '开发',
     },
     {
       id: 'api-design-guide',
-      title: 'Modern API Design Principles',
-      excerpt: 'Learn how to design scalable and maintainable APIs for your applications.',
-      date: 'December 28, 2023',
-      readTime: '10 min read',
+      title: '现代 API 设计原则',
+      excerpt: '学习如何为您的应用程序设计可扩展且易于维护的 API。',
+      date: '2023年12月28日',
+      readTime: '10分钟阅读',
+      category: '后端',
     },
   ];
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-4xl">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-primary-800 dark:text-primary-200 mb-4">Latest Articles</h1>
-        <p className="text-xl text-secondary-700 dark:text-secondary-300">
-          Insights and tutorials on modern web development
-        </p>
-      </div>
-
-      <div className="space-y-8">
-        {samplePosts.map((post) => (
-          <PostCard key={post.id} {...post} />
-        ))}
-      </div>
-
-      {samplePosts.length === 0 && (
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">No posts yet</h2>
-          <p className="text-secondary-600 dark:text-secondary-300 mb-6">
-            Check back soon for new articles!
+    <div className="min-h-screen bg-tech-darkblue">
+      <div className="container mx-auto px-4 py-20 lg:py-24">
+        <GlassCard className="max-w-4xl mx-auto mb-12 text-center animate-fade-in-up">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            最新文章
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            关于现代Web开发的见解和教程
           </p>
+        </GlassCard>
+
+        <div className="max-w-4xl mx-auto space-y-8">
+          {samplePosts.map((post, index) => (
+            <div 
+              key={post.id}
+              className="animate-fade-in-up"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <PostCard {...post} />
+            </div>
+          ))}
         </div>
-      )}
+
+        {samplePosts.length === 0 && (
+          <div className="text-center py-16 animate-fade-in-up">
+            <h2 className="text-2xl font-semibold text-white mb-2">暂无文章</h2>
+            <p className="text-gray-300 mb-6">
+              敬请期待新文章！
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

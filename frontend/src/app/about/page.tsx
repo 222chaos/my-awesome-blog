@@ -1,35 +1,62 @@
+import GlassCard from '@/components/ui/GlassCard';
+
 export default function AboutPage() {
   return (
-    <div className="container mx-auto px-4 py-16 max-w-3xl">
-      <h1 className="text-4xl font-bold text-primary-800 dark:text-primary-200 mb-6">About Me</h1>
-      
-      <div className="prose prose-lg dark:prose-invert max-w-none">
-        <p className="text-xl text-secondary-700 dark:text-secondary-300 mb-6">
-          Welcome to my personal blog! I{'\''}m passionate about technology, design, and sharing knowledge with the community.
-        </p>
-        
-        <p className="mb-6">
-          With years of experience in software development, I focus on creating elegant solutions to complex problems. 
-          My expertise spans across frontend and backend technologies, with a particular interest in modern JavaScript 
-          frameworks and cloud architectures.
-        </p>
-        
-        <h2 className="text-2xl font-semibold text-primary-700 dark:text-primary-300 mt-8 mb-4">What You{'\''}ll Find Here</h2>
-        <p className="mb-6">
-          This blog covers a wide range of topics including:
-        </p>
-        <ul className="list-disc pl-6 mb-6 space-y-2">
-          <li>Technical tutorials and guides</li>
-          <li>Best practices for modern web development</li>
-          <li>Insights on design systems and UI/UX</li>
-          <li>Reviews of the latest tools and frameworks</li>
-          <li>Opinions on industry trends and developments</li>
-        </ul>
-        
-        <h2 className="text-2xl font-semibold text-primary-700 dark:text-primary-300 mt-8 mb-4">Contact</h2>
-        <p>
-          Have questions or want to connect? Feel free to reach out through the contact page or connect with me on social media.
-        </p>
+    <div className="min-h-screen bg-tech-darkblue">
+      <div className="container mx-auto px-4 py-20 lg:py-24">
+        <GlassCard className="max-w-3xl mx-auto mb-12 animate-fade-in-up">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            关于我
+          </h1>
+          <p className="text-xl text-gray-300 leading-relaxed">
+            欢迎来到我的个人博客！我热衷于技术、设计，并喜欢与社区分享知识。
+          </p>
+        </GlassCard>
+
+        <div className="max-w-3xl mx-auto space-y-8">
+          <GlassCard className="animate-fade-in-up animate-delay-100">
+            <p className="text-gray-300 text-lg leading-relaxed">
+              凭借多年的软件开发经验，我专注于为复杂问题创建优雅的解决方案。
+              我的专业知识涵盖前后端技术，特别关注现代JavaScript框架和云架构。
+            </p>
+          </GlassCard>
+
+          <GlassCard className="animate-fade-in-up animate-delay-200">
+            <h2 className="text-2xl font-bold text-white mb-4">
+              在这里你会发现
+            </h2>
+            <p className="text-gray-300 mb-6">这个博客涵盖广泛的主题，包括：</p>
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start gap-3">
+                <span className="text-tech-cyan mt-1">✓</span>
+                技术教程和指南
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-tech-cyan mt-1">✓</span>
+                现代Web开发的最佳实践
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-tech-cyan mt-1">✓</span>
+                设计系统和UI/UX的见解
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-tech-cyan mt-1">✓</span>
+                最新工具和框架的评测
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-tech-cyan mt-1">✓</span>
+                行业趋势和发展的观点
+              </li>
+            </ul>
+          </GlassCard>
+
+          <GlassCard className="animate-fade-in-up animate-delay-300">
+            <h2 className="text-2xl font-bold text-white mb-4">联系方式</h2>
+            <p className="text-gray-300">
+              有问题或想要联系？欢迎通过联系页面与我取得联系，或在社交媒体上关注我。
+            </p>
+          </GlassCard>
+        </div>
       </div>
     </div>
   );

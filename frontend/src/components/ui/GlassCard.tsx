@@ -1,47 +1,52 @@
+'use client';
+
+import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/theme-context';
 
-interface GlassCardProps {
+export interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-  className?: string;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
   hoverEffect?: boolean;
-  floatEffect?: boolean;
   glowEffect?: boolean;
-  padding?: 'sm' | 'md' | 'lg' | 'none';
+  className?: string;
 }
 
-export default function GlassCard({
-  children,
-  className = '',
-  hoverEffect = true,
-  floatEffect = false,
-  glowEffect = false,
-  padding = 'md',
-}: GlassCardProps) {
-  const paddingClasses = {
-    none: '',
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
-  };
+const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
+  ({ children, padding = 'md', hoverEffect = false, glowEffect = false, className, ...props }, ref) => {
+    const { resolvedTheme } = useTheme();
+    
+    const paddingClasses = {
+      none: '',
+      sm: 'p-4',
+      md: 'p-6',
+      lg: 'p-8',
+    };
+    
+    // 根据主题确定玻璃效果类
+    const glassClass = resolvedTheme === 'light' 
+      ? 'bg-glass-light border-glass-light-border text-gray-900'
+      : 'bg-glass/30 border-glass-border text-white';
+    
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'rounded-xl backdrop-blur-xl shadow-lg',
+          glassClass,
+          paddingClasses[padding],
+          hoverEffect && 'transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-tech-cyan/20',
+          glowEffect && 'hover:border-tech-cyan/50',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+);
 
-  const baseClasses = 'glass-card rounded-xl border border-glass-border shadow-lg';
-  const hoverClasses = hoverEffect ? 'glass-hover' : '';
-  const floatClasses = floatEffect ? 'animate-float' : '';
-  const glowClasses = glowEffect ? 'animate-pulse-glow' : '';
-  const paddingClass = paddingClasses[padding];
+GlassCard.displayName = 'GlassCard';
 
-  const combinedClasses = cn(
-    baseClasses,
-    paddingClass,
-    hoverClasses,
-    floatClasses,
-    glowClasses,
-    className
-  );
-
-  return (
-    <div className={combinedClasses}>
-      {children}
-    </div>
-  );
-}
+export default GlassCard;

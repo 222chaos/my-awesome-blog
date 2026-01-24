@@ -1,110 +1,139 @@
 import Link from 'next/link';
-import GlassCard from '@/components/ui/GlassCard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import type { Category, PopularPost } from '@/types';
+import { Twitter, Github, Linkedin } from 'lucide-react';
 
-interface Category {
-  name: string;
-  count: number;
-}
-
-interface PopularPost {
-  id: string;
-  title: string;
-  date: string;
-}
-
-export default function Sidebar({ 
-  categories = [], 
-  popularPosts = [] 
-}: { 
-  categories?: Category[]; 
-  popularPosts?: PopularPost[]; 
+export default function Sidebar({
+  categories = [],
+  popularPosts = [],
+}: {
+  categories?: Category[];
+  popularPosts?: PopularPost[];
 }) {
   return (
     <div className="space-y-8">
-      {/* About Card */}
-      <GlassCard className="text-center" padding="lg">
-        <div className="flex justify-center mb-4">
-          <div className="bg-glass border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center text-gray-400">
-            Avatar
+      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-tech-cyan to-tech-sky p-1">
+              <div className="w-full h-full rounded-full bg-glass/80 flex items-center justify-center">
+                <span className="text-2xl">👨‍💻</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2">John Doe</h3>
-        <p className="text-gray-300 text-sm mb-4">
-          Tech enthusiast, developer, and writer exploring the digital frontier.
-        </p>
-        <div className="flex justify-center space-x-4">
-          <Link href="#" className="text-tech-cyan hover:text-tech-lightcyan">
-            <span className="sr-only">Twitter</span>
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-            </svg>
-          </Link>
-          <Link href="#" className="text-tech-cyan hover:text-tech-lightcyan">
-            <span className="sr-only">GitHub</span>
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-              <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-            </svg>
-          </Link>
-          <Link href="#" className="text-tech-cyan hover:text-tech-lightcyan">
-            <span className="sr-only">LinkedIn</span>
-            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-            </svg>
-          </Link>
-        </div>
-      </GlassCard>
-
-      {/* Categories */}
-      <GlassCard padding="lg">
-        <h3 className="text-lg font-bold text-white mb-4">Categories</h3>
-        <div className="space-y-2">
-          {categories.map((category, index) => (
-            <div 
-              key={index} 
-              className="flex justify-between items-center py-2 px-3 rounded-lg hover:bg-glass/30 transition-colors cursor-pointer"
+          <CardTitle className="text-xl text-white mb-2">John Doe</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-300 text-sm mb-6 text-center">
+            Tech enthusiast, developer, and writer exploring the digital frontier.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link
+              href="#"
+              aria-label="访问Twitter"
+              className="w-10 h-10 rounded-lg bg-glass/50 flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan hover:bg-glass/80 transition-all"
             >
-              <span className="text-gray-200">{category.name}</span>
-              <span className="text-tech-cyan">{category.count}</span>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
-
-      {/* Popular Posts */}
-      <GlassCard padding="lg">
-        <h3 className="text-lg font-bold text-white mb-4">Popular Posts</h3>
-        <div className="space-y-4">
-          {popularPosts.map((post, index) => (
-            <div 
-              key={index} 
-              className="block group cursor-pointer"
+              <Twitter className="h-5 w-5" />
+            </Link>
+            <Link
+              href="#"
+              aria-label="访问GitHub"
+              className="w-10 h-10 rounded-lg bg-glass/50 flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan hover:bg-glass/80 transition-all"
             >
-              <h4 className="font-medium text-gray-200 group-hover:text-tech-cyan transition-colors">
-                {post.title}
-              </h4>
-              <p className="text-xs text-gray-400">{post.date}</p>
-            </div>
-          ))}
-        </div>
-      </GlassCard>
+              <Github className="h-5 w-5" />
+            </Link>
+            <Link
+              href="#"
+              aria-label="访问LinkedIn"
+              className="w-10 h-10 rounded-lg bg-glass/50 flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan hover:bg-glass/80 transition-all"
+            >
+              <Linkedin className="h-5 w-5" />
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Newsletter */}
-      <GlassCard padding="lg">
-        <h3 className="text-lg font-bold text-white mb-2">Subscribe</h3>
-        <p className="text-gray-300 text-sm mb-4">
-          Get the latest posts delivered right to your inbox.
-        </p>
-        <div className="flex flex-col space-y-2">
-          <input
-            type="email"
-            placeholder="Your email address"
-            className="w-full px-3 py-2 rounded-md bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan"
-          />
-          <button className="w-full bg-tech-cyan text-white py-2 rounded-md hover:bg-tech-lightcyan transition-colors">
+      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <span className="text-tech-cyan">📁</span>
+            Categories
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1 max-h-64 overflow-y-auto custom-scrollbar">
+            {categories.map((category, index) => (
+              <Link
+                key={index}
+                href={`/category/${category.name}` as any}
+                className="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-glass/50 transition-all group cursor-pointer"
+              >
+                <span className="text-gray-200 group-hover:text-tech-lightcyan transition-colors">
+                  {category.name}
+                </span>
+                <span className="text-tech-cyan text-sm font-semibold">
+                  {category.count}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <span className="text-tech-cyan">🔥</span>
+            Popular Posts
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4 max-h-64 overflow-y-auto custom-scrollbar">
+            {popularPosts.map((post, index) => (
+              <Link
+                key={index}
+                href={`/posts/${post.id}`}
+                className="block group"
+              >
+                <h4 className="font-medium text-gray-200 group-hover:text-tech-cyan transition-colors mb-1 line-clamp-2">
+                  {post.title}
+                </h4>
+                <p className="text-xs text-gray-400 flex items-center gap-2">
+                  <span>{post.date}</span>
+                </p>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <span className="text-tech-cyan">📧</span>
             Subscribe
-          </button>
-        </div>
-      </GlassCard>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-300 text-sm mb-4">
+            Get the latest posts delivered right to your inbox.
+          </p>
+          <div className="space-y-3">
+            <input
+              type="email"
+              placeholder="Your email address"
+              aria-label="输入邮箱地址"
+              className="w-full px-4 py-2.5 rounded-lg bg-glass/50 border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan transition-all"
+            />
+            <Button className="w-full bg-gradient-to-r from-tech-cyan to-tech-sky text-white hover:shadow-lg hover:shadow-tech-cyan/20 transition-all">
+              Subscribe
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

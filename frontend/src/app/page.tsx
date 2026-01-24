@@ -4,27 +4,15 @@ import { useState, useEffect } from 'react';
 import HeroSection from '@/components/home/HeroSection';
 import PostGrid from '@/components/home/PostGrid';
 import Sidebar from '@/components/home/Sidebar';
-import GlassCard from '@/components/ui/GlassCard';
-
-interface Post {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  readTime: string;
-  category: string;
-}
-
-interface Category {
-  name: string;
-  count: number;
-}
-
-interface PopularPost {
-  id: string;
-  title: string;
-  date: string;
-}
+import FeaturedSection from '@/components/home/FeaturedSection';
+import StatsPanel from '@/components/home/StatsPanel';
+import TagCloud from '@/components/home/TagCloud';
+import Timeline from '@/components/home/Timeline';
+import FriendLinks from '@/components/home/FriendLinks';
+import Portfolio from '@/components/home/Portfolio';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import type { Post, Category, PopularPost } from '@/types';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -32,109 +20,125 @@ export default function Home() {
   const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]);
 
   useEffect(() => {
-    // Sample data - in a real app, this would come from an API
     setPosts([
       {
         id: 'getting-started-with-nextjs',
-        title: 'Getting Started with Next.js 14',
-        excerpt: 'Learn how to build modern web applications with Next.js 14 and the new App Router.',
-        date: 'January 15, 2024',
-        readTime: '5 min read',
-        category: 'Development'
+        title: 'Next.js 14 入门指南',
+        excerpt: '学习如何使用 Next.js 14 和新的 App Router 构建现代化网页应用。',
+        date: '2024年1月15日',
+        readTime: '5分钟阅读',
+        category: '开发',
       },
       {
         id: 'tailwind-css-tips',
-        title: 'Advanced Tailwind CSS Techniques',
-        excerpt: 'Discover advanced techniques for building beautiful and responsive UIs with Tailwind CSS.',
-        date: 'January 10, 2024',
-        readTime: '8 min read',
-        category: 'Design'
+        title: '高级 Tailwind CSS 技巧',
+        excerpt: '探索使用 Tailwind CSS 构建美观响应式用户界面的高级技巧。',
+        date: '2024年1月10日',
+        readTime: '8分钟阅读',
+        category: '设计',
       },
       {
         id: 'typescript-best-practices',
-        title: 'TypeScript Best Practices for React Developers',
-        excerpt: 'Essential TypeScript patterns and practices every React developer should know.',
-        date: 'January 5, 2024',
-        readTime: '6 min read',
-        category: 'Development'
+        title: 'React 开发者的 TypeScript 最佳实践',
+        excerpt: '每个 React 开发者都应该知道的重要 TypeScript 模式和实践。',
+        date: '2024年1月5日',
+        readTime: '6分钟阅读',
+        category: '开发',
       },
       {
         id: 'api-design-guide',
-        title: 'Modern API Design Principles',
-        excerpt: 'Learn how to design scalable and maintainable APIs for your applications.',
-        date: 'December 28, 2023',
-        readTime: '10 min read',
-        category: 'Backend'
+        title: '现代 API 设计原则',
+        excerpt: '学习如何为您的应用程序设计可扩展且易于维护的 API。',
+        date: '2023年12月28日',
+        readTime: '10分钟阅读',
+        category: '后端',
       },
       {
         id: 'state-management-options',
-        title: 'State Management in 2024',
-        excerpt: 'Comparing different state management solutions for React applications.',
-        date: 'December 20, 2023',
-        readTime: '12 min read',
-        category: 'Frontend'
+        title: '2024年的状态管理',
+        excerpt: '比较 React 应用程序的不同状态管理解决方案。',
+        date: '2023年12月20日',
+        readTime: '12分钟阅读',
+        category: '前端',
       },
       {
         id: 'web-security-basics',
-        title: 'Essential Web Security Practices',
-        excerpt: 'Protect your applications from common security vulnerabilities.',
-        date: 'December 15, 2023',
-        readTime: '9 min read',
-        category: 'Security'
-      }
+        title: '必备的网络安全实践',
+        excerpt: '保护您的应用程序免受常见安全漏洞的影响。',
+        date: '2023年12月15日',
+        readTime: '9分钟阅读',
+        category: '安全',
+      },
     ]);
 
     setCategories([
-      { name: 'Development', count: 12 },
-      { name: 'Design', count: 8 },
-      { name: 'Backend', count: 5 },
-      { name: 'Frontend', count: 10 },
-      { name: 'Security', count: 4 },
-      { name: 'DevOps', count: 6 }
+      { name: '开发', count: 12 },
+      { name: '设计', count: 8 },
+      { name: '后端', count: 5 },
+      { name: '前端', count: 10 },
+      { name: '安全', count: 4 },
+      { name: 'DevOps', count: 6 },
     ]);
 
     setPopularPosts([
-      { id: 'getting-started-with-nextjs', title: 'Getting Started with Next.js 14', date: 'Jan 15' },
-      { id: 'tailwind-css-tips', title: 'Advanced Tailwind CSS Techniques', date: 'Jan 10' },
-      { id: 'typescript-best-practices', title: 'TypeScript Best Practices', date: 'Jan 5' },
-      { id: 'api-design-guide', title: 'Modern API Design Principles', date: 'Dec 28' }
+      { id: 'getting-started-with-nextjs', title: 'Next.js 14 入门指南', date: '1月15日' },
+      { id: 'tailwind-css-tips', title: '高级 Tailwind CSS 技巧', date: '1月10日' },
+      { id: 'typescript-best-practices', title: 'TypeScript 最佳实践', date: '1月5日' },
+      { id: 'api-design-guide', title: '现代 API 设计原则', date: '12月28日' },
     ]);
   }, []);
 
   return (
     <div className="min-h-screen bg-tech-darkblue text-white">
       <HeroSection />
-      
+
+      <StatsPanel />
+
+      <FeaturedSection />
+
       <div className="container mx-auto px-4 py-16">
         <div className="flex flex-col lg:flex-row gap-8">
           <main className="flex-1">
             <PostGrid posts={posts} />
           </main>
-          
+
           <aside className="lg:w-80">
             <Sidebar categories={categories} popularPosts={popularPosts} />
           </aside>
         </div>
       </div>
-      
-      <GlassCard className="container mx-auto px-4 py-8 mt-12" padding="lg">
-        <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">Stay Updated</h3>
+
+      <TagCloud />
+
+      <Timeline />
+
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <FriendLinks />
+          <Portfolio />
+        </div>
+      </div>
+
+      <Card className="container mx-auto px-4 py-8 mt-12 glass-card glow-border">
+        <CardContent className="text-center">
+          <h3 className="text-2xl font-bold text-white mb-4 animate-fade-in-up">
+            订阅更新
+          </h3>
           <p className="text-gray-300 max-w-2xl mx-auto mb-6">
-            Join our newsletter to receive updates on the latest articles, tips, and resources.
+            加入我们的邮件列表，获取最新文章、技巧和资源。
           </p>
           <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
             <input
               type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-2 rounded-md bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+              placeholder="输入您的邮箱"
+              className="flex-1 px-4 py-2 rounded-md bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan backdrop-blur-lg"
             />
-            <button className="px-6 py-2 bg-tech-cyan text-white rounded-md hover:bg-tech-lightcyan transition-colors">
-              Subscribe
-            </button>
+            <Button className="bg-tech-cyan text-white hover:bg-tech-lightcyan transition-colors">
+              订阅
+            </Button>
           </div>
-        </div>
-      </GlassCard>
+        </CardContent>
+      </Card>
     </div>
   );
 }

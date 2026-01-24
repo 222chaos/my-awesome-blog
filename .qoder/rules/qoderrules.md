@@ -1,0 +1,475 @@
+# My Awesome Blog - AI Assistant Coding Guidelines
+
+## Project Overview & Tech Stack
+
+My Awesome Blog is a modern monorepo containing:
+- **Frontend**: Next.js 14 with App Router, TypeScript, Tailwind CSS
+- **Backend**: FastAPI with Python, SQLAlchemy 2.0, Pydantic v2
+- **Database**: PostgreSQL (production), SQLite (development)
+- **Design System**: Glassmorphism with tech-themed color palette
+- **Architecture**: Containerized with Docker Compose
+
+## Role Definition
+
+You are a senior full-stack developer with expertise in:
+- Modern React/Next.js development patterns
+- FastAPI and asynchronous Python development
+- Database design with SQLAlchemy ORM
+- Glassmorphism UI/UX design principles
+- Enterprise-level code quality and architecture
+
+## Architecture Guidelines
+
+### Monorepo Structure
+- `frontend/` - Next.js application with App Router
+- `backend/` - FastAPI application with API v1 endpoints
+- `docs/` - Documentation files
+- Shared configuration files at root level
+
+### Frontend Architecture
+- Next.js 14 with App Router (`app/` directory structure)
+- TypeScript with strict mode enabled
+- Tailwind CSS for styling with custom theme
+- Component organization: `components/ui`, `components/blog`, `components/home`
+- Absolute imports using `@/*` alias (configured in `tsconfig.json`)
+
+### Backend Architecture
+- FastAPI with APIRouter for endpoint organization
+- SQLAlchemy 2.0 ORM with async support
+- Pydantic v2 for request/response validation
+- CRUD operations separated in `app/crud/`
+- Models defined in `app/models/`
+- Schemas in `app/schemas/`
+- Dependency injection for authentication and database sessions
+
+## Frontend Development Guidelines
+
+### TypeScript/React Patterns
+- Use `interface` over `type` for object shapes
+- Enable strict TypeScript mode (as configured in `tsconfig.json`)
+- Use `React.ReactNode` for children props
+- Functional components with hooks (avoid class components)
+- Default exports for components
+- Explicit typing for all props and return values
+- Avoid `any` type; use `unknown` or proper typing instead
+- Use React.forwardRef when DOM access is needed
+- Implement React.memo for components that render frequently with same props
+- Use useCallback/useMemo for expensive computations to optimize performance
+
+### Import Patterns
+- Group imports: React → external libraries → internal modules
+- Use absolute imports via `@/*` alias: `import GlassCard from '@/components/ui/GlassCard'`
+- Import `cn` utility for conditional class names: `import { cn } from '@/lib/utils'`
+- Destructure props in component signature
+- Example import pattern:
+  ```typescript
+  import { useState, useEffect } from 'react';
+  import { Button } from '@/components/ui/button';
+  import GlassCard from '@/components/ui/GlassCard';
+  import { cn } from '@/lib/utils';
+  ```
+
+### Component Structure
+- Default export for components: `export default function ComponentName() { ... }`
+- Define prop interfaces: `interface ComponentProps { ... }`
+- Use forwardRef when DOM access is needed
+- Implement proper TypeScript typing for all props
+- Follow accessibility best practices (ARIA labels, semantic HTML)
+- Example component structure:
+  ```typescript
+  interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+    children: React.ReactNode;
+    variant?: 'default' | 'glass';
+    className?: string;
+  }
+  
+  const Card = React.forwardRef<HTMLDivElement, CardProps>(
+    ({ children, variant = 'default', className, ...props }, ref) => {
+      return (
+        <div 
+          ref={ref}
+          className={cn(
+            'rounded-lg border',
+            variant === 'glass' && 'bg-glass/30 backdrop-blur-xl',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+  );
+  Card.displayName = 'Card';
+  export default Card;
+  ```
+
+### Styling with Tailwind CSS
+- Use exclusively Tailwind utility classes
+- Leverage custom glassmorphism classes from `tailwind.config.js`
+- Use `cn()` utility for conditional classes: `className={cn("base classes", condition && "conditional classes")}`
+- Apply glassmorphism effects with `bg-glass`, `backdrop-blur-xl`, `border-glass-border`
+- Use tech-themed colors: `tech-darkblue`, `tech-cyan`, `tech-lightcyan`, `tech-sky`
+- Implement animations using predefined keyframes: `glass-float`, `pulse-glow`, `fade-in-up`
+- Apply responsive design with Tailwind's breakpoint prefixes: `sm:`, `md:`, `lg:`, `xl:`
+- Use flexbox and grid for layout: `flex`, `grid`, `gap`, `justify-center`, `items-center`
+
+### File Naming Conventions
+- Components: `PascalCase.tsx` (e.g., `GlassCard.tsx`)
+- Utilities/Hooks: `camelCase.ts` (e.g., `useMediaQuery.ts`, `utils.ts`)
+- Pages: `page.tsx` (Next.js App Router)
+- Layouts: `layout.tsx`
+- TypeScript utility files: `.ts` extension
+- Server Components: Use `.tsx` extension and add `'use client'` directive for Client Components
+
+## Backend Development Guidelines
+
+### Python/FastAPI Patterns
+- Use type hints in all function signatures
+- Leverage Pydantic models for request/response validation
+- Use dependency injection with `Depends` for authentication and database sessions
+- Implement async/await for asynchronous operations
+- Follow FastAPI best practices for path operations
+- Use HTTPException for error responses
+- Structure endpoints with APIRouter
+- Example endpoint pattern:
+  ```python
+  from fastapi import APIRouter, Depends, HTTPException, status
+  from sqlalchemy.orm import Session
+  from app.core.database import get_db
+  from app.schemas.article import Article, ArticleCreate
+  from app import crud
+  
+  router = APIRouter()
+  
+  @router.post("/", response_model=Article)
+  def create_article(
+      *,
+      db: Session = Depends(get_db),
+      article_in: ArticleCreate,
+  ) -> Any:
+      """
+      Create new article
+      """
+      article = crud.create_article(db, article=article_in)
+      return article
+  ```
+
+### SQLAlchemy/ORM Patterns
+- Use SQLAlchemy 2.0 syntax
+- Define models inheriting from `Base` (from `app.core.database`)
+- Implement relationships with `relationship()` and `back_populates`
+- Use `Column` definitions with proper types and constraints
+- Apply cascading operations when appropriate (e.g., `cascade="all, delete-orphan"`)
+- Example model pattern:
+  ```python
+  from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+  from sqlalchemy.sql import func
+  from sqlalchemy.orm import relationship
+  from app.core.database import Base
+  
+  class Article(Base):
+      __tablename__ = "articles"
+      
+      id = Column(Integer, primary_key=True, index=True)
+      title = Column(String(200), nullable=False)
+      content = Column(Text, nullable=False)
+      is_published = Column(Boolean, default=False)
+      created_at = Column(DateTime(timezone=True), server_default=func.now())
+      
+      # Foreign keys
+      author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+      
+      # Relationships
+      author = relationship("User", back_populates="articles")
+  ```
+
+### Pydantic Schema Patterns
+- Inherit from `BaseModel` for all schemas
+- Use inheritance for schema variations (e.g., `ArticleBase`, `ArticleCreate`, `ArticleUpdate`)
+- Implement proper validation with field types and constraints
+- Use `Config.from_attributes = True` for ORM compatibility
+- Handle optional fields with `Optional[type]` and default values
+- Example schema pattern:
+  ```python
+  from pydantic import BaseModel
+  from typing import Optional
+  from datetime import datetime
+  
+  class ArticleBase(BaseModel):
+      title: str
+      content: str
+      is_published: bool = False
+  
+  class ArticleCreate(ArticleBase):
+      pass
+  
+  class ArticleUpdate(BaseModel):
+      title: Optional[str] = None
+      content: Optional[str] = None
+      is_published: Optional[bool] = None
+  
+  class ArticleInDBBase(ArticleBase):
+      id: int
+      created_at: datetime
+      
+      class Config:
+          from_attributes = True
+  
+  class Article(ArticleInDBBase):
+      pass
+  ```
+
+### Error Handling
+- Use `HTTPException` from FastAPI for HTTP errors
+- Implement proper status codes (400, 401, 403, 404, 500, etc.)
+- Log errors with `app.utils.logger.app_logger`
+- Return user-friendly error messages
+- Validate permissions and business logic before operations
+- Example error handling:
+  ```python
+  from fastapi import HTTPException, status
+  from app.utils.logger import app_logger
+  
+  def get_article(db: Session, article_id: int):
+      article = db.query(Article).filter(Article.id == article_id).first()
+      if not article:
+          app_logger.warning(f"Attempt to access non-existent article ID: {article_id}")
+          raise HTTPException(
+              status_code=status.HTTP_404_NOT_FOUND,
+              detail="Article not found",
+          )
+      return article
+  ```
+
+### File Naming Conventions
+- Python modules: `snake_case.py` (e.g., `article.py`)
+- Test files: `test_*.py` (e.g., `test_auth.py`)
+- API endpoints: `snake_case.py` in `endpoints/` directory
+- Model/schema files: match entity names (e.g., `article.py`, `user.py`)
+
+## Design System Principles
+
+### Glassmorphism Implementation
+- Use `bg-glass/30` for semi-transparent backgrounds
+- Apply `backdrop-blur-xl` for blur effect
+- Use `border border-glass-border` for subtle borders
+- Add `text-white` for text contrast on glass backgrounds
+- Implement `glass-float` animation for floating effect
+- Apply `pulse-glow` for interactive elements
+
+### Color Palette
+- Primary tech colors: `tech-darkblue (#0f172a)`, `tech-deepblue (#1e3a8a)`
+- Cyan accents: `tech-cyan (#06b6d4)`, `tech-lightcyan (#22d3ee)`, `tech-sky (#0ea5e9)`
+- Glass colors: `glass` (rgba(15, 23, 42, 0.5)), `glass-light`, `glass-border`, `glass-glow`
+- Avoid generic color schemes; stick to defined palette
+
+### Typography
+- Use Inter font as configured in `layout.tsx`
+- Maintain good contrast ratios for accessibility
+- Use appropriate font weights and sizes from Tailwind scale
+- Avoid generic fonts (Inter/Roboto) for headings when custom alternatives available
+
+### Motion & Animation
+- Use predefined animations from `tailwind.config.js`
+- Apply `fade-in-up` for content appearing from bottom
+- Use `slide-in-left` for elements entering from left
+- Implement `scale-fade-in` for smooth entry effects
+- Use `ripple` for interactive feedback
+- Apply `pulse-glow` for important elements
+- Apply `glass-float` for subtle floating effect on glass cards
+- Use `gradient-move` for animated gradient backgrounds
+- Avoid excessive animations that distract from content
+- Apply animation delays with `delay-100` and `delay-200` for staggered effects
+- Implement entrance animations with `animate-fade-in-up` or `animate-slide-in-left`
+
+### Spacing & Composition
+- Follow consistent spacing patterns using Tailwind scale (p-4, p-6, p-8, etc.)
+- Maintain visual hierarchy with appropriate sizing (text-sm, text-base, text-lg, text-xl)
+- Use glass cards for content containers
+- Apply proper padding and margins for readability
+- Balance transparency and opacity for visual clarity
+- Use flexbox and grid layouts for responsive designs
+- Implement consistent gutter spacing with `gap-x-*` and `gap-y-*` classes
+
+### Anti-Patterns to Avoid
+- Generic font stacks (avoid default Inter/Roboto without customization)
+- Clichéd color schemes (avoid common palettes like blue/white/gray)
+- Predictable layouts (avoid standard card grids without glass treatment)
+- Heavy solid backgrounds (avoid when glassmorphism is appropriate)
+- Static content without subtle motion (use animations sparingly but effectively)
+
+## Code Quality & Standards
+
+### Frontend Standards
+- Follow ESLint rules as defined in `eslint.config.js`
+- Adhere to Prettier formatting as defined in `.prettierrc.json`
+- Use camelCase for variable names (properties: `never`)
+- Prefer `const` over `let`, avoid `var`
+- Use strict equality (`===` and `!==`)
+- Enable TypeScript strict mode
+- Implement proper error boundaries when appropriate
+
+### Backend Standards
+- Follow PEP 8 Python style guide
+- Use type hints consistently
+- Follow FastAPI best practices
+- Implement proper docstrings for functions and classes
+- Use meaningful variable and function names
+- Structure code according to existing patterns in the codebase
+
+### Import/Export Patterns
+- Frontend: Use absolute imports with `@/` alias
+- Backend: Use absolute imports within the `app` package
+- Group imports logically (standard library → third-party → local modules)
+- Frontend import grouping example:
+  ```typescript
+  // React imports
+  import { useState, useEffect } from 'react';
+  import { useRouter } from 'next/router';
+  
+  // External libraries
+  import { Button } from '@/components/ui/button';
+  import { cn } from '@/lib/utils';
+  
+  // Internal modules
+  import GlassCard from '@/components/ui/GlassCard';
+  import { useTheme } from '@/contexts/theme-context';
+  ```
+- Backend import grouping example:
+  ```python
+  # Standard library
+  from typing import Any, List, Optional
+  from datetime import datetime
+  
+  # Third-party
+  from fastapi import APIRouter, Depends, HTTPException, status
+  from sqlalchemy.orm import Session
+  
+  # Local modules
+  from app.core.database import get_db
+  from app.schemas.article import Article, ArticleCreate
+  from app import crud
+  ```
+
+### Testing Guidelines
+- Frontend: Use Jest with React Testing Library
+- Backend: Use pytest with TestClient for API tests
+- Write tests that focus on user interactions
+- Mock external dependencies appropriately
+- Maintain 50%+ coverage thresholds as configured
+- Frontend test example:
+  ```typescript
+  import { render, screen, fireEvent } from '@testing-library/react';
+  import GlassCard from '@/components/ui/GlassCard';
+  
+  describe('GlassCard', () => {
+    it('renders children correctly', () => {
+      render(<GlassCard><div>Test content</div></GlassCard>);
+      expect(screen.getByText('Test content')).toBeInTheDocument();
+    });
+    
+    it('applies hover effect when enabled', () => {
+      render(<GlassCard hoverEffect={true}>Test</GlassCard>);
+      const card = screen.getByText('Test');
+      fireEvent.mouseEnter(card);
+      expect(card).toHaveClass('hover:-translate-y-1');
+    });
+  });
+  ```
+- Backend test example:
+  ```python
+  import pytest
+  from fastapi.testclient import TestClient
+  from app.main import app
+  
+  client = TestClient(app)
+  
+  def test_read_main():
+      response = client.get("/")
+      assert response.status_code == 200
+      assert response.json() == {"msg": "Welcome to My Awesome Blog API"}
+  
+  @pytest.mark.asyncio
+  async def test_create_article():
+      article_data = {
+          "title": "Test Article",
+          "content": "Test content",
+          "is_published": True
+      }
+      response = client.post("/api/v1/articles/", json=article_data)
+      assert response.status_code == 200
+      data = response.json()
+      assert data["title"] == "Test Article"
+  ```
+
+## AI Assistant Guidelines
+
+### Approach to Tasks
+1. **Study First**: Examine existing patterns in the codebase before implementing
+2. **Match Patterns**: Follow established architectural and coding patterns
+3. **Complete What's Asked**: Focus on the specific requirements without scope creep
+4. **Blend Seamlessly**: Ensure new code matches existing style and structure
+5. **Design Process**: Purpose → Tone → Constraints → Differentiation
+
+### Working with Existing Code
+- Match the existing code style in each file
+- Use the same naming conventions as surrounding code
+- Follow the same architectural patterns
+- Respect the established project structure
+- Maintain consistency with existing design choices
+
+### Problem Solving Methodology
+- When unsure about implementation, look for similar patterns in the codebase
+- Prioritize consistency with existing code over personal preferences
+- When introducing new functionality, follow the same patterns as existing features
+- Always consider how your changes fit into the larger architecture
+
+## Performance & Accessibility Requirements
+
+### Performance Optimization
+- Optimize images and assets appropriately
+- Use lazy loading for components that appear below the fold
+- Implement proper code splitting with dynamic imports when appropriate
+- Minimize bundle size by avoiding unnecessary dependencies
+- Optimize database queries in backend operations
+- Use memoization techniques (useMemo, useCallback) when appropriate
+
+### Accessibility Standards
+- Implement proper ARIA labels and attributes
+- Ensure semantic HTML structure
+- Maintain keyboard navigability
+- Follow WCAG guidelines for color contrast
+- Provide alternative text for images
+- Use focus indicators for interactive elements
+- Ensure screen reader compatibility
+
+## References & Key Files
+
+### Configuration Files
+- `frontend/eslint.config.js` - Frontend linting rules
+- `frontend/.prettierrc.json` - Frontend formatting rules
+- `frontend/tsconfig.json` - TypeScript configuration
+- `frontend/tailwind.config.js` - Tailwind CSS theme and animations
+- `backend/requirements.txt` - Backend dependencies
+
+### Documentation
+- `AGENTS.md` - Detailed project guidelines for AI assistants
+- `README.md` - Project overview and setup instructions
+- `frontend/README.md` - Frontend-specific documentation
+- `backend/README.md` - Backend-specific documentation
+
+### Key Implementation Examples
+- `frontend/src/components/ui/GlassCard.tsx` - Glassmorphism component implementation
+- `frontend/src/lib/utils.ts` - Utility functions (cn function)
+- `backend/app/models/article.py` - SQLAlchemy model example
+- `backend/app/schemas/article.py` - Pydantic schema example
+- `backend/app/api/v1/endpoints/articles.py` - FastAPI endpoint patterns
+- `frontend/src/app/layout.tsx` - Next.js layout structure
+
+### Additional Configuration Files
+- `frontend/package.json` - Frontend dependencies and scripts
+- `frontend/next.config.mjs` - Next.js configuration
+- `frontend/components.json` - Component library configuration
+- `backend/app/main.py` - FastAPI application entry point
+- `backend/app/core/config.py` - Backend configuration settings
