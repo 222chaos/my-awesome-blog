@@ -21,6 +21,9 @@ def get_articles(
     published_only: bool = True,
     author_id: Optional[int] = None,
     search: Optional[str] = None,
+    order_by_views: bool = False,
+    category_id: Optional[int] = None,
+    tag_id: Optional[int] = None,
 ):
     query = db.query(Article)
     
@@ -38,7 +41,23 @@ def get_articles(
         )
         query = query.filter(search_filter)
     
-    return query.order_by(Article.created_at.desc()).offset(skip).limit(limit).all()
+    # Filter by category if provided
+    if category_id is not None:
+        from app.models.article_category import ArticleCategory
+        query = query.join(ArticleCategory).filter(ArticleCategory.category_id == category_id)
+    
+    # Filter by tag if provided
+    if tag_id is not None:
+        from app.models.article_tag import ArticleTag
+        query = query.join(ArticleTag).filter(ArticleTag.tag_id == tag_id)
+    
+    # Order by views or by creation date
+    if order_by_views:
+        query = query.order_by(Article.view_count.desc(), Article.created_at.desc())
+    else:
+        query = query.order_by(Article.created_at.desc())
+    
+    return query.offset(skip).limit(limit).all()
 
 
 def create_article(db: Session, article: ArticleCreate, author_id: int) -> Article:
@@ -99,3 +118,80 @@ def increment_view_count(db: Session, article_id: int) -> Optional[Article]:
     db.commit()
     db.refresh(db_article)
     return db_article
+
+
+def get_featured_articles(db: Session, limit: int = 10):
+    """Get featured articles based on view count and publication date"""
+    return (
+        db.query(Article)
+        .filter(Article.is_published == True)
+        .order_by(Article.view_count.desc(), Article.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def get_related_articles(db: Session, article_id: int, limit: int = 5):
+    """Get articles related to a specific article based on category or tags"""
+    from app.models.article_category import ArticleCategory
+    from app.models.article_tag import ArticleTag
+    
+    # Get the original article
+    original_article = get_article(db, article_id)
+    if not original_article:
+        return []
+    
+    # Find articles in the same category
+    related_by_category = []
+    if original_article.category_id:
+        related_by_category = (
+            db.query(Article)
+            .join(ArticleCategory)
+            .filter(
+                Article.id != article_id,
+                Article.is_published == True,
+                ArticleCategory.category_id == original_article.category_id
+            )
+            .order_by(Article.view_count.desc())
+            .limit(limit)
+            .all()
+        )
+    
+    # If we don't have enough articles from the same category, get popular articles
+    if len(related_by_category) < limit:
+        remaining = limit - len(related_by_category)
+        popular_articles = (
+            db.query(Article)
+            .filter(
+                Article.id != article_id,
+                Article.is_published == True,
+                Article.id.notin_([a.id for a in related_by_category])
+            )
+            .order_by(Article.view_count.desc(), Article.created_at.desc())
+            .limit(remaining)
+            .all()
+        )
+        related_by_category.extend(popular_articles)
+    
+    return related_by_category
+
+
+def get_articles_with_categories_and_tags(db: Session, skip: int = 0, limit: int = 100, published_only: bool = True, category_id: int = None, tag_id: int = None):
+    """Get articles with optimized query including joined relationships for categories and tags"""
+    from app.models.article_category import ArticleCategory
+    from app.models.article_tag import ArticleTag
+    from app.models.category import Category
+    from app.models.tag import Tag
+    
+    query = db.query(Article)
+    
+    if published_only:
+        query = query.filter(Article.is_published == True)
+    
+    if category_id is not None:
+        query = query.join(ArticleCategory).filter(ArticleCategory.category_id == category_id)
+    
+    if tag_id is not None:
+        query = query.join(ArticleTag).filter(ArticleTag.tag_id == tag_id)
+    
+    return query.offset(skip).limit(limit).all()

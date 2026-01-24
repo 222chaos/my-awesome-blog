@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, BigInteger
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -18,13 +18,22 @@ class Article(Base):
     view_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # 新增字段
+    read_time = Column(Integer)  # 阅读时长（分钟）
+    featured_image_id = Column(Integer, ForeignKey("images.id"))
+    is_featured = Column(Boolean, default=False)
+    is_pinned = Column(Boolean, default=False)
+    meta_title = Column(String(200))
+    meta_description = Column(Text)
     
     # Foreign keys
     author_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    featured_image = relationship("Image", foreign_keys=[featured_image_id])
     
     # Relationships
     author = relationship("User", back_populates="articles")
     comments = relationship("Comment", back_populates="article", cascade="all, delete-orphan")
-    
-    # Tags will be implemented as a separate table (many-to-many)
-    # tags = relationship("Tag", secondary="article_tags", back_populates="articles")
+    categories = relationship("Category", secondary="article_categories", back_populates="articles")
+    tags = relationship("Tag", secondary="article_tags", back_populates="articles")
+    article_categories = relationship("ArticleCategory", back_populates="article", cascade="all, delete-orphan")
+    article_tags = relationship("ArticleTag", back_populates="article", cascade="all, delete-orphan")

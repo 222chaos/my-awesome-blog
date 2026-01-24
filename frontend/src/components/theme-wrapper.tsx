@@ -10,10 +10,14 @@ export default function ThemeWrapper({ children }: { children: React.ReactNode }
     setIsMounted(true);
   }, []);
 
+  // 改进：添加过渡效果，使闪烁更平滑
   return (
     <ThemeProvider>
-      {/* 在客户端挂载之前隐藏内容以避免闪烁 */}
-      <div className={!isMounted ? 'opacity-0' : 'opacity-100'}>
+      <div 
+        className={`transition-opacity duration-300 ${
+          !isMounted ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
         {children}
       </div>
     </ThemeProvider>

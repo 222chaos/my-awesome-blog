@@ -26,6 +26,7 @@ export interface FriendLink {
   id: string;
   name: string;
   url: string;
+  favicon: string;
   avatar?: string;
   description?: string;
 }
@@ -42,6 +43,13 @@ export interface PortfolioItem {
 
 // 时间轴类型
 export interface TimelineItem {
+  date: string;
+  title: string;
+  description: string;
+}
+
+// 新的时间轴事件类型
+export interface TimelineEvent {
   date: string;
   title: string;
   description: string;

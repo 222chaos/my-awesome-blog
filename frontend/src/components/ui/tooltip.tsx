@@ -1,27 +1,43 @@
 "use client"
 
 import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
 import { cn } from "@/lib/utils"
 
-// 简化的Tooltip组件，避免使用radix-ui以解决安装问题
 const TooltipProvider = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>
 }
 
-const Tooltip = ({ children, open, defaultOpen, onOpenChange }: { 
-  children: React.ReactNode, 
-  open?: boolean, 
-  defaultOpen?: boolean, 
-  onOpenChange?: (open: boolean) => void 
-}) => {
+interface TooltipProps {
+  children: React.ReactNode
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+const Tooltip = ({ children, open, defaultOpen, onOpenChange }: TooltipProps) => {
   return <>{children}</>
 }
 
-const TooltipTrigger = ({ children, ...props }: { children: React.ReactNode } & React.HTMLAttributes<HTMLButtonElement>) => {
-  return <span {...props}>{children}</span>
+interface TooltipTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean
 }
 
-const TooltipContent = ({ children, ...props }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
+const TooltipTrigger = React.forwardRef<HTMLButtonElement, TooltipTriggerProps>(
+  ({ asChild = false, children, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp ref={ref} {...props}>
+        {children}
+      </Comp>
+    )
+  }
+)
+TooltipTrigger.displayName = "TooltipTrigger"
+
+const TooltipContent = ({ children, ...props }: { 
+  children: React.ReactNode 
+} & React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div 
       className={cn(

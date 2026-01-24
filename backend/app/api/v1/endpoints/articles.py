@@ -167,3 +167,104 @@ def delete_article(
         )
     
     return {"message": "Article deleted successfully"}
+
+
+@router.get("/featured", response_model=List[ArticleWithAuthor])
+def read_featured_articles(
+    limit: int = Query(10, ge=1, le=50, description="Number of featured articles to return"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get featured/pinned articles
+    """
+    articles = crud.get_featured_articles(db, limit=limit)
+    return articles
+
+
+@router.get("/popular", response_model=List[ArticleWithAuthor])
+def read_popular_articles(
+    limit: int = Query(10, ge=1, le=50, description="Number of popular articles to return"),
+    days: int = Query(30, ge=1, description="Number of days to consider for popularity calculation"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get popular articles based on views in recent days
+    """
+    articles = crud.get_articles(
+        db,
+        skip=0,
+        limit=limit,
+        published_only=True,
+        order_by_views=True
+    )
+    return articles
+
+
+@router.get("/related/{article_id}", response_model=List[ArticleWithAuthor])
+def read_related_articles(
+    article_id: int,
+    limit: int = Query(5, ge=1, le=20, description="Number of related articles to return"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get articles related to a specific article
+    """
+    article = crud.get_article(db, article_id=article_id)
+    if not article:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
+        )
+    
+    related_articles = crud.get_related_articles(db, article_id=article_id, limit=limit)
+    return related_articles
+
+
+@router.get("/search", response_model=List[ArticleWithAuthor])
+def search_articles(
+    q: str = Query(..., min_length=1, max_length=100, description="Search query"),
+    category_slug: Optional[str] = Query(None, description="Filter by category slug"),
+    tag_slug: Optional[str] = Query(None, description="Filter by tag slug"),
+    author_id: Optional[int] = Query(None, description="Filter by author ID"),
+    published_only: bool = Query(True, description="Only return published articles"),
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Search articles by query string with optional filters
+    """
+    # Get category_id if category_slug is provided
+    category_id = None
+    if category_slug:
+        category = crud.get_category_by_slug(db, category_slug)
+        if not category:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+            )
+        category_id = category.id
+    
+    # Get tag_id if tag_slug is provided
+    tag_id = None
+    if tag_slug:
+        tag = crud.get_tag_by_slug(db, tag_slug)
+        if not tag:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Tag not found",
+            )
+        tag_id = tag.id
+    
+    articles = crud.get_articles(
+        db,
+        skip=skip,
+        limit=limit,
+        published_only=published_only,
+        author_id=author_id,
+        search=q,
+        category_id=category_id,
+        tag_id=tag_id
+    )
+    
+    return articles

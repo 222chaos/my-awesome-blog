@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Navbar from '@/components/navigation/Navbar';
 import HeroSection from '@/components/home/HeroSection';
 import PostGrid from '@/components/home/PostGrid';
 import Sidebar from '@/components/home/Sidebar';
@@ -11,13 +12,15 @@ import Timeline from '@/components/home/Timeline';
 import FriendLinks from '@/components/home/FriendLinks';
 import Portfolio from '@/components/home/Portfolio';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import type { Post, Category, PopularPost } from '@/types';
+import { Button } from '@/components/ui/Button';
+import type { Post, Category, PopularPost, TimelineItem, FriendLink } from '@/types';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineItem[]>([]);
+  const [friendLinks, setFriendLinks] = useState<FriendLink[]>([]);
 
   useEffect(() => {
     setPosts([
@@ -86,59 +89,143 @@ export default function Home() {
       { id: 'typescript-best-practices', title: 'TypeScript 最佳实践', date: '1月5日' },
       { id: 'api-design-guide', title: '现代 API 设计原则', date: '12月28日' },
     ]);
+    
+    setTimelineEvents([
+      {
+        date: '2024年1月',
+        title: '博客启动',
+        description: '开始了我的技术博客，分享知识和经验。',
+      },
+      {
+        date: '2023年12月',
+        title: 'React精通',
+        description: '完成了高级React课程，开始构建复杂应用。',
+      },
+      {
+        date: '2023年11月',
+        title: 'Next.js之旅',
+        description: '迁移到Next.js 14，使用App Router提升性能。',
+      },
+      {
+        date: '2023年10月',
+        title: '开源贡献',
+        description: '为几个开源项目和GitHub仓库做出贡献。',
+      },
+    ]);
+    
+    setFriendLinks([
+      {
+        id: '1',
+        name: 'Next.js',
+        url: 'https://nextjs.org',
+        favicon: '/assets/nextjs-logo.svg',
+        description: '生产就绪的React框架',
+      },
+      {
+        id: '2',
+        name: 'Vercel',
+        url: 'https://vercel.com',
+        favicon: '/assets/vercel-logo.svg',
+        description: '开发. 预览. 部署.',
+      },
+      {
+        id: '3',
+        name: 'Tailwind CSS',
+        url: 'https://tailwindcss.com',
+        favicon: '/assets/tailwind-logo.svg',
+        description: '快速构建现代网站',
+      },
+      {
+        id: '4',
+        name: 'Radix UI',
+        url: 'https://www.radix-ui.com',
+        favicon: '/assets/radix-logo.svg',
+        description: '无样式、可访问的UI组件',
+      },
+    ]);
   }, []);
 
   return (
     <div className="min-h-screen bg-tech-darkblue text-white">
-      <HeroSection />
-
-      <StatsPanel />
-
-      <FeaturedSection />
-
-      <div className="container mx-auto px-4 py-16">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <main className="flex-1">
-            <PostGrid posts={posts} />
-          </main>
-
-          <aside className="lg:w-80">
-            <Sidebar categories={categories} popularPosts={popularPosts} />
-          </aside>
+      <Navbar />
+      <div id="content">
+        <HeroSection />
+        
+        <div className="container mx-auto px-4 py-16">
+          <StatsPanel />
         </div>
-      </div>
-
-      <TagCloud />
-
-      <Timeline />
-
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <FriendLinks />
-          <Portfolio />
+        
+        <div className="container mx-auto px-4 py-16">
+          <FeaturedSection />
         </div>
-      </div>
-
-      <Card className="container mx-auto px-4 py-8 mt-12 glass-card glow-border">
-        <CardContent className="text-center">
-          <h3 className="text-2xl font-bold text-white mb-4 animate-fade-in-up">
-            订阅更新
-          </h3>
-          <p className="text-gray-300 max-w-2xl mx-auto mb-6">
-            加入我们的邮件列表，获取最新文章、技巧和资源。
-          </p>
-          <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="输入您的邮箱"
-              className="flex-1 px-4 py-2 rounded-md bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan backdrop-blur-lg"
-            />
-            <Button className="bg-tech-cyan text-white hover:bg-tech-lightcyan transition-colors">
-              订阅
-            </Button>
+        
+        <div className="container mx-auto px-4 py-16">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <main className="flex-1">
+              <PostGrid posts={posts} />
+            </main>
+            
+            <aside className="lg:w-80">
+              <Sidebar 
+                categories={categories} 
+                popularPosts={popularPosts} 
+              />
+            </aside>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        
+        <div className="container mx-auto px-4 py-16">
+          <TagCloud tags={categories.map(cat => ({ name: cat.name, count: cat.count }))} />
+        </div>
+        
+        <div className="container mx-auto px-4 py-16">
+          <Timeline events={timelineEvents} />
+        </div>
+        
+        <div className="container mx-auto px-4 py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <FriendLinks links={friendLinks} />
+            <Portfolio 
+              projects={[{
+                id: '1',
+                title: '电商网站',
+                description: '使用React和Node.js构建的全功能电商平台',
+                image: '/placeholder-portfolio.jpg',
+                tags: ['React', 'Node.js', 'MongoDB'],
+                link: '/projects/ecommerce',
+              }, {
+                id: '2',
+                title: '任务管理应用',
+                description: '具有实时协作功能的任务管理工具',
+                image: '/placeholder-portfolio.jpg',
+                tags: ['Vue.js', 'Firebase', 'Tailwind'],
+                link: '/projects/task-manager',
+              }]} 
+            />
+          </div>
+        </div>
+        
+        <Card className="container mx-auto px-4 py-8 mt-12 glass-card glow-border">
+          <CardContent className="text-center">
+            <h3 className="text-2xl font-bold text-white mb-4 animate-fade-in-up">
+              订阅更新
+            </h3>
+            <p className="text-gray-300 max-w-2xl mx-auto mb-6">
+              加入我们的邮件列表，获取最新文章、技巧和资源。
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="输入您的邮箱"
+                className="flex-1 px-4 py-2 rounded-md bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan backdrop-blur-lg"
+              />
+              <Button className="bg-tech-cyan text-white hover:bg-tech-lightcyan transition-colors">
+                订阅
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,6 @@
+---
+trigger: always_on
+---
 # My Awesome Blog - AI Assistant Coding Guidelines
 
 ## Project Overview & Tech Stack

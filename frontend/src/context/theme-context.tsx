@@ -22,8 +22,11 @@ export function ThemeProvider({
   storageKey?: string;
 }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem(storageKey);
-    return stored ? (stored as Theme) : defaultTheme;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(storageKey);
+      return stored ? (stored as Theme) : defaultTheme;
+    }
+    return defaultTheme;
   });
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
@@ -31,7 +34,9 @@ export function ThemeProvider({
   // 强制更新主题的方法
   const updateTheme = (newTheme: Theme) => {
     setTheme(newTheme);
-    localStorage.setItem(storageKey, newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(storageKey, newTheme);
+    }
   };
 
   // 计算实际主题
@@ -55,7 +60,9 @@ export function ThemeProvider({
     setResolvedTheme(actualTheme);
     
     // 保存到localStorage
-    localStorage.setItem(storageKey, theme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(storageKey, theme);
+    }
   }, [theme, storageKey]);
 
   // 监听系统主题变化

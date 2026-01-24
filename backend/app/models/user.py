@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -16,6 +16,13 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # 新增字段
+    avatar = Column(String(500))
+    bio = Column(Text)
+    website = Column(String(200))
+    twitter = Column(String(100))
+    github = Column(String(100))
+    linkedin = Column(String(100))
     
     # Relationships
     articles = relationship("Article", back_populates="author", cascade="all, delete-orphan")

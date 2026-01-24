@@ -133,6 +133,16 @@
   100% { background-position: 0% 50%; }
 }
 
+/* 背景漂移动画 */
+@keyframes drift {
+  0%, 100% { transform: scale(1) translateX(0) translateY(0); }
+  50% { transform: scale(1.02) translateX(-10px) translateY(-5px); }
+}
+
+.hero-bg {
+  animation: drift 20s ease-in-out infinite;
+}
+
 /* Floating animation for cards */
 .animate-float {
   animation: glass-float 6s ease-in-out infinite;
@@ -255,32 +265,7 @@
   animation: scale-fade-in 0.5s ease-out forwards;
 }
 
-/* 按钮涟漪效果 */
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
 
-.ripple-effect {
-  position: relative;
-  overflow: hidden;
-}
-
-.ripple-effect::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100px;
-  height: 100px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  opacity: 1;
-  animation: ripple 0.6s ease-out;
-}
 
 /* 下划线展开动画 */
 .nav-link {
@@ -428,6 +413,27 @@ html {
 .animate-delay-300 { animation-delay: 300ms; }
 .animate-delay-400 { animation-delay: 400ms; }
 .animate-delay-500 { animation-delay: 500ms; }
+
+/* 主题切换器动画 */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* View Transitions API */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
 
 /* 玻璃卡片变体 */
 .glass-card-primary {
