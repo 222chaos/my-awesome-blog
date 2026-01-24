@@ -1,0 +1,82 @@
+from pydantic import BaseModel
+from typing import Optional, List
+from datetime import datetime
+
+
+class ImageBase(BaseModel):
+    original_filename: str
+    file_path: str
+    file_size: int  # 字节
+    mime_type: str
+    width: Optional[int] = None
+    height: Optional[int] = None
+    alt_text: Optional[str] = None
+    caption: Optional[str] = None
+    is_optimized: Optional[bool] = False
+
+
+class ImageCreate(ImageBase):
+    original_filename: str
+    file_path: str
+    file_size: int
+    mime_type: str
+
+
+class ImageUpdate(BaseModel):
+    alt_text: Optional[str] = None
+    caption: Optional[str] = None
+
+
+class ImageInDBBase(ImageBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class Image(ImageInDBBase):
+    pass
+
+
+class ImageVariantBase(BaseModel):
+    variant_name: str  # thumbnail, small, medium, large, hero
+    file_path: str
+    width: int
+    height: int
+    file_size: int
+    quality: Optional[int] = 85
+    format: Optional[str] = 'webp'  # webp, jpeg, png
+
+
+class ImageVariantCreate(ImageVariantBase):
+    variant_name: str
+    file_path: str
+    width: int
+    height: int
+    file_size: int
+
+
+class ImageVariantUpdate(BaseModel):
+    quality: Optional[int] = None
+    format: Optional[str] = None
+
+
+class ImageVariantInDBBase(ImageVariantBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ImageVariant(ImageVariantInDBBase):
+    pass
+
+
+class ImageUploadResponse(ImageInDBBase):
+    variants: List[ImageVariant] = []
+
+
+class ImageWithVariants(Image):
+    variants: List[ImageVariant] = []
