@@ -1,19 +1,26 @@
+'use client';
+
 import Link from 'next/link';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import type { Post } from '@/types';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { PostCardSkeleton } from '@/components/blog/PostCard';
+import { useTheme } from '@/context/theme-context';
 
 interface PostCardItemProps {
   post: Post;
   index: number;
 }
 
-const PostCardItem = React.memo(({ post, index }: PostCardItemProps) => (
+interface PostCardItemWithThemeProps extends PostCardItemProps {
+  glassCardClass: string;
+}
+
+const PostCardItemWithTheme = React.memo(({ post, index, glassCardClass }: PostCardItemWithThemeProps) => (
   <Card
     key={post.id}
-    className="glass-hover group h-full flex flex-col animate-fade-scale-up"
+    className={`${glassCardClass} group h-full flex flex-col animate-fade-scale-up`}
     style={{ animationDelay: `${index * 100}ms` }}
   >
     <CardContent className="flex-grow p-6">
@@ -62,7 +69,7 @@ const PostCardItem = React.memo(({ post, index }: PostCardItemProps) => (
   </Card>
 ));
 
-PostCardItem.displayName = 'PostCardItem';
+PostCardItemWithTheme.displayName = 'PostCardItemWithTheme';
 
 interface PostGridProps {
   posts: Post[];
@@ -72,6 +79,12 @@ interface PostGridProps {
 }
 
 export default function PostGrid({ posts, loading = false, hasMore = true, onLoadMore }: PostGridProps) {
+  const { resolvedTheme } = useTheme();
+  
+  const glassCardClass = resolvedTheme === 'dark'
+    ? 'glass-card'
+    : 'bg-gray-100 shadow-lg border border-gray-200';
+  
   const [page, setPage] = useState(1);
   const [hasMoreLocal, setHasMoreLocal] = useState(hasMore);
   const [loadingLocal, setLoadingLocal] = useState(loading);
@@ -114,7 +127,7 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
   return (
     <section className="py-16 lg:py-20">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
           Latest Articles
         </h2>
 
@@ -126,7 +139,7 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
             ))
           ) : (
             posts.map((post, index) => (
-              <PostCardItem key={post.id} post={post} index={index} />
+              <PostCardItemWithTheme key={post.id} post={post} index={index} glassCardClass={glassCardClass} />
             ))
           )}
         </div>

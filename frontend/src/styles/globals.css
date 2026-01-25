@@ -19,87 +19,87 @@
     --radius: 0.5rem;
     
     /* 扩展的颜色变量 */
-    --muted: #93c5fd;
-    --muted-foreground: #3b82f6;
+    --muted: #34d399;
+    --muted-foreground: #22c55e;
     --popover: #ffffff;
     --popover-foreground: #0a0a0a;
-    --input: #93c5fd;
-    --ring: #2563eb;
+    --input: #34d399;
+    --ring: #059669;
     
     /* 玻璃效果专用变量 - 浅色主题 */
     --glass-default: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(30, 58, 138, 0.15);
-    --glass-glow: rgba(30, 58, 138, 0.2);
+    --glass-border: rgba(5, 150, 105, 0.15);
+    --glass-glow: rgba(5, 150, 105, 0.2);
     
-    /* 技术颜色变量 - 浅色白蓝主题 */
+    /* 技术颜色变量 - 浅色绿黑主题 */
     --tech-darkblue: #0f172a;
-    --tech-deepblue: #1e3a8a;
-    --tech-cyan: #0ea5e9;
-    --tech-lightcyan: #7dd3fc;
-    --tech-sky: #38bdf8;
+    --tech-deepblue: #166534;
+    --tech-cyan: #059669;
+    --tech-lightcyan: #34d399;
+    --tech-sky: #22c55e;
     
     /* 动画变量 */
     --transition-duration: 0.3s;
     --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
     
     /* 涟漪效果颜色 - 浅色主题 */
-    --ripple-color: rgba(14, 165, 233, 0.3);
+    --ripple-color: rgba(5, 150, 105, 0.3);
     
     /* 纹理叠加颜色 - 浅色主题 */
     --texture-color: rgba(0, 0, 0, 0.1);
     
     /* 技术阴影颜色 - 浅色主题 */
-    --shadow-tech-cyan: rgba(6, 182, 212, 0.5);
+    --shadow-tech-cyan: rgba(5, 150, 105, 0.5);
   }
 
   .dark {
-    --background: #0a0a0a;
+    --background: #000000;
     --foreground: #e0f2fe;
-    --primary: #0891b2;
-    --primary-foreground: #0a0a0a;
-    --secondary: #0c4a6e;
+    --primary: #059669;
+    --primary-foreground: #e0f2fe;
+    --secondary: #047857;
     --secondary-foreground: #e0f2fe;
-    --accent: #082a3c;
+    --accent: #065f46;
     --accent-foreground: #e0f2fe;
-    --card: #0a0a0a;
+    --card: #111111;
     --card-foreground: #e0f2fe;
-    --border: #0c4a6e;
+    --border: #10b981;
     --glass-light-border: rgba(16, 185, 129, 0.15);
-    
+
     /* 扩展的颜色变量 */
-    --muted: #0c4a6e;
-    --muted-foreground: #0891b2;
-    --popover: #0a0a0a;
+    --muted: #34d399;
+    --muted-foreground: #22c55e;
+    --popover: #111111;
     --popover-foreground: #e0f2fe;
-    --input: #0c4a6e;
-    --ring: #0891b2;
-    
+    --input: #34d399;
+    --ring: #059669;
+
     /* 玻璃效果专用变量 - 深色主题 */
-    --glass-default: rgba(10, 10, 10, 0.7);
-    --glass-border: rgba(16, 185, 129, 0.15);
-    --glass-glow: rgba(16, 185, 129, 0.2);
-    
-    /* 技术颜色变量 - 深色黑绿主题 */
-    --tech-darkblue: #0a0a0a;
-    --tech-deepblue: #0c4a6e;
-    --tech-cyan: #06b6d4;
+    --glass-default: rgba(30, 30, 30, 0.7);
+    --glass-border: rgba(5, 150, 105, 0.15);
+    --glass-glow: rgba(5, 150, 105, 0.2);
+
+    /* 技术颜色变量 - 深色绿黑主题 */
+    --tech-darkblue: #064e3b;
+    --tech-deepblue: #047857;
+    --tech-cyan: #059669;
     --tech-lightcyan: #10b981;
-    --tech-sky: #059669;
-    
+    --tech-sky: #22c55e;
+
     /* 涟漪效果颜色 - 深色主题 */
-    --ripple-color: rgba(6, 182, 212, 0.3);
-    
+    --ripple-color: rgba(5, 150, 105, 0.3);
+
     /* 纹理叠加颜色 - 深色主题 */
     --texture-color: rgba(0, 0, 0, 0.2);
-    
+
     /* 技术阴影颜色 - 深色主题 */
-    --shadow-tech-cyan: rgba(6, 182, 212, 0.5);
+    --shadow-tech-cyan: rgba(5, 150, 105, 0.5);
   }
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground bg-page;
   }
 }
 
@@ -112,6 +112,18 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   border-radius: 1rem;
   transition: all var(--transition-duration) var(--transition-easing);
+}
+
+/* 主背景 - 确保整个页面应用主题 */
+.bg-page {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+.dark .bg-page {
+  background: var(--background);
+  color: var(--foreground);
 }
 
 /* 主题感知的玻璃效果 */
@@ -582,6 +594,33 @@ html {
 .glass-card-secondary {
   @apply backdrop-blur-lg border border-glass-border rounded-xl;
   background: var(--glass-default);
+}
+
+/* 波浪组件样式 */
+.wave-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+}
+
+.wave-top {
+  top: 0;
+  bottom: auto;
+}
+
+.wave-stack {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
 }
 
 /* 文本渐变变体 - 浅色白蓝 */

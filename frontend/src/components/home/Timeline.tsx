@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
+import { useTheme } from '@/context/theme-context';
 
 interface TimelineEvent {
   date: string;
@@ -53,6 +54,8 @@ function TimelineEventItem({ event, index }: { event: TimelineEvent; index: numb
 }
 
 export default function Timeline({ events }: TimelineProps) {
+  const { resolvedTheme } = useTheme();
+  
   if (!events || events.length === 0) {
     return null;
   }
@@ -60,7 +63,7 @@ export default function Timeline({ events }: TimelineProps) {
   return (
     <section className="py-16 lg:py-20">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in-up" style={{ color: 'var(--foreground)' }}>
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in-up text-foreground">
           我的历程
         </h2>
 
@@ -105,7 +108,7 @@ const TimelineItem = forwardRef<HTMLDivElement, {
         padding="md"
       >
         <div className="text-sm text-tech-cyan mb-2">{event.date}</div>
-        <h4 className="text-lg font-bold text-white mb-2">{event.title}</h4>
+        <h4 className="text-lg font-bold text-foreground mb-2">{event.title}</h4>
         <p className="text-muted-foreground">{event.description}</p>
       </GlassCard>
     </div>

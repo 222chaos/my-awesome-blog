@@ -1,6 +1,9 @@
+'use client';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Code, Palette, Zap } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
+import { useTheme } from '@/context/theme-context';
 
 interface FeaturedItem {
   id: string;
@@ -11,6 +14,12 @@ interface FeaturedItem {
 }
 
 export default function FeaturedSection() {
+  const { resolvedTheme } = useTheme();
+  
+  const glassCardClass = resolvedTheme === 'dark'
+    ? 'glass-card'
+    : 'bg-gray-100 shadow-lg border border-gray-200';
+  
   const features: FeaturedItem[] = [
     {
       id: 'latest-posts',
@@ -45,7 +54,7 @@ export default function FeaturedSection() {
   return (
     <section className="py-16 lg:py-20">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
           特色推荐
         </h2>
         
@@ -55,7 +64,7 @@ export default function FeaturedSection() {
             return (
               <GlassCard
                 key={item.id}
-                className="group cursor-pointer"
+                className={`${glassCardClass} group cursor-pointer`}
                 hoverEffect={true}
                 glowEffect={true}
                 padding="lg"
@@ -66,7 +75,7 @@ export default function FeaturedSection() {
                 </div>
                 
                 {/* 标题 */}
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-tech-cyan transition-colors">
+                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-tech-cyan transition-colors">
                   {item.title}
                 </h3>
                 

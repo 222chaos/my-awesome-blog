@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import GlassCard from '@/components/ui/GlassCard';
+import { useTheme } from '@/context/theme-context';
 
 interface FriendLink {
   id: string;
@@ -14,6 +17,12 @@ interface FriendLinksProps {
 }
 
 export default function FriendLinks({ links }: FriendLinksProps) {
+  const { resolvedTheme } = useTheme();
+  
+  const glassCardClass = resolvedTheme === 'dark'
+    ? 'glass-card'
+    : 'bg-gray-100 shadow-lg border border-gray-200';
+  
   if (!links || links.length === 0) {
     return null;
   }
@@ -21,7 +30,7 @@ export default function FriendLinks({ links }: FriendLinksProps) {
   return (
     <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
           友情链接
         </h2>
         
@@ -35,7 +44,7 @@ export default function FriendLinks({ links }: FriendLinksProps) {
               className="group"
             >
               <GlassCard
-                className="h-full flex flex-col items-center justify-center p-6"
+                className={`${glassCardClass} h-full flex flex-col items-center justify-center p-6`}
                 hoverEffect={true}
                 glowEffect={true}
                 padding="md"
@@ -48,13 +57,13 @@ export default function FriendLinks({ links }: FriendLinksProps) {
                 />
                 
                 {/* 名称 */}
-                <h4 className="text-white font-medium mb-1 group-hover:text-tech-cyan transition-colors">
+                <h4 className="text-foreground font-medium mb-1 group-hover:text-tech-cyan transition-colors">
                   {link.name}
                 </h4>
                 
                 {/* 描述 */}
                 {link.description && (
-                  <p className="text-gray-400 text-sm">{link.description}</p>
+                  <p className="text-muted-foreground text-sm">{link.description}</p>
                 )}
               </GlassCard>
             </a>

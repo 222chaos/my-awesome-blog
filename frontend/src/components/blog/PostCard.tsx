@@ -1,7 +1,10 @@
+'use client';
+
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/theme-context';
 
 interface PostCardProps {
   id: string;
@@ -26,8 +29,14 @@ export default function PostCard({
   href = `/posts/${id}`,
   className
 }: PostCardProps) {
+  const { resolvedTheme } = useTheme();
+  
+  const glassCardClass = resolvedTheme === 'dark'
+    ? 'glass-card'
+    : 'bg-gray-100 shadow-lg border border-gray-200';
+  
   return (
-    <article className={cn("glass-card-secondary glass-hover group overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ", className)}>
+    <article className={cn(`${glassCardClass} group overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-xl `, className)}>
       <div className="p-6 md:p-8 flex-grow">
         {category && (
           <span className="inline-block px-3 py-1 text-xs font-semibold bg-glass rounded-full mb-4" style={{ backgroundColor: 'var(--glass-default)', color: 'var(--tech-cyan)' }}>

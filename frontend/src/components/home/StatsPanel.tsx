@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Folder, Eye, Hash } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTheme } from '@/context/theme-context';
 
 interface Stat {
   label: string;
@@ -31,6 +32,7 @@ function useNumberAnimation(target: number, duration: number = 2000) {
 }
 
 export default function StatsPanel() {
+  const { resolvedTheme } = useTheme();
   const stats: Stat[] = [
     { label: '文章', value: 105, icon: FileText },
     { label: '分类', value: 12, icon: Folder },
@@ -41,19 +43,23 @@ export default function StatsPanel() {
   return (
     <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in-up text-foreground">
           网站统计
         </h2>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, index) => {
             const animatedValue = useNumberAnimation(stat.value);
             const IconComponent = stat.icon;
-            
+
             return (
               <div
                 key={stat.label}
-                className="glass-card rounded-xl p-6 text-center hover:scale-105 transition-transform duration-300 group"
+                className={`rounded-xl p-6 text-center hover:scale-105 transition-transform duration-300 group ${
+                  resolvedTheme === 'dark'
+                    ? 'glass-card'
+                    : 'bg-white shadow-lg border border-tech-cyan/20'
+                }`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* 图标 */}
@@ -62,14 +68,14 @@ export default function StatsPanel() {
                     <IconComponent className="w-6 h-6 text-tech-cyan" />
                   </div>
                 </div>
-                
+
                 {/* 数字 */}
-                <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-3xl font-bold mb-2 text-foreground">
                   {animatedValue.toLocaleString()}+
                 </div>
-                
+
                 {/* 标签 */}
-                <p className="text-gray-400">{stat.label}</p>
+                <p className="text-muted-foreground">{stat.label}</p>
               </div>
             );
           })}

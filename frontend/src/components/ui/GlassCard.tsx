@@ -24,9 +24,7 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
     };
     
     // 根据主题确定玻璃效果类
-    const glassClass = resolvedTheme === 'light' 
-      ? 'bg-glass-light border-glass-light-border text-tech-deepblue'
-      : 'bg-glass border-glass-border text-tech-lightcyan';
+    const glassClass = `bg-glass border-glass-border text-foreground`;
     
     return (
       <div

@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import GlassCard from '@/components/ui/GlassCard';
+import { useTheme } from '@/context/theme-context';
 
 interface Project {
   id: string;
@@ -15,6 +18,12 @@ interface PortfolioProps {
 }
 
 export default function Portfolio({ projects }: PortfolioProps) {
+  const { resolvedTheme } = useTheme();
+  
+  const glassCardClass = resolvedTheme === 'dark'
+    ? 'glass-card'
+    : 'bg-gray-100 shadow-lg border border-gray-200';
+  
   if (!projects || projects.length === 0) {
     return null;
   }
@@ -22,7 +31,7 @@ export default function Portfolio({ projects }: PortfolioProps) {
   return (
     <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
           作品集
         </h2>
         
@@ -30,7 +39,7 @@ export default function Portfolio({ projects }: PortfolioProps) {
           {projects.map((project) => (
             <GlassCard
               key={project.id}
-              className="group cursor-pointer overflow-hidden"
+              className={`${glassCardClass} group cursor-pointer overflow-hidden`}
               hoverEffect={true}
               padding="none"
             >
@@ -48,7 +57,7 @@ export default function Portfolio({ projects }: PortfolioProps) {
               
               {/* 内容区 */}
               <div className="p-6">
-                <h4 className="text-xl font-bold text-white mb-2 group-hover:text-tech-cyan transition-colors">
+                <h4 className="text-xl font-bold text-foreground mb-2 group-hover:text-tech-cyan transition-colors">
                   {project.title}
                 </h4>
                 

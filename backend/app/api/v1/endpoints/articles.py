@@ -55,120 +55,6 @@ def create_article(
     return article
 
 
-@router.get("/{article_id}", response_model=ArticleWithAuthor)
-def read_article_by_id(
-    article_id: int,
-    db: Session = Depends(get_db)
-) -> Any:
-    """
-    Get a specific article by id
-    """
-    article = crud.get_article(db, article_id=article_id)
-    if not article:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Article not found",
-        )
-    
-    # Increment view count
-    crud.increment_view_count(db, article_id=article_id)
-    
-    return article
-
-
-@router.get("/slug/{slug}", response_model=ArticleWithAuthor)
-def read_article_by_slug(
-    slug: str,
-    db: Session = Depends(get_db)
-) -> Any:
-    """
-    Get a specific article by slug
-    """
-    article = crud.get_article_by_slug(db, slug=slug)
-    if not article:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Article not found",
-        )
-    
-    # Increment view count
-    crud.increment_view_count(db, article_id=article.id)  # type: ignore
-    
-    return article
-
-
-@router.put("/{article_id}", response_model=Article)
-def update_article(
-    *,
-    db: Session = Depends(get_db),
-    article_id: int,
-    article_in: ArticleUpdate,
-    current_user: User = Depends(get_current_active_user)
-) -> Any:
-    """
-    Update an article
-    """
-    article = crud.get_article(db, article_id=article_id)
-    if not article:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Article not found",
-        )
-    
-    # Check permission: only author or superuser can update
-    if article.author_id != current_user.id and not current_user.is_superuser:  # type: ignore
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to update this article",
-        )
-    
-    # Check if slug is being updated and already exists
-    if article_in.slug and article_in.slug != article.slug:
-        existing_article = crud.get_article_by_slug(db, slug=article_in.slug)
-        if existing_article:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="An article with this slug already exists",
-            )
-    
-    article = crud.update_article(db, article_id=article_id, article_update=article_in)
-    return article
-
-
-@router.delete("/{article_id}", response_model=dict)
-def delete_article(
-    *,
-    db: Session = Depends(get_db),
-    article_id: int,
-    current_user: User = Depends(get_current_active_user)
-) -> Any:
-    """
-    Delete an article
-    """
-    article = crud.get_article(db, article_id=article_id)
-    if not article:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Article not found",
-        )
-    
-    # Check permission: only author or superuser can delete
-    if article.author_id != current_user.id and not current_user.is_superuser:  # type: ignore
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to delete this article",
-        )
-    
-    deleted = crud.delete_article(db, article_id=article_id)
-    if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Article not found",
-        )
-    
-    return {"message": "Article deleted successfully"}
-
-
 @router.get("/featured", response_model=List[ArticleWithAuthor])
 def read_featured_articles(
     limit: int = Query(10, ge=1, le=50, description="Number of featured articles to return"),
@@ -198,26 +84,6 @@ def read_popular_articles(
         order_by_views=True
     )
     return articles
-
-
-@router.get("/related/{article_id}", response_model=List[ArticleWithAuthor])
-def read_related_articles(
-    article_id: int,
-    limit: int = Query(5, ge=1, le=20, description="Number of related articles to return"),
-    db: Session = Depends(get_db)
-) -> Any:
-    """
-    Get articles related to a specific article
-    """
-    article = crud.get_article(db, article_id=article_id)
-    if not article:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Article not found",
-        )
-    
-    related_articles = crud.get_related_articles(db, article_id=article_id, limit=limit)
-    return related_articles
 
 
 @router.get("/search", response_model=List[ArticleWithAuthor])
@@ -268,3 +134,65 @@ def search_articles(
     )
     
     return articles
+
+
+@router.get("/slug/{slug}", response_model=ArticleWithAuthor)
+def read_article_by_slug(
+    slug: str,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get a specific article by slug
+    """
+    article = crud.get_article_by_slug(db, slug=slug)
+    if not article:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
+        )
+    
+    # Increment view count
+    crud.increment_view_count(db, article_id=article.id)  # type: ignore
+    
+    return article
+
+
+@router.get("/related/{article_id}", response_model=List[ArticleWithAuthor])
+def read_related_articles(
+    article_id: int,
+    limit: int = Query(5, ge=1, le=20, description="Number of related articles to return"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get articles related to a specific article
+    """
+    article = crud.get_article(db, article_id=article_id)
+    if not article:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
+        )
+    
+    related_articles = crud.get_related_articles(db, article_id=article_id, limit=limit)
+    return related_articles
+
+
+@router.get("/{article_id}", response_model=ArticleWithAuthor)
+def read_article_by_id(
+    article_id: int,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get a specific article by id
+    """
+    article = crud.get_article(db, article_id=article_id)
+    if not article:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
+        )
+    
+    # Increment view count
+    crud.increment_view_count(db, article_id=article_id)
+    
+    return article

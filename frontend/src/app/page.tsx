@@ -146,18 +146,18 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div id="content">
+      <div id="content" className="bg-background">
         <HeroSection />
         
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16 bg-background">
           <StatsPanel />
         </div>
         
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16 bg-background">
           <FeaturedSection />
         </div>
         
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16 bg-background">
           <div className="flex flex-col lg:flex-row gap-8">
             <main className="flex-1">
               <PostGrid posts={posts} />
@@ -172,15 +172,15 @@ export default function Home() {
           </div>
         </div>
         
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16 bg-background">
           <TagCloud tags={categories.map(cat => ({ name: cat.name, count: cat.count }))} />
         </div>
         
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16 bg-background">
           <Timeline events={timelineEvents} />
         </div>
         
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-16 bg-background">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <FriendLinks links={friendLinks} />
             <Portfolio 
@@ -205,17 +205,17 @@ export default function Home() {
         
         <Card className="container mx-auto px-4 py-8 mt-12 glass-card glow-border">
           <CardContent className="text-center">
-            <h3 className="text-2xl font-bold text-white mb-4 animate-fade-in-up">
+            <h3 className="text-2xl font-bold text-foreground mb-4 animate-fade-in-up">
               订阅更新
             </h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
+            <p className="text-foreground max-w-2xl mx-auto mb-6">
               加入我们的邮件列表，获取最新文章、技巧和资源。
             </p>
             <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
               <input
                 type="email"
                 placeholder="输入您的邮箱"
-                className="flex-1 px-4 py-2 rounded-md bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan backdrop-blur-lg"
+                className="flex-1 px-4 py-2 rounded-md bg-glass border border-glass-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan backdrop-blur-lg"
               />
               <Button className="bg-tech-cyan text-white hover:bg-tech-lightcyan transition-colors">
                 订阅

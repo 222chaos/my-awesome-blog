@@ -1,4 +1,5 @@
 import sys
+import os
 from datetime import datetime
 from loguru import logger
 from app.core.config import settings
@@ -8,6 +9,10 @@ def setup_logger():
     """Configure and setup the logger with custom format and rotation."""
     # Remove default logger
     logger.remove()
+    
+    # Create logs directory if it doesn't exist
+    log_dir = settings.LOG_DIR
+    os.makedirs(log_dir, exist_ok=True)
     
     # Add custom logger with file rotation
     log_format = (
@@ -27,7 +32,7 @@ def setup_logger():
     
     # File logger with rotation
     logger.add(
-        f"logs/app_{datetime.now().strftime('%Y%m%d')}.log",
+        f"{log_dir}/app_{datetime.now().strftime('%Y%m%d')}.log",
         format=log_format,
         level="INFO",
         rotation="10 MB",
@@ -37,7 +42,7 @@ def setup_logger():
     
     # Error file logger for critical issues
     logger.add(
-        f"logs/errors_{datetime.now().strftime('%Y%m%d')}.log",
+        f"{log_dir}/errors_{datetime.now().strftime('%Y%m%d')}.log",
         format=log_format,
         level="ERROR",
         rotation="10 MB",
@@ -58,11 +63,6 @@ def get_logger(name: str = None):
     if name:
         return app_logger.bind(name=name)
     return app_logger
-
-
-# Create logs directory if it doesn't exist
-import os
-os.makedirs("logs", exist_ok=True)
 
 
 __all__ = ["app_logger", "get_logger"]

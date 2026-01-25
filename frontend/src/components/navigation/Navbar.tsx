@@ -48,15 +48,15 @@ export default function Navbar() {
         onMouseLeave={() => setIsHovered(false)}
         className={`sticky top-0 z-[100] w-full transition-all duration-300 ${
           scrolled || isHovered
-            ? 'bg-black/60 backdrop-blur-3xl shadow-2xl'
+            ? 'bg-glass backdrop-blur-3xl shadow-2xl'
             : 'bg-transparent backdrop-blur-0'
         }`}
       >
         <div className="w-full h-16 flex items-center">
           <Link href="/" className="flex items-center space-x-2 group">
-            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300 text-white">⚡</span>
-            <span className="font-bold text-xl text-gradient-primary hidden sm:inline-block text-white">
-              我的优秀博客
+            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300 text-foreground">⚡</span>
+            <span className="font-bold text-xl text-gradient-primary hidden sm:inline-block text-foreground">
+              Awesome Blog
             </span>
           </Link>
 
@@ -70,7 +70,7 @@ export default function Navbar() {
                     className={`nav-link relative text-sm font-medium transition-colors flex items-center py-2 space-x-1 ${
                       pathname === link.href
                         ? "text-tech-cyan"
-                        : "text-white/80 hover:text-tech-cyan"
+                        : "text-foreground/80 hover:text-tech-cyan"
                     }`}
                   >
                     <IconComponent className="h-4 w-4" />
@@ -84,13 +84,13 @@ export default function Navbar() {
             })}
           </nav>
 
-          <div className="flex items-center space-x-2 ml-4 text-white">
+          <div className="flex items-center space-x-2 ml-4 text-foreground">
             <RopeThemeToggler ropeLength={120} className="hidden md:flex" />
             <RopeThemeToggler ropeLength={60} className="flex md:hidden" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="glass" size="sm" className="flex items-center text-white">
-                  <User className="h-4 w-4 text-white" />
+                <Button variant="glass" size="sm" className="flex items-center text-foreground">
+                  <User className="h-4 w-4 text-foreground" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">

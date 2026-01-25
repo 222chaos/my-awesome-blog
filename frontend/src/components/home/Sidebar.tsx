@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -5,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/Button';
 import type { Category, PopularPost } from '@/types';
 import { Twitter, Github, Linkedin, FileText, Folder, Eye } from 'lucide-react';
+import { useTheme } from '@/context/theme-context';
 
 interface StatsItem {
   icon: React.ElementType;
@@ -28,10 +31,16 @@ export default function Sidebar({
     { icon: Eye, label: '访问', value: 12500, color: 'text-tech-lightcyan' },
   ],
 }: SidebarProps) {
+  const { resolvedTheme } = useTheme();
+  
+  const glassCardClass = resolvedTheme === 'dark'
+    ? 'glass-card'
+    : 'bg-gray-100 shadow-lg border border-gray-200';
+  
   return (
     <div className="space-y-6">
       {/* 个人信息卡片 */}
-      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+      <Card className={`${glassCardClass} animate-fade-in-up`} style={{ animationDelay: '0ms' }}>
         <CardHeader className="text-center pb-4">
           <div className="flex justify-center mb-4">
             <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-tech-cyan to-tech-sky p-1">
@@ -40,7 +49,7 @@ export default function Sidebar({
               </div>
             </div>
           </div>
-          <CardTitle className="text-xl text-white mb-1">John Doe</CardTitle>
+          <CardTitle className="text-xl text-foreground mb-1">John Doe</CardTitle>
           <p className="text-sm text-muted-foreground">
             Tech enthusiast & developer
           </p>
@@ -92,9 +101,9 @@ export default function Sidebar({
       </Card>
 
       {/* 分类卡片 */}
-      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+      <Card className={`${glassCardClass} animate-fade-in-up`} style={{ animationDelay: '100ms' }}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
             <span className="text-tech-cyan">📁</span>
             Categories
           </CardTitle>
@@ -107,7 +116,7 @@ export default function Sidebar({
                 href={`/category/${category.name}` as any}
                 className="flex justify-between items-center py-3 px-4 rounded-lg transition-all group cursor-pointer"
               >
-                <span className="text-gray-200 group-hover:text-tech-lightcyan transition-colors">
+                <span className="text-muted-foreground group-hover:text-tech-lightcyan transition-colors">
                   {category.name}
                 </span>
                 <span className="text-tech-cyan text-sm font-semibold">
@@ -120,9 +129,9 @@ export default function Sidebar({
       </Card>
 
       {/* 热门文章卡片 */}
-      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+      <Card className={`${glassCardClass} animate-fade-in-up`} style={{ animationDelay: '200ms' }}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
             <span className="text-tech-cyan">🔥</span>
             Popular Posts
           </CardTitle>
@@ -135,10 +144,10 @@ export default function Sidebar({
                 href={`/posts/${post.id}`}
                 className="block group"
               >
-                <h4 className="font-medium text-gray-200 group-hover:text-tech-cyan transition-colors mb-1 line-clamp-2">
+                <h4 className="font-medium text-muted-foreground group-hover:text-tech-cyan transition-colors mb-1 line-clamp-2">
                   {post.title}
                 </h4>
-                <p className="text-xs text-gray-400 flex items-center gap-2">
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <span>{post.date}</span>
                 </p>
               </Link>
@@ -148,9 +157,9 @@ export default function Sidebar({
       </Card>
 
       {/* 订阅卡片 */}
-      <Card className="glass-hover animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+      <Card className={`${glassCardClass} animate-fade-in-up`} style={{ animationDelay: '300ms' }}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+          <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
             <span className="text-tech-cyan">📧</span>
             Subscribe
           </CardTitle>

@@ -1,4 +1,7 @@
+'use client';
+
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/context/theme-context';
 
 interface Tag {
   name: string;
@@ -21,11 +24,13 @@ function getSizeClass(count: number, maxCount: number): string {
 function getColorClass(count: number, maxCount: number): string {
   const ratio = count / maxCount;
   if (ratio > 0.8) return 'text-tech-cyan border-tech-cyan';
-  if (ratio > 0.5) return 'text-gray-200 border-glass-border';
-  return 'text-gray-400 border-glass-border';
+  if (ratio > 0.5) return 'text-muted-foreground border-glass-border';
+  return 'text-muted-foreground border-glass-border';
 }
 
 export default function TagCloud({ tags }: TagCloudProps) {
+  const { resolvedTheme } = useTheme();
+  
   if (!tags || tags.length === 0) {
     return null;
   }
@@ -36,7 +41,7 @@ export default function TagCloud({ tags }: TagCloudProps) {
   return (
     <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
           标签云
         </h2>
         

@@ -1,10 +1,8 @@
 from typing import Optional
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
+from app.core.security import pwd_context
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
-
-from app.core.security import pwd_context
 
 
 def get_password_hash(password: str) -> str:
@@ -15,11 +13,6 @@ def get_password_hash(password: str) -> str:
         truncated = password.encode('utf-8')[:71].decode('utf-8', errors='ignore')
         return pwd_context.hash(truncated)
     return pwd_context.hash(password)
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    from app.core.security import verify_password as verify_password_security
-    return verify_password_security(plain_password, hashed_password)
 
 
 def get_user(db: Session, user_id: int) -> Optional[User]:
@@ -45,6 +38,12 @@ def create_user(db: Session, user: UserCreate) -> User:
         email=user.email,
         hashed_password=hashed_password,
         full_name=user.full_name,
+        avatar=user.avatar,
+        bio=user.bio,
+        website=user.website,
+        twitter=user.twitter,
+        github=user.github,
+        linkedin=user.linkedin,
     )
     db.add(db_user)
     db.commit()
@@ -85,7 +84,7 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
     user = get_user_by_username(db, username)
     if not user:
         return None
-    from app.core.security import verify_password as verify_password_security
-    if not verify_password_security(password, str(user.hashed_password)):
+    from app.core.security import verify_password
+    if not verify_password(password, str(user.hashed_password)):
         return None
     return user
