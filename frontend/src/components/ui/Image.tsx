@@ -36,7 +36,7 @@ export default function Image({ src, alt, className, ...props }: ImageProps) {
   return (
     <div ref={imgRef} className={cn('overflow-hidden', className)}>
       {!isLoaded && (
-        <div className="w-full h-full bg-glass/30 animate-pulse rounded-lg" />
+        <div className="w-full h-full animate-pulse rounded-lg" style={{ backgroundColor: 'var(--glass-default)' }} />
       )}
       {isInView && (
         <img

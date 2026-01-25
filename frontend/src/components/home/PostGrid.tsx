@@ -17,26 +17,29 @@ const PostCardItem = React.memo(({ post, index }: PostCardItemProps) => (
     style={{ animationDelay: `${index * 100}ms` }}
   >
     <CardContent className="flex-grow p-6">
-      <span className="inline-block px-3 py-1 text-xs font-semibold text-tech-cyan bg-glass/50 rounded-full mb-4">
+      <span className="inline-block px-3 py-1 text-xs font-semibold bg-glass rounded-full mb-4" style={{ backgroundColor: 'var(--glass-default)', color: 'var(--tech-cyan)' }}>
         {post.category}
       </span>
 
-      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-tech-lightcyan transition-colors">
+      <h3 className="text-xl font-bold mb-3 group-hover:text-tech-lightcyan transition-colors" style={{ color: 'var(--foreground)' }}>
         {post.title}
       </h3>
 
-      <p className="text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
+      <p className="mb-4 line-clamp-3" style={{ color: 'var(--foreground)' }}>{post.excerpt}</p>
 
-      <div className="flex justify-between items-center text-sm text-gray-400">
-        <span>{post.date}</span>
-        <span>{post.readTime}</span>
+      <div className="flex justify-between items-center text-sm" style={{ color: 'var(--muted-foreground)' }}>
+        <span style={{ color: 'var(--muted-foreground)' }}>{post.date}</span>
+        <span style={{ color: 'var(--muted-foreground)' }}>{post.readTime}</span>
       </div>
     </CardContent>
 
     <CardFooter className="mt-auto">
       <Link
         href={`/posts/${post.id}`}
-        className="text-tech-cyan hover:text-tech-lightcyan font-medium inline-flex items-center group-hover:translate-x-1 transition-transform"
+        className="font-medium inline-flex items-center group-hover:translate-x-1 transition-transform"
+        style={{ color: 'var(--tech-cyan)' }}
+        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--tech-lightcyan)'}
+        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--tech-cyan)'}
         aria-label={`阅读文章: ${post.title}`}
       >
         Read more

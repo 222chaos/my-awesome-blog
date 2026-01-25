@@ -30,7 +30,7 @@ const ScrollBar = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "absolute bottom-0 right-0 top-0 w-2.5 bg-glass/20 hover:bg-glass/40 transition-colors",
+      "absolute bottom-0 right-0 top-0 w-2.5 transition-colors",
       "data-[orientation=horizontal]:bottom-0 data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-full",
       className
     )}

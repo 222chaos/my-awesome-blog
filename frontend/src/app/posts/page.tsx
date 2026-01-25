@@ -39,13 +39,13 @@ export default function PostsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-tech-darkblue">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-20 lg:py-24">
         <GlassCard className="max-w-4xl mx-auto mb-12 text-center animate-fade-in-up">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             最新文章
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             关于现代Web开发的见解和教程
           </p>
         </GlassCard>
@@ -65,7 +65,7 @@ export default function PostsPage() {
         {samplePosts.length === 0 && (
           <div className="text-center py-16 animate-fade-in-up">
             <h2 className="text-2xl font-semibold text-white mb-2">暂无文章</h2>
-            <p className="text-gray-300 mb-6">
+            <p className="text-muted-foreground mb-6">
               敬请期待新文章！
             </p>
           </div>

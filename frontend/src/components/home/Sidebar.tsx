@@ -41,7 +41,7 @@ export default function Sidebar({
             </div>
           </div>
           <CardTitle className="text-xl text-white mb-1">John Doe</CardTitle>
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-muted-foreground">
             Tech enthusiast & developer
           </p>
         </CardHeader>
@@ -50,21 +50,21 @@ export default function Sidebar({
             <Link
               href="#"
               aria-label="访问Twitter"
-              className="w-10 h-10 rounded-lg bg-glass/50 flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan hover:bg-glass/80 transition-all"
+              className="w-10 h-10 rounded-lg bg-glass flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan transition-all" style={{ backgroundColor: 'var(--glass-default)' }}
             >
               <Twitter className="h-5 w-5" />
             </Link>
             <Link
               href="#"
               aria-label="访问GitHub"
-              className="w-10 h-10 rounded-lg bg-glass/50 flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan hover:bg-glass/80 transition-all"
+              className="w-10 h-10 rounded-lg bg-glass flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan transition-all" style={{ backgroundColor: 'var(--glass-default)' }}
             >
               <Github className="h-5 w-5" />
             </Link>
             <Link
               href="#"
               aria-label="访问LinkedIn"
-              className="w-10 h-10 rounded-lg bg-glass/50 flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan hover:bg-glass/80 transition-all"
+              className="w-10 h-10 rounded-lg bg-glass flex items-center justify-center text-tech-cyan hover:text-tech-lightcyan transition-all" style={{ backgroundColor: 'var(--glass-default)' }}
             >
               <Linkedin className="h-5 w-5" />
             </Link>
@@ -75,8 +75,8 @@ export default function Sidebar({
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className="group flex items-center justify-between p-3 rounded-lg bg-glass/30 border border-glass-border/50 hover:bg-glass/50 transition-all duration-300"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="group flex items-center justify-between p-3 rounded-lg border border-glass-border transition-all duration-300"
+                style={{ backgroundColor: 'var(--glass-default)', animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-center space-x-3">
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
@@ -105,7 +105,7 @@ export default function Sidebar({
               <Link
                 key={index}
                 href={`/category/${category.name}` as any}
-                className="flex justify-between items-center py-3 px-4 rounded-lg hover:bg-glass/50 transition-all group cursor-pointer"
+                className="flex justify-between items-center py-3 px-4 rounded-lg transition-all group cursor-pointer"
               >
                 <span className="text-gray-200 group-hover:text-tech-lightcyan transition-colors">
                   {category.name}
@@ -156,7 +156,7 @@ export default function Sidebar({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-300 text-sm mb-4">
+          <p className="text-muted-foreground text-sm mb-4">
             Get the latest posts delivered right to your inbox.
           </p>
           <div className="space-y-3">
@@ -164,7 +164,7 @@ export default function Sidebar({
               type="email"
               placeholder="Your email address"
               aria-label="输入邮箱地址"
-              className="w-full px-4 py-2.5 rounded-lg bg-glass/50 border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan transition-all"
+              className="w-full px-4 py-2.5 rounded-lg bg-glass border border-glass-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tech-cyan transition-all" style={{ backgroundColor: 'var(--glass-default)', color: 'var(--foreground)' }}
             />
             <Button className="w-full bg-gradient-to-r from-tech-cyan to-tech-sky text-white hover:shadow-lg hover:shadow-tech-cyan/20 transition-all">
               Subscribe

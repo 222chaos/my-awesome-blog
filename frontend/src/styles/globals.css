@@ -8,74 +8,92 @@
     --foreground: #0a0a0a;
     --primary: #2563eb;
     --primary-foreground: #f8fafc;
-    --secondary: #f1f5f9;
-    --secondary-foreground: #0f172a;
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
+    --secondary: #dbeafe;
+    --secondary-foreground: #1e3a8a;
+    --accent: #dbeafe;
+    --accent-foreground: #1e3a8a;
     --card: #ffffff;
     --card-foreground: #0a0a0a;
-    --border: #e2e8f0;
-    --glass-light-border: rgba(0, 0, 0, 0.1);
+    --border: #93c5fd;
+    --glass-light-border: rgba(30, 58, 138, 0.15);
     --radius: 0.5rem;
     
     /* 扩展的颜色变量 */
-    --muted: #94a3b8;
-    --muted-foreground: #64748b;
+    --muted: #93c5fd;
+    --muted-foreground: #3b82f6;
     --popover: #ffffff;
     --popover-foreground: #0a0a0a;
-    --input: #e2e8f0;
+    --input: #93c5fd;
     --ring: #2563eb;
     
-    /* 玻璃效果专用变量 */
+    /* 玻璃效果专用变量 - 浅色主题 */
     --glass-default: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(0, 0, 0, 0.1);
-    --glass-glow: rgba(37, 99, 235, 0.2);
+    --glass-border: rgba(30, 58, 138, 0.15);
+    --glass-glow: rgba(30, 58, 138, 0.2);
     
-    /* 技术颜色变量 */
+    /* 技术颜色变量 - 浅色白蓝主题 */
     --tech-darkblue: #0f172a;
     --tech-deepblue: #1e3a8a;
-    --tech-cyan: #06b6d4;
-    --tech-lightcyan: #22d3ee;
-    --tech-sky: #0ea5e9;
+    --tech-cyan: #0ea5e9;
+    --tech-lightcyan: #7dd3fc;
+    --tech-sky: #38bdf8;
     
     /* 动画变量 */
     --transition-duration: 0.3s;
     --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* 涟漪效果颜色 - 浅色主题 */
+    --ripple-color: rgba(14, 165, 233, 0.3);
+    
+    /* 纹理叠加颜色 - 浅色主题 */
+    --texture-color: rgba(0, 0, 0, 0.1);
+    
+    /* 技术阴影颜色 - 浅色主题 */
+    --shadow-tech-cyan: rgba(6, 182, 212, 0.5);
   }
 
   .dark {
     --background: #0a0a0a;
-    --foreground: #f8fafc;
-    --primary: #3b82f6;
+    --foreground: #e0f2fe;
+    --primary: #0891b2;
     --primary-foreground: #0a0a0a;
-    --secondary: #334155;
-    --secondary-foreground: #f8fafc;
-    --accent: #1e293b;
-    --accent-foreground: #f8fafc;
+    --secondary: #0c4a6e;
+    --secondary-foreground: #e0f2fe;
+    --accent: #082a3c;
+    --accent-foreground: #e0f2fe;
     --card: #0a0a0a;
-    --card-foreground: #f8fafc;
-    --border: #334155;
-    --glass-light-border: rgba(255, 255, 255, 0.1);
+    --card-foreground: #e0f2fe;
+    --border: #0c4a6e;
+    --glass-light-border: rgba(16, 185, 129, 0.15);
     
     /* 扩展的颜色变量 */
-    --muted: #64748b;
-    --muted-foreground: #94a3b8;
+    --muted: #0c4a6e;
+    --muted-foreground: #0891b2;
     --popover: #0a0a0a;
-    --popover-foreground: #f8fafc;
-    --input: #334155;
-    --ring: #3b82f6;
+    --popover-foreground: #e0f2fe;
+    --input: #0c4a6e;
+    --ring: #0891b2;
     
-    /* 玻璃效果专用变量 */
-    --glass-default: rgba(15, 23, 42, 0.7);
-    --glass-border: rgba(34, 211, 238, 0.15);
-    --glass-glow: rgba(6, 182, 212, 0.3);
+    /* 玻璃效果专用变量 - 深色主题 */
+    --glass-default: rgba(10, 10, 10, 0.7);
+    --glass-border: rgba(16, 185, 129, 0.15);
+    --glass-glow: rgba(16, 185, 129, 0.2);
     
-    /* 技术颜色变量 */
-    --tech-darkblue: #0f172a;
-    --tech-deepblue: #1e3a8a;
+    /* 技术颜色变量 - 深色黑绿主题 */
+    --tech-darkblue: #0a0a0a;
+    --tech-deepblue: #0c4a6e;
     --tech-cyan: #06b6d4;
-    --tech-lightcyan: #22d3ee;
-    --tech-sky: #0ea5e9;
+    --tech-lightcyan: #10b981;
+    --tech-sky: #059669;
+    
+    /* 涟漪效果颜色 - 深色主题 */
+    --ripple-color: rgba(6, 182, 212, 0.3);
+    
+    /* 纹理叠加颜色 - 深色主题 */
+    --texture-color: rgba(0, 0, 0, 0.2);
+    
+    /* 技术阴影颜色 - 深色主题 */
+    --shadow-tech-cyan: rgba(6, 182, 212, 0.5);
   }
 }
 
@@ -87,59 +105,59 @@
 
 /* 轻度磨砂玻璃 - 可读性优先 */
 .glass-card {
-  background: rgba(15, 23, 42, 0.5); /* 降低透明度 */
-  backdrop-filter: blur(16px); /* 增加模糊 */
+  background: var(--glass-default);
+  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(34, 211, 238, 0.15); /* 降低边框透明度 */
+  border: 1px solid var(--glass-border);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   border-radius: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 /* 主题感知的玻璃效果 */
 .glass {
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--glass-default);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(34, 211, 238, 0.15);
+  border: 1px solid var(--glass-border);
   border-radius: 1rem;
-  transition: all 0.3s ease;
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-default);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: 1rem;
   transition: all 0.3s ease;
 }
 
 /* 深色模式下的玻璃效果调整 */
 .dark .glass {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(34, 211, 238, 0.15);
+  background: var(--glass-default);
+  border: 1px solid var(--glass-border);
 }
 
 /* 浅色模式下的玻璃效果调整 */
 .light .glass {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--glass-default);
+  border: 1px solid var(--glass-border);
 }
 
 /* 悬停增强效果 */
 .glass-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-duration) var(--transition-easing);
   will-change: transform;
 }
 
 .glass-hover:hover {
-  background: rgba(30, 58, 138, 0.6);
-  border: 1px solid rgba(6, 182, 212, 0.4);
+  background: var(--glass-default);
+  border: 1px solid var(--tech-cyan);
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4),
-              0 0 30px rgba(6, 182, 212, 0.3);
+              0 0 30px var(--shadow-tech-cyan);
   transform: translateY(-8px) scale(1.02);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 /* 轻微悬停效果 - 用于较小的元素 */
@@ -148,25 +166,31 @@
 }
 
 .glass-hover-subtle:hover {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(6, 182, 212, 0.25);
+  background: var(--glass-default);
+  border: 1px solid var(--tech-cyan);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2),
-              0 0 15px rgba(6, 182, 212, 0.15);
+              0 0 15px var(--shadow-tech-cyan);
   transform: translateY(-2px);
 }
 
 /* 发光效果 */
 .glass-glow {
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 15px var(--shadow-tech-cyan);
 }
 
 .glass-glow:hover {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 30px var(--shadow-tech-cyan);
 }
 
-/* Gradient backgrounds */
+/* Gradient backgrounds - 使用CSS变量 */
 .gradient-bg {
-  background: linear-gradient(-45deg, #0f172a, #1e3a8a, #06b6d4, #22d3ee);
+  background: linear-gradient(-45deg, var(--background), var(--tech-deepblue), var(--tech-cyan), var(--tech-sky));
+  background-size: 400% 400%;
+  animation: gradient-move 8s ease infinite;
+}
+
+.dark .gradient-bg {
+  background: linear-gradient(-45deg, var(--background), var(--tech-deepblue), var(--tech-lightcyan), var(--tech-sky));
   background-size: 400% 400%;
   animation: gradient-move 8s ease infinite;
 }
@@ -203,8 +227,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.6); }
+  0%, 100% { box-shadow: 0 0 15px var(--shadow-tech-cyan); }
+  50% { box-shadow: 0 0 25px var(--shadow-tech-cyan); }
 }
 
 /* Custom scrollbar */
@@ -311,7 +335,7 @@
 
 
 
-/* 下划线展开动画 */
+/* 下划线展开动画 - 浅色白蓝 */
 .nav-link {
   position: relative;
 }
@@ -323,8 +347,12 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #06B6D4, #22D3EE);
+  background: linear-gradient(90deg, var(--tech-cyan), var(--tech-sky));
   transition: width 0.3s ease;
+}
+
+.dark .nav-link::after {
+  background: linear-gradient(90deg, var(--tech-lightcyan), var(--tech-sky));
 }
 
 .nav-link:hover::after,
@@ -332,15 +360,22 @@
   width: 100%;
 }
 
-/* 文本渐变 */
+/* 文本渐变 - 使用CSS变量 */
 .text-gradient {
-  background: linear-gradient(135deg, #06B6D4, #22D3EE, #0EA5E9);
+  background: linear-gradient(135deg, var(--tech-cyan), var(--tech-sky), var(--tech-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* 发光边框 */
+.dark .text-gradient {
+  background: linear-gradient(135deg, var(--tech-lightcyan), var(--tech-sky), var(--tech-lightcyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 发光边框 - 浅色白蓝 */
 .glow-border {
   position: relative;
 }
@@ -349,11 +384,15 @@
   content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(45deg, #06B6D4, #22D3EE, #0EA5E9, #06B6D4);
+  background: linear-gradient(45deg, var(--tech-cyan), var(--tech-sky), var(--tech-cyan), var(--tech-cyan));
   border-radius: inherit;
   z-index: -1;
   background-size: 400% 400%;
   animation: gradient-move 3s ease infinite;
+}
+
+.dark .glow-border::before {
+  background: linear-gradient(45deg, var(--tech-lightcyan), var(--tech-sky), var(--tech-lightcyan), var(--tech-lightcyan));
 }
 
 /* 平滑滚动 */
@@ -436,13 +475,13 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.2);
+  background: var(--glass-default);
   border-radius: 5px;
-  border: 1px solid rgba(34, 211, 238, 0.1);
+  border: 1px solid var(--glass-border);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #06B6D4, #22D3EE, #0EA5E9, #06B6D4);
+  background: linear-gradient(180deg, var(--tech-cyan), var(--tech-lightcyan), var(--tech-cyan));
   background-size: 300% 300%;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
@@ -469,17 +508,17 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.3);
+  background: var(--glass-default);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(6, 182, 212, 0.5);
+  background: var(--tech-cyan);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(6, 182, 212, 0.7);
+  background: var(--tech-lightcyan);
 }
 
 /* 动画延迟类 */
@@ -536,16 +575,25 @@ html {
 
 /* 玻璃卡片变体 */
 .glass-card-primary {
-  @apply bg-glass/50 backdrop-blur-xl border border-glass-border rounded-2xl;
+  @apply backdrop-blur-xl border border-glass-border rounded-2xl;
+  background: var(--glass-default);
 }
 
 .glass-card-secondary {
-  @apply bg-glass/30 backdrop-blur-lg border border-glass-border/50 rounded-xl;
+  @apply backdrop-blur-lg border border-glass-border rounded-xl;
+  background: var(--glass-default);
 }
 
-/* 文本渐变变体 */
+/* 文本渐变变体 - 浅色白蓝 */
 .text-gradient-primary {
-  background: linear-gradient(135deg, #06B6D4, #22D3EE, #0EA5E9);
+  background: linear-gradient(135deg, var(--tech-cyan), var(--tech-sky), var(--tech-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .text-gradient-primary {
+  background: linear-gradient(135deg, var(--tech-lightcyan), var(--tech-sky), var(--tech-lightcyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -94,7 +94,7 @@ const SheetClose = React.forwardRef<HTMLDivElement, SheetCloseProps>(
 SheetClose.displayName = 'SheetClose';
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-glass/95 backdrop-blur-xl border border-glass-border p-6 shadow-lg text-white",
+  "fixed z-50 gap-4 bg-glass backdrop-blur-xl border border-glass-border p-6 shadow-lg text-white",
   {
     variants: {
       side: {
@@ -130,7 +130,7 @@ const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
     
     return (
       <>
-        <div className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm" onClick={() => setOpen(false)} />
+        <div className="fixed inset-0 z-40 backdrop-blur-sm" onClick={() => setOpen(false)} style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }} />
         <div
           ref={ref}
           className={cn(

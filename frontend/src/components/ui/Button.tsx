@@ -19,8 +19,8 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        glass: 'bg-glass text-white border border-glass-border hover:bg-glass/80 hover:border-glass-border/40',
-        'glass-light': 'bg-glass-light text-gray-900 border border-glass-light-border hover:bg-glass-light/80 hover:border-glass-light-border/40',
+        glass: 'bg-glass text-tech-cyan border border-glass-border backdrop-blur-md',
+        'glass-light': 'bg-glass text-tech-deepblue border border-glass-border backdrop-blur-md',
       },
       size: {
         default: 'h-10 px-4 py-2',
@@ -59,7 +59,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ripple.style.cssText = `
         position: absolute;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--ripple-color);
         transform: scale(0);
         animation: ripple 0.6s ease-out;
         pointer-events: none;

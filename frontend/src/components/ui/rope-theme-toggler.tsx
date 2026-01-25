@@ -18,7 +18,7 @@ const hasViewTransitionSupport = typeof document !== 'undefined' &&
 
 export const RopeThemeToggler = ({
   ropeLength = 120,
-  ropeColor = 'from-amber-800 to-amber-700',
+  ropeColor = 'from-[#D4A574] to-[#8B4513]', // 渐变棕色
   ropeWidth = 4,
   animationDuration = 400,
   className,
@@ -126,54 +126,62 @@ export const RopeThemeToggler = ({
           } as React.CSSProperties}
         >
         {/* 固定点装饰 - 连接到导航栏底部 */}
-        <div className="w-2 h-2 rounded-full bg-gradient-to-b from-amber-700 to-amber-600 mb-1 z-10"></div>
-        
+        <div
+          className="w-2 h-2 rounded-full mb-1 z-10"
+          style={{
+            background: 'linear-gradient(to bottom, #C4956A, #8B4513)'
+          }}
+        ></div>
+
         {/* 绳子 */}
-        <div 
+        <div
           className={cn(
             "rope-line w-[var(--rope-width)] relative overflow-hidden transition-all duration-300 ease-out",
-            "bg-gradient-to-b", 
+            "bg-gradient-to-b",
             ropeColor,
             "rounded-full"
           )}
-          style={{ 
+          style={{
             height: `${ropeLength}px`,
             '--rope-length': `${ropeLength}px`,
             '--rope-width': `${ropeWidth}px`
           } as React.CSSProperties}
         >
           {/* 绳子纹理效果 */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(0,0,0,0.2)_20%,transparent_40%,rgba(0,0,0,0.2)_60%,transparent_100%)]"></div>
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to bottom, transparent 0%, var(--texture-color) 20%, transparent 40%, var(--texture-color) 60%, transparent 100%)'
+            }}
+          ></div>
         </div>
         
         {/* 绳结装饰 */}
-        <div className="w-3 h-1.5 bg-gradient-to-b from-amber-700/90 to-amber-600/90 rounded-full -mt-0.5 z-10"></div>
+        <div
+          className="w-3 h-1.5 rounded-full -mt-0.5 z-10"
+          style={{
+            background: 'linear-gradient(to bottom, #C4956A, #8B4513)'
+          }}
+        ></div>
         
         {/* 主题切换按钮 */}
         <button
           ref={buttonRef}
           onClick={toggleTheme}
           className={cn(
-            'relative w-9 h-9 flex items-center justify-center rounded-full bg-glass/50 backdrop-blur-xl border border-glass-border',
-            'hover:bg-glass/70 hover:border-glass-border/50 hover:shadow-lg hover:scale-110',
+            'relative w-9 h-9 flex items-center justify-center rounded-full bg-glass backdrop-blur-xl border border-glass-border',
+            'hover:shadow-lg hover:scale-110',
             'transition-all duration-300 ease-in-out cursor-pointer',
-            'focus:outline-none focus:ring-2 focus:ring-amber-600/50',
+            'focus:outline-none focus:ring-2 focus:ring-brown-500/50',
             'z-10'
           )}
           aria-label="切换主题"
         >
           {isDark ? (
-            <Sun className="h-5 w-5 text-white transition-transform duration-500 animate-spin-slow" />
+            <Moon className="h-5 w-5 transition-transform duration-500" style={{ color: '#4A5568' }} />
           ) : (
-            <Moon className="h-5 w-5 text-white transition-transform duration-500" />
+            <Sun className="h-5 w-5 transition-transform duration-500 animate-spin-slow" style={{ color: '#FCD34D' }} />
           )}
-          
-          {/* 按钮发光效果 */}
-          <div className={cn(
-            "absolute inset-0 rounded-full bg-gradient-to-br from-amber-600/20 to-amber-700/10",
-            "transition-opacity duration-300",
-            "pointer-events-none"
-          )}></div>
         </button>
         </div>
       </div>

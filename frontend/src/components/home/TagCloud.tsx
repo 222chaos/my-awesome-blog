@@ -20,9 +20,9 @@ function getSizeClass(count: number, maxCount: number): string {
 // 根据标签数量计算颜色
 function getColorClass(count: number, maxCount: number): string {
   const ratio = count / maxCount;
-  if (ratio > 0.8) return 'bg-tech-cyan/20 text-tech-cyan border-tech-cyan/30';
-  if (ratio > 0.5) return 'bg-tech-cyan/10 text-gray-200 border-glass-border';
-  return 'bg-glass/30 text-gray-400 border-glass-border/50';
+  if (ratio > 0.8) return 'text-tech-cyan border-tech-cyan';
+  if (ratio > 0.5) return 'text-gray-200 border-glass-border';
+  return 'text-gray-400 border-glass-border';
 }
 
 export default function TagCloud({ tags }: TagCloudProps) {
@@ -46,8 +46,8 @@ export default function TagCloud({ tags }: TagCloudProps) {
               key={tag.name}
               className={cn(
                 'rounded-full border transition-all duration-300',
-                'hover:scale-110 hover:shadow-lg hover:shadow-tech-cyan/20',
-                'hover:bg-tech-cyan/30 hover:border-tech-cyan/50',
+                'hover:scale-110 hover:shadow-lg',
+                'hover:border-tech-cyan',
                 getSizeClass(tag.count, maxCount),
                 getColorClass(tag.count, maxCount)
               )}

@@ -52,7 +52,7 @@ export default function Portfolio({ projects }: PortfolioProps) {
                   {project.title}
                 </h4>
                 
-                <p className="text-gray-300 mb-4 line-clamp-2">
+                <p className="text-muted-foreground mb-4 line-clamp-2">
                   {project.description}
                 </p>
                 
@@ -61,7 +61,7 @@ export default function Portfolio({ projects }: PortfolioProps) {
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-xs rounded-full bg-glass/50 text-tech-cyan border border-glass-border"
+                      className="px-2 py-1 text-xs rounded-full bg-glass text-tech-cyan border border-glass-border"
                     >
                       {tag}
                     </span>

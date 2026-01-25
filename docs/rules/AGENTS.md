@@ -90,6 +90,21 @@ This document provides essential information for AI agents working in the My Awe
   import GlassCard from '@/components/ui/GlassCard';
   ```
 
+**Theme Colors**:
+- Light theme: White-blue color palette
+  - `--tech-darkblue: #0f172a` (Deep blue)
+  - `--tech-deepblue: #1e3a8a` (Blue)
+  - `--tech-cyan: #0ea5e9` (Sky blue)
+  - `--tech-lightcyan: #7dd3fc` (Light sky blue)
+  - `--tech-sky: #38bdf8` (Bright blue)
+- Dark theme: Black-green color palette
+  - `--tech-darkblue: #0a0a0a` (Near black)
+  - `--tech-deepblue: #0c4a6e` (Deep green-blue)
+  - `--tech-cyan: #06b6d4` (Cyan)
+  - `--tech-lightcyan: #10b981` (Emerald green)
+  - `--tech-sky: #059669` (Deep emerald)
+- Use CSS variables for consistent theming across components.
+
 **Components**:
 - Use default export for components: `export default function ComponentName() { ... }`
 - Props typing: Define `interface ComponentProps` with explicit types.

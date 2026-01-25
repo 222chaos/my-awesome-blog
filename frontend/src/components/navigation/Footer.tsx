@@ -5,12 +5,12 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-tech-darkblue pt-16 pb-8">
+    <footer className="bg-background pt-16 pb-8">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">我的优秀博客</h3>
-            <p className="text-gray-300">
+            <p className="text-muted-foreground">
               一个现代的企业级个人博客，分享关于技术、设计和开发的见解。
             </p>
           </div>
@@ -19,17 +19,17 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-white">导航</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-tech-cyan transition-colors">
+                <Link href="/" className="text-muted-foreground hover:text-tech-cyan transition-colors">
                   首页
                 </Link>
               </li>
               <li>
-                <Link href="/posts" className="text-gray-300 hover:text-tech-cyan transition-colors">
+                <Link href="/posts" className="text-muted-foreground hover:text-tech-cyan transition-colors">
                   文章
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-tech-cyan transition-colors">
+                <Link href="/about" className="text-muted-foreground hover:text-tech-cyan transition-colors">
                   关于
                 </Link>
               </li>
@@ -44,7 +44,7 @@ export default function Footer() {
                   href="https://twitter.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-tech-cyan transition-colors"
+                  className="text-muted-foreground hover:text-tech-cyan transition-colors"
                 >
                   推特
                 </a>
@@ -54,7 +54,7 @@ export default function Footer() {
                   href="https://github.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-tech-cyan transition-colors"
+                  className="text-muted-foreground hover:text-tech-cyan transition-colors"
                 >
                   GitHub
                 </a>
@@ -64,7 +64,7 @@ export default function Footer() {
                   href="https://linkedin.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-tech-cyan transition-colors"
+                  className="text-muted-foreground hover:text-tech-cyan transition-colors"
                 >
                   领英
                 </a>
@@ -74,7 +74,7 @@ export default function Footer() {
           
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">订阅</h3>
-            <p className="text-gray-300 mb-4">
+            <p className="text-muted-foreground mb-4">
               获取最新文章，直接发送到您的邮箱。
             </p>
             <div className="flex flex-col space-y-2">
@@ -91,7 +91,7 @@ export default function Footer() {
         </div>
         
         <GlassCard className="text-center py-6" padding="none">
-          <p className="text-gray-300 text-sm">
+          <p className="text-muted-foreground text-sm">
             © {currentYear} 我的优秀博客. 保留所有权利。
           </p>
         </GlassCard>

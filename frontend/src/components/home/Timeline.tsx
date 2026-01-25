@@ -60,13 +60,13 @@ export default function Timeline({ events }: TimelineProps) {
   return (
     <section className="py-16 lg:py-20">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in-up" style={{ color: 'var(--foreground)' }}>
           我的历程
         </h2>
 
         <div className="relative max-w-3xl mx-auto">
           {/* 垂直线 */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-tech-cyan to-transparent"></div>
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-tech-cyan to-transparent" style={{ background: 'linear-gradient(to bottom, var(--tech-cyan), transparent)' }}></div>
 
           {events.map((event, index) => (
             <TimelineEventItem key={index} event={event} index={index} />
@@ -89,7 +89,7 @@ const TimelineItem = forwardRef<HTMLDivElement, {
     >
       {/* 日期 */}
       <div className="relative z-10 w-16 h-16 flex items-center justify-center">
-        <div className="w-4 h-4 bg-tech-cyan rounded-full shadow-lg shadow-tech-cyan/50 animate-pulse"></div>
+        <div className="w-4 h-4 bg-tech-cyan rounded-full shadow-lg shadow-tech-cyan/50 animate-pulse" style={{ backgroundColor: 'var(--tech-cyan)', boxShadow: '0 0 10px var(--shadow-tech-cyan)' }}></div>
       </div>
       
       {/* 事件卡片 */}
@@ -106,7 +106,7 @@ const TimelineItem = forwardRef<HTMLDivElement, {
       >
         <div className="text-sm text-tech-cyan mb-2">{event.date}</div>
         <h4 className="text-lg font-bold text-white mb-2">{event.title}</h4>
-        <p className="text-gray-300">{event.description}</p>
+        <p className="text-muted-foreground">{event.description}</p>
       </GlassCard>
     </div>
   );

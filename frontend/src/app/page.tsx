@@ -188,14 +188,14 @@ export default function Home() {
                 id: '1',
                 title: '电商网站',
                 description: '使用React和Node.js构建的全功能电商平台',
-                image: '/placeholder-portfolio.jpg',
+                image: '/assets/placeholder-portfolio.jpg',
                 tags: ['React', 'Node.js', 'MongoDB'],
                 link: '/projects/ecommerce',
               }, {
                 id: '2',
                 title: '任务管理应用',
                 description: '具有实时协作功能的任务管理工具',
-                image: '/placeholder-portfolio.jpg',
+                image: '/assets/placeholder-portfolio.jpg',
                 tags: ['Vue.js', 'Firebase', 'Tailwind'],
                 link: '/projects/task-manager',
               }]} 
@@ -208,7 +208,7 @@ export default function Home() {
             <h3 className="text-2xl font-bold text-white mb-4 animate-fade-in-up">
               订阅更新
             </h3>
-            <p className="text-gray-300 max-w-2xl mx-auto mb-6">
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
               加入我们的邮件列表，获取最新文章、技巧和资源。
             </p>
             <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">

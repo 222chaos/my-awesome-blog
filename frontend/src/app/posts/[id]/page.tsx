@@ -93,11 +93,11 @@ export default function PostPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-3xl">
-      <article className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <article className="bg-card rounded-xl shadow-md overflow-hidden">
         <div className="p-6 md:p-8">
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{post.title}</h1>
-            <div className="flex flex-wrap items-center text-secondary-600 dark:text-secondary-400 text-sm">
+            <h1 className="text-4xl font-bold text-foreground mb-4">{post.title}</h1>
+            <div className="flex flex-wrap items-center text-muted-foreground text-sm">
               <time className="mr-4">{post.date}</time>
               <span>{post.readTime}</span>
             </div>
@@ -111,9 +111,9 @@ export default function PostPage({ params }: { params: { id: string } }) {
       </article>
       
       <div className="mt-8 text-center">
-        <a 
-          href="#" 
-          className="inline-flex items-center text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
+        <a
+          href="#"
+          className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
         >
           ← 返回所有文章
         </a>

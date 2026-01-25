@@ -71,7 +71,7 @@ export default function FeaturedSection() {
                 </h3>
                 
                 {/* 描述 */}
-                <p className="text-gray-300 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   {item.description}
                 </p>
               </GlassCard>
