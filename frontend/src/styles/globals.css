@@ -17,6 +17,30 @@
     --border: #e2e8f0;
     --glass-light-border: rgba(0, 0, 0, 0.1);
     --radius: 0.5rem;
+    
+    /* 扩展的颜色变量 */
+    --muted: #94a3b8;
+    --muted-foreground: #64748b;
+    --popover: #ffffff;
+    --popover-foreground: #0a0a0a;
+    --input: #e2e8f0;
+    --ring: #2563eb;
+    
+    /* 玻璃效果专用变量 */
+    --glass-default: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-glow: rgba(37, 99, 235, 0.2);
+    
+    /* 技术颜色变量 */
+    --tech-darkblue: #0f172a;
+    --tech-deepblue: #1e3a8a;
+    --tech-cyan: #06b6d4;
+    --tech-lightcyan: #22d3ee;
+    --tech-sky: #0ea5e9;
+    
+    /* 动画变量 */
+    --transition-duration: 0.3s;
+    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
@@ -32,6 +56,26 @@
     --card-foreground: #f8fafc;
     --border: #334155;
     --glass-light-border: rgba(255, 255, 255, 0.1);
+    
+    /* 扩展的颜色变量 */
+    --muted: #64748b;
+    --muted-foreground: #94a3b8;
+    --popover: #0a0a0a;
+    --popover-foreground: #f8fafc;
+    --input: #334155;
+    --ring: #3b82f6;
+    
+    /* 玻璃效果专用变量 */
+    --glass-default: rgba(15, 23, 42, 0.7);
+    --glass-border: rgba(34, 211, 238, 0.15);
+    --glass-glow: rgba(6, 182, 212, 0.3);
+    
+    /* 技术颜色变量 */
+    --tech-darkblue: #0f172a;
+    --tech-deepblue: #1e3a8a;
+    --tech-cyan: #06b6d4;
+    --tech-lightcyan: #22d3ee;
+    --tech-sky: #0ea5e9;
   }
 }
 
@@ -385,6 +429,40 @@ html {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
+/* 全局渐变动态滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.2);
+  border-radius: 5px;
+  border: 1px solid rgba(34, 211, 238, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #06B6D4, #22D3EE, #0EA5E9, #06B6D4);
+  background-size: 300% 300%;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+  animation: gradient-scroll 3s ease infinite;
+  transition: all 0.3s ease;
+  will-change: transform, background;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  animation: gradient-scroll 1s ease infinite;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+  transform: scaleY(1.2);
+}
+
+@keyframes gradient-scroll {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* 自定义滚动条 */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
@@ -435,6 +513,27 @@ html {
   mix-blend-mode: normal;
 }
 
+/* 绳子主题切换器动画 - 使用恒定duration */
+@keyframes rope-swing {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* 摇摆容器 - 恒定动画时长 */
+.rope-swing {
+  animation: rope-swing 3s ease-in-out infinite;
+}
+
+/* 摇摆容器hover增强 - 叠加transform增强摇摆 */
+.rope-swing-wrapper:hover .rope-swing {
+  animation: rope-swing 1.5s ease-in-out infinite;
+}
+
+/* 摇摆容器下拉动画 */
+.rope-pull {
+  animation: rope-pull 0.3s ease-in-out;
+}
+
 /* 玻璃卡片变体 */
 .glass-card-primary {
   @apply bg-glass/50 backdrop-blur-xl border border-glass-border rounded-2xl;
@@ -451,3 +550,4 @@ html {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+

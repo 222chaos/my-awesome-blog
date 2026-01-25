@@ -55,41 +55,56 @@ export default function Timeline({ events }: TimelineProps) {
           
           {events.map((event, index) => {
             const [ref, inView] = useInView(0.2);
+            const isLeft = index % 2 === 0;
             
             return (
-              <div
+              <TimelineItem
                 key={index}
                 ref={ref}
-                className={`flex items-start mb-12 ${
-                  index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-                }`}
-              >
-                {/* 日期 */}
-                <div className="relative z-10 w-16 h-16 flex items-center justify-center">
-                  <div className="w-4 h-4 bg-tech-cyan rounded-full shadow-lg shadow-tech-cyan/50 animate-pulse"></div>
-                </div>
-                
-                {/* 事件卡片 */}
-                <GlassCard
-                  className={`flex-1 ml-4 ${
-                    inView 
-                      ? 'opacity-100 translate-x-0' 
-                      : index % 2 === 0 
-                        ? 'opacity-0 -translate-x-10' 
-                        : 'opacity-0 translate-x-10'
-                  } transition-all duration-700`}
-                  hoverEffect={true}
-                  padding="md"
-                >
-                  <div className="text-sm text-tech-cyan mb-2">{event.date}</div>
-                  <h4 className="text-lg font-bold text-white mb-2">{event.title}</h4>
-                  <p className="text-gray-300">{event.description}</p>
-                </GlassCard>
-              </div>
+                event={event}
+                isLeft={isLeft}
+                inView={inView}
+              />
             );
           })}
         </div>
       </div>
     </section>
+  );
+}
+
+function TimelineItem({ event, isLeft, inView, ref }: {
+  event: TimelineEvent;
+  isLeft: boolean;
+  inView: boolean;
+  ref: (node: HTMLElement | null) => void;
+}) {
+  return (
+    <div
+      ref={ref}
+      className={`flex items-start mb-12 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}
+    >
+      {/* 日期 */}
+      <div className="relative z-10 w-16 h-16 flex items-center justify-center">
+        <div className="w-4 h-4 bg-tech-cyan rounded-full shadow-lg shadow-tech-cyan/50 animate-pulse"></div>
+      </div>
+      
+      {/* 事件卡片 */}
+      <GlassCard
+        className={`flex-1 ml-4 ${
+          inView 
+            ? 'opacity-100 translate-x-0' 
+            : isLeft 
+              ? 'opacity-0 -translate-x-10' 
+              : 'opacity-0 translate-x-10'
+        } transition-all duration-700`}
+        hoverEffect={true}
+        padding="md"
+      >
+        <div className="text-sm text-tech-cyan mb-2">{event.date}</div>
+        <h4 className="text-lg font-bold text-white mb-2">{event.title}</h4>
+        <p className="text-gray-300">{event.description}</p>
+      </GlassCard>
+    </div>
   );
 }

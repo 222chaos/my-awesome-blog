@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/navigation/Navbar';
 import HeroSection from '@/components/home/HeroSection';
 import PostGrid from '@/components/home/PostGrid';
 import Sidebar from '@/components/home/Sidebar';
@@ -146,8 +145,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-tech-darkblue text-white">
-      <Navbar />
+    <div className="min-h-screen bg-background text-foreground">
       <div id="content">
         <HeroSection />
         
