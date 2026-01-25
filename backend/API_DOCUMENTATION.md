@@ -1131,6 +1131,165 @@ Authorization: Bearer {jwt_token}
 }
 ```
 
+## Typewriter Contents API
+
+### Get All Typewriter Contents
+- **GET** `/typewriter-contents/`
+- **Description**: Get all typewriter contents with optional filtering and pagination
+- **Query Parameters**:
+  - `skip` (optional, integer, default: 0): Number of records to skip
+  - `limit` (optional, integer, default: 100, max: 100): Maximum number of records to return
+  - `active_only` (optional, boolean, default: true): Only return active contents
+- **Response**: `200 OK`
+```json
+[
+  {
+    "id": "integer",
+    "text": "string",
+    "priority": "integer",
+    "is_active": "boolean",
+    "created_at": "datetime",
+    "updated_at": "datetime"
+  }
+]
+```
+
+### Get Active Typewriter Contents
+- **GET** `/typewriter-contents/active`
+- **Description**: Get all active typewriter contents ordered by priority
+- **Response**: `200 OK`
+```json
+[
+  {
+    "id": "integer",
+    "text": "string",
+    "priority": "integer",
+    "is_active": "boolean",
+    "created_at": "datetime",
+    "updated_at": "datetime"
+  }
+]
+```
+
+### Get Typewriter Content by ID
+- **GET** `/typewriter-contents/{content_id}`
+- **Description**: Get a specific typewriter content by its ID
+- **Parameters**:
+  - `content_id` (path parameter): Content ID
+- **Response**: `200 OK`
+```json
+{
+  "id": "integer",
+  "text": "string",
+  "priority": "integer",
+  "is_active": "boolean",
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}
+```
+- **Error Responses**:
+  - `404 Not Found` - Content not found
+
+### Create Typewriter Content
+- **POST** `/typewriter-contents/`
+- **Description**: Create a new typewriter content
+- **Headers**: 
+  - `Authorization: Bearer {jwt_token}` (superuser required)
+  - `Content-Type: application/json`
+- **Request Body**:
+```json
+{
+  "text": "string (required, max: 500 chars)",
+  "priority": "integer (optional, default: 0)",
+  "is_active": "boolean (optional, default: true)"
+}
+```
+- **Response**: `201 Created`
+```json
+{
+  "id": "integer",
+  "text": "string",
+  "priority": "integer",
+  "is_active": "boolean",
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}
+```
+- **Error Responses**:
+  - `400 Bad Request` - Validation error
+  - `401 Unauthorized` - Not authenticated
+  - `403 Forbidden` - Superuser access required
+
+### Update Typewriter Content
+- **PUT** `/typewriter-contents/{content_id}`
+- **Description**: Update an existing typewriter content
+- **Headers**: 
+  - `Authorization: Bearer {jwt_token}` (superuser required)
+  - `Content-Type: application/json`
+- **Parameters**:
+  - `content_id` (path parameter): Content ID
+- **Request Body**:
+```json
+{
+  "text": "string (optional, max: 500 chars)",
+  "priority": "integer (optional)",
+  "is_active": "boolean (optional)"
+}
+```
+- **Response**: `200 OK`
+```json
+{
+  "id": "integer",
+  "text": "string",
+  "priority": "integer",
+  "is_active": "boolean",
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}
+```
+- **Error Responses**:
+  - `400 Bad Request` - Validation error
+  - `401 Unauthorized` - Not authenticated
+  - `403 Forbidden` - Superuser access required
+  - `404 Not Found` - Content not found
+
+### Delete Typewriter Content
+- **DELETE** `/typewriter-contents/{content_id}`
+- **Description**: Delete a typewriter content
+- **Headers**: 
+  - `Authorization: Bearer {jwt_token}` (superuser required)
+- **Parameters**:
+  - `content_id` (path parameter): Content ID
+- **Response**: `204 No Content`
+- **Error Responses**:
+  - `401 Unauthorized` - Not authenticated
+  - `403 Forbidden` - Superuser access required
+  - `404 Not Found` - Content not found
+
+### Deactivate Typewriter Content
+- **POST** `/typewriter-contents/{content_id}/deactivate`
+- **Description**: Soft delete a typewriter content by setting is_active to False
+- **Headers**: 
+  - `Authorization: Bearer {jwt_token}` (superuser required)
+- **Parameters**:
+  - `content_id` (path parameter): Content ID
+- **Response**: `200 OK`
+```json
+{
+  "id": "integer",
+  "text": "string",
+  "priority": "integer",
+  "is_active": "boolean",
+  "created_at": "datetime",
+  "updated_at": "datetime"
+}
+```
+- **Error Responses**:
+  - `401 Unauthorized` - Not authenticated
+  - `403 Forbidden` - Superuser access required
+  - `404 Not Found` - Content not found
+
+
 ## Images API
 
 ### Upload Image

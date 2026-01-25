@@ -36,7 +36,7 @@ export default function HeroSection() {
           <GlassCard padding="sm" hoverEffect={false} glowEffect={true} className="max-w-2xl mx-auto text-center">
             <h1 className="text-2xl md:text-3xl font-bold mb-4 animate-fade-in-up">
               <TextType
-                text={["欢迎来到我的技术博客", "探索前沿技术", "分享创新见解", "编程思维与实践", "Web开发艺术", "现代架构设计"]}
+                fetchFromApi={true}
                 typingSpeed={75}
                 pauseDuration={1500}
                 showCursor

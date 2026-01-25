@@ -11,3 +11,4 @@ from app.models.portfolio import Portfolio
 from app.models.timeline_event import TimelineEvent
 from app.models.subscription import Subscription
 from app.models.image import Image, ImageVariant
+from app.models.typewriter_content import TypewriterContent

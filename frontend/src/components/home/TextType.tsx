@@ -3,6 +3,7 @@
 import { ElementType, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { getActiveTypewriterContents } from '@/lib/api';
 
 interface TextTypeProps {
   className?: string;
@@ -11,7 +12,7 @@ interface TextTypeProps {
   cursorCharacter?: string | React.ReactNode;
   cursorBlinkDuration?: number;
   cursorClassName?: string;
-  text: string | string[];
+  text?: string | string[];
   as?: ElementType;
   typingSpeed?: number;
   initialDelay?: number;
@@ -23,6 +24,7 @@ interface TextTypeProps {
   onSentenceComplete?: (sentence: string, index: number) => void;
   startOnVisible?: boolean;
   reverseMode?: boolean;
+  fetchFromApi?: boolean;
 }
 
 const TextType = ({
@@ -44,6 +46,7 @@ const TextType = ({
   onSentenceComplete,
   startOnVisible = false,
   reverseMode = false,
+  fetchFromApi = false,
   ...props
 }: TextTypeProps & React.HTMLAttributes<HTMLElement>) => {
   const [displayedText, setDisplayedText] = useState('');
@@ -51,10 +54,29 @@ const TextType = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
+  const [dynamicTexts, setDynamicTexts] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(fetchFromApi);
   const cursorRef = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLElement>(null);
 
-  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+  // Fetch from API if enabled
+  useEffect(() => {
+    if (fetchFromApi && !text) {
+      setIsLoading(true);
+      getActiveTypewriterContents().then((fetchedTexts) => {
+        setDynamicTexts(fetchedTexts);
+        setIsLoading(false);
+      });
+    }
+  }, [fetchFromApi, text]);
+
+  // Determine which texts to use (dynamic or static)
+  const textArray = useMemo(() => {
+    if (fetchFromApi && !text) {
+      return dynamicTexts.length > 0 ? dynamicTexts : [];
+    }
+    return text ? (Array.isArray(text) ? text : [text]) : [];
+  }, [text, fetchFromApi, dynamicTexts]);
 
   const getRandomSpeed = useCallback(() => {
     if (!variableSpeed) return typingSpeed;
@@ -169,7 +191,33 @@ const TextType = ({
   ]);
 
   const shouldHideCursor =
-    hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
+    hideCursorWhileTyping && (currentCharIndex < (textArray[currentTextIndex]?.length || 0) || isDeleting);
+
+  // Show loading indicator when fetching from API
+  if (isLoading) {
+    return createElement(
+      Component,
+      {
+        ref: containerRef,
+        className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
+        ...props
+      },
+      <span className="inline animate-pulse">加载中...</span>
+    );
+  }
+
+  // Show nothing if no texts available
+  if (textArray.length === 0) {
+    return createElement(
+      Component,
+      {
+        ref: containerRef,
+        className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
+        ...props
+      },
+      <span className="inline opacity-50">暂无内容</span>
+    );
+  }
 
   return createElement(
     Component,

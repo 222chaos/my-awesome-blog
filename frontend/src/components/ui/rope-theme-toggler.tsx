@@ -30,7 +30,7 @@ export const RopeThemeToggler = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 直接使用resolvedTheme，它已经处理了auto模式
+  // 根据当前主题确定图标显示：亮色主题显示太阳图标，暗色主题显示月亮图标
   const isDark = resolvedTheme === 'dark';
 
   // 移除MutationObserver，直接使用resolvedTheme
@@ -177,10 +177,10 @@ export const RopeThemeToggler = ({
           )}
           aria-label="切换主题"
         >
-          {isDark ? (
-            <Moon className="h-5 w-5 transition-transform duration-500" style={{ color: '#4A5568' }} />
+          {!isDark ? (
+            <Sun className="h-5 w-5 transition-transform duration-500 text-tech-cyan" />
           ) : (
-            <Sun className="h-5 w-5 transition-transform duration-500 animate-spin-slow" style={{ color: '#FCD34D' }} />
+            <Moon className="h-5 w-5 transition-transform duration-500 text-tech-sky" />
           )}
         </button>
         </div>

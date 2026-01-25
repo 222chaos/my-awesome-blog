@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, User } from 'lucide-react';
+import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, User, UserCircle, LayoutDashboard, FileText, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { RopeThemeToggler } from '@/components/ui/rope-theme-toggler';
+import { useTheme } from '@/context/theme-context';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +18,23 @@ import {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { resolvedTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // 根据主题选择下拉框样式
+  const dropdownBgClass = resolvedTheme === 'dark'
+    ? 'bg-glass/95 backdrop-blur-xl border-glass-border/50'
+    : 'bg-white/95 backdrop-blur-xl border-gray-200 shadow-lg';
+  const dropdownItemClass = resolvedTheme === 'dark'
+    ? 'focus:bg-tech-cyan/10'
+    : 'focus:bg-gray-100';
+  const textColorClass = resolvedTheme === 'dark'
+    ? 'text-foreground/90 group-hover:text-tech-cyan'
+    : 'text-gray-700 group-hover:text-tech-cyan';
+  const separatorClass = resolvedTheme === 'dark'
+    ? 'bg-glass-border/30'
+    : 'bg-gray-200';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +70,11 @@ export default function Navbar() {
       >
         <div className="w-full h-16 flex items-center">
           <Link href="/" className="flex items-center space-x-2 group">
-            <span className="text-2xl group-hover:rotate-12 transition-transform duration-300 text-foreground">⚡</span>
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-8 h-8 object-contain group-hover:scale-110 transition-transform duration-300"
+            />
             <span className="font-bold text-xl text-gradient-primary hidden sm:inline-block text-foreground">
               Awesome Blog
             </span>
@@ -87,21 +107,41 @@ export default function Navbar() {
           <div className="flex items-center space-x-2 ml-4 text-foreground">
             <RopeThemeToggler ropeLength={120} className="hidden md:flex" />
             <RopeThemeToggler ropeLength={60} className="flex md:hidden" />
+          </div>
+          <div className="flex items-center space-x-2 mr-2 text-foreground">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="glass" size="sm" className="flex items-center text-foreground">
-                  <User className="h-4 w-4 text-foreground" />
+                <Button variant="glass" size="sm" className="flex items-center justify-center text-foreground p-2 w-9 h-9 hover:bg-tech-cyan/20 transition-all duration-200 hover:scale-105">
+                  <User className="h-5 w-5 text-foreground" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>我的账户</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>个人资料</DropdownMenuItem>
-                <DropdownMenuItem>仪表板</DropdownMenuItem>
-                <DropdownMenuItem>文章管理</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>设置</DropdownMenuItem>
-                <DropdownMenuItem>退出登录</DropdownMenuItem>
+              <DropdownMenuContent align="end" className={`w-56 ${dropdownBgClass} shadow-2xl z-[200]`}>
+                <DropdownMenuLabel className={`text-sm font-semibold py-2 ${resolvedTheme === 'dark' ? 'text-foreground/80' : 'text-gray-900'}`}>
+                  我的账户
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className={separatorClass} />
+                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                  <UserCircle className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
+                  <span className={`${textColorClass} transition-colors`}>个人资料</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                  <LayoutDashboard className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
+                  <span className={`${textColorClass} transition-colors`}>仪表板</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                  <FileText className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
+                  <span className={`${textColorClass} transition-colors`}>文章管理</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className={separatorClass} />
+                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                  <Settings className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
+                  <span className={`${textColorClass} transition-colors`}>设置</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className={separatorClass} />
+                <DropdownMenuItem className={`group cursor-pointer ${resolvedTheme === 'dark' ? 'focus:bg-red-500/10' : 'focus:bg-red-50'}`}>
+                  <LogOut className="h-4 w-4 mr-3 text-red-500 group-hover:scale-110 transition-transform" />
+                  <span className={`text-foreground/90 group-hover:text-red-500 transition-colors ${resolvedTheme === 'dark' ? '' : 'text-gray-700'}`}>退出登录</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -1,7 +1,7 @@
 from app.crud.user import (
     get_user, get_user_by_username, get_user_by_email, get_users,
     create_user, update_user, delete_user, authenticate_user,
-    get_password_hash, verify_password
+    get_password_hash
 )
 
 from app.crud.article import (
@@ -52,5 +52,15 @@ from app.crud.subscription import (
 from app.crud.image import (
     get_image, get_images, create_image,
     update_image, delete_image
+)
+
+from app.crud.typewriter_content import (
+    get_typewriter_content,
+    get_typewriter_contents,
+    get_active_typewriter_contents,
+    create_typewriter_content,
+    update_typewriter_content,
+    delete_typewriter_content,
+    deactivate_typewriter_content,
 )
 
