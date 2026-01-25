@@ -24,37 +24,16 @@ export const RopeThemeToggler = ({
   className,
   ...props
 }: RopeThemeTogglerProps) => {
-  const { theme, setTheme } = useTheme();
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [isPulling, setIsPulling] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // 初始化时同步主题状态
-    setIsDark(theme === 'dark' || (theme === 'auto' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches));
-  }, [theme]);
+  // 直接使用resolvedTheme，它已经处理了auto模式
+  const isDark = resolvedTheme === 'dark';
 
-  useEffect(() => {
-    const updateTheme = () => {
-      if (typeof document !== 'undefined') {
-        setIsDark(document.documentElement.classList.contains('dark'));
-      }
-    };
-
-    updateTheme();
-
-    if (typeof MutationObserver !== 'undefined') {
-      const observer = new MutationObserver(updateTheme);
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class'],
-      });
-
-      return () => observer.disconnect();
-    }
-  }, []);
+  // 移除MutationObserver，直接使用resolvedTheme
 
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current || typeof document === 'undefined') return;

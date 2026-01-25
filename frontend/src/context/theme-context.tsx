@@ -12,8 +12,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ 
-  children, 
+export function ThemeProvider({
+  children,
   defaultTheme = 'auto',
   storageKey = 'theme'
 }: {
@@ -21,13 +21,17 @@ export function ThemeProvider({
   defaultTheme?: Theme;
   storageKey?: string;
 }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(storageKey);
-      return stored ? (stored as Theme) : defaultTheme;
+  const [isMounted, setIsMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+
+  // 客户端挂载后初始化主题
+  useEffect(() => {
+    setIsMounted(true);
+    const stored = localStorage.getItem(storageKey);
+    if (stored) {
+      setTheme(stored as Theme);
     }
-    return defaultTheme;
-  });
+  }, [storageKey]);
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
 
@@ -41,49 +45,51 @@ export function ThemeProvider({
 
   // 计算实际主题
   useEffect(() => {
+    if (!isMounted || typeof window === 'undefined') return;
+
     const root = window.document.documentElement;
-    
+
     // 移除旧的主题类
     root.classList.remove('light', 'dark');
-    
+
     let actualTheme: 'light' | 'dark';
-    
+
     if (theme === 'auto') {
       // 如果是自动模式，根据系统偏好决定
       actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } else {
       actualTheme = theme;
     }
-    
+
     // 添加对应的主题类
     root.classList.add(actualTheme);
     setResolvedTheme(actualTheme);
-    
+
     // 保存到localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(storageKey, theme);
-    }
-  }, [theme, storageKey]);
+    localStorage.setItem(storageKey, theme);
+  }, [theme, storageKey, isMounted]);
 
   // 监听系统主题变化
   useEffect(() => {
+    if (!isMounted || typeof window === 'undefined') return;
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     const handleChange = () => {
       if (theme === 'auto') {
         const newTheme = mediaQuery.matches ? 'dark' : 'light';
         setResolvedTheme(newTheme);
-        
+
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');
         root.classList.add(newTheme);
       }
     };
-    
+
     mediaQuery.addEventListener('change', handleChange);
-    
+
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, [theme, isMounted]);
 
   const value = {
     theme,

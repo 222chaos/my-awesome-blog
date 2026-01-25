@@ -35,7 +35,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[100vh] flex flex-col items-center justify-start pt-0 overflow-hidden">
+    <section className="relative min-h-[100vh] flex flex-col items-center justify-start pt-16 overflow-hidden">
       <div className="absolute inset-0 z-0 gradient-bg hero-bg"></div>
 
       <div className="absolute inset-0 z-10 overflow-hidden opacity-30">
@@ -57,7 +57,7 @@ export default function HeroSection() {
         ))}
       </div>
 
-      <div className="relative z-20 container mx-auto px-4 pt-16 pb-16 text-center">
+      <div className="relative z-20 container mx-auto px-4 pt-20 pb-16 text-center">
         <Card
           className={cn(
             "max-w-4xl mx-auto text-center backdrop-blur-xl border-glass-border/30 shadow-2xl glow-border glass-hover glass-card-primary transition-all duration-1000 ease-out",

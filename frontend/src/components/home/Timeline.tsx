@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 
 interface TimelineEvent {
@@ -37,6 +37,21 @@ function useInView(threshold = 0.1) {
   return [setRef, inView] as const;
 }
 
+// 单个事件项的包装组件
+function TimelineEventItem({ event, index }: { event: TimelineEvent; index: number }) {
+  const [ref, inView] = useInView(0.2);
+  const isLeft = index % 2 === 0;
+
+  return (
+    <TimelineItem
+      ref={ref}
+      event={event}
+      isLeft={isLeft}
+      inView={inView}
+    />
+  );
+}
+
 export default function Timeline({ events }: TimelineProps) {
   if (!events || events.length === 0) {
     return null;
@@ -48,37 +63,25 @@ export default function Timeline({ events }: TimelineProps) {
         <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12 animate-fade-in-up">
           我的历程
         </h2>
-        
+
         <div className="relative max-w-3xl mx-auto">
           {/* 垂直线 */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-tech-cyan to-transparent"></div>
-          
-          {events.map((event, index) => {
-            const [ref, inView] = useInView(0.2);
-            const isLeft = index % 2 === 0;
-            
-            return (
-              <TimelineItem
-                key={index}
-                ref={ref}
-                event={event}
-                isLeft={isLeft}
-                inView={inView}
-              />
-            );
-          })}
+
+          {events.map((event, index) => (
+            <TimelineEventItem key={index} event={event} index={index} />
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function TimelineItem({ event, isLeft, inView, ref }: {
+const TimelineItem = forwardRef<HTMLDivElement, {
   event: TimelineEvent;
   isLeft: boolean;
   inView: boolean;
-  ref: (node: HTMLElement | null) => void;
-}) {
+}>(({ event, isLeft, inView }, ref) => {
   return (
     <div
       ref={ref}
@@ -107,4 +110,6 @@ function TimelineItem({ event, isLeft, inView, ref }: {
       </GlassCard>
     </div>
   );
-}
+});
+
+TimelineItem.displayName = 'TimelineItem';
