@@ -10,8 +10,8 @@ class CommentBase(BaseModel):
 
 # Create schemas
 class CommentCreate(CommentBase):
-    article_id: int
-    parent_id: Optional[int] = None
+    article_id: str
+    parent_id: Optional[str] = None
 
 
 # Update schemas
@@ -22,10 +22,10 @@ class CommentUpdate(BaseModel):
 
 # Response schemas
 class CommentInDBBase(CommentBase):
-    id: int
-    article_id: int
-    author_id: int
-    parent_id: Optional[int] = None
+    id: str
+    article_id: str
+    author_id: str
+    parent_id: Optional[str] = None
     is_approved: bool
     created_at: datetime
     updated_at: Optional[datetime] = None

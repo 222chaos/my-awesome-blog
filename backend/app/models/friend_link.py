@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, UUID
 from sqlalchemy.sql import func
+import uuid
 from app.core.database import Base
 
 
 class FriendLink(Base):
     __tablename__ = "friend_links"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     name = Column(String(100), nullable=False)
     url = Column(String(500), nullable=False)
     favicon = Column(String(500))

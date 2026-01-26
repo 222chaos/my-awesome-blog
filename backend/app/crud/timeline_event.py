@@ -1,10 +1,11 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.timeline_event import TimelineEvent
 from app.schemas.timeline_event import TimelineEventCreate, TimelineEventUpdate
 
 
-def get_timeline_event(db: Session, event_id: int) -> Optional[TimelineEvent]:
+def get_timeline_event(db: Session, event_id: UUID) -> Optional[TimelineEvent]:
     """获取单个时间轴事件"""
     return db.query(TimelineEvent).filter(TimelineEvent.id == event_id).first()
 
@@ -79,7 +80,7 @@ def create_timeline_event(db: Session, event: TimelineEventCreate) -> TimelineEv
 
 
 def update_timeline_event(
-    db: Session, event_id: int, event_update: TimelineEventUpdate
+    db: Session, event_id: UUID, event_update: TimelineEventUpdate
 ) -> Optional[TimelineEvent]:
     """更新时间轴事件"""
     db_event = get_timeline_event(db, event_id)
@@ -92,7 +93,7 @@ def update_timeline_event(
     return db_event
 
 
-def delete_timeline_event(db: Session, event_id: int) -> bool:
+def delete_timeline_event(db: Session, event_id: UUID) -> bool:
     """删除时间轴事件"""
     db_event = get_timeline_event(db, event_id)
     if db_event:

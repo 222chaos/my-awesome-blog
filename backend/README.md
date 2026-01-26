@@ -17,56 +17,131 @@ FastAPI backend for the My Awesome Blog application.
 
 ```
 backend/
-├── app/
+├── alembic/                    # 数据库迁移文件
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+│       ├── 001_add_new_tables.py
+│       ├── 002_add_typewriter_contents_table.py
+│       └── 003_migrate_to_uuid.py
+├── app/                        # 主应用代码
 │   ├── __init__.py
-│   ├── main.py                 # FastAPI application entry point
-│   ├── api/
+│   ├── main.py                # FastAPI应用入口
+│   ├── api/                   # API路由
+│   │   ├── __init__.py
 │   │   └── v1/
-│   │       ├── endpoints/      # API route handlers
-│   │       │   ├── auth.py     # Authentication endpoints
-│   │       │   ├── users.py    # User management endpoints
-│   │       │   ├── articles.py # Article endpoints
-│   │       │   └── comments.py # Comment endpoints
-│   │       └── router.py       # API router configuration
-│   ├── core/
+│   │       ├── __init__.py
+│   │       ├── router.py
+│   │       └── endpoints/     # API端点
+│   │           ├── __init__.py
+│   │           ├── auth.py
+│   │           ├── users.py
+│   │           ├── articles.py
+│   │           ├── comments.py
+│   │           ├── categories.py
+│   │           ├── tags.py
+│   │           ├── friend_links.py
+│   │           ├── portfolio.py
+│   │           ├── timeline_events.py
+│   │           ├── statistics.py
+│   │           ├── subscriptions.py
+│   │           ├── images.py
+│   │           └── typewriter_contents.py
+│   ├── core/                  # 核心配置和工具
 │   │   ├── __init__.py
-│   │   ├── config.py           # Application configuration
-│   │   ├── database.py         # Database connection
-│   │   ├── security.py         # JWT and password utilities
-│   │   └── dependencies.py     # FastAPI dependencies
-│   ├── models/
+│   │   ├── config.py          # 应用配置
+│   │   ├── database.py        # 数据库配置
+│   │   ├── security.py        # 安全相关
+│   │   └── dependencies.py    # 依赖注入
+│   ├── models/                # SQLAlchemy模型
 │   │   ├── __init__.py
-│   │   ├── user.py             # User model
-│   │   ├── article.py          # Article model
-│   │   └── comment.py          # Comment model
-│   ├── schemas/
+│   │   ├── user.py
+│   │   ├── article.py
+│   │   ├── comment.py
+│   │   ├── category.py
+│   │   ├── tag.py
+│   │   ├── friend_link.py
+│   │   ├── portfolio.py
+│   │   ├── timeline_event.py
+│   │   ├── subscription.py
+│   │   ├── image.py
+│   │   ├── typewriter_content.py
+│   │   ├── article_category.py
+│   │   └── article_tag.py
+│   ├── schemas/               # Pydantic模型（数据验证）
 │   │   ├── __init__.py
-│   │   ├── user.py             # Pydantic schemas for users
-│   │   ├── article.py          # Pydantic schemas for articles
-│   │   ├── comment.py          # Pydantic schemas for comments
-│   │   └── token.py            # Pydantic schemas for tokens
-│   ├── crud/
+│   │   ├── user.py
+│   │   ├── article.py
+│   │   ├── comment.py
+│   │   ├── category.py
+│   │   ├── tag.py
+│   │   ├── friend_link.py
+│   │   ├── portfolio.py
+│   │   ├── timeline_event.py
+│   │   ├── subscription.py
+│   │   ├── image.py
+│   │   ├── typewriter_content.py
+│   │   ├── token.py
+│   │   └── statistics.py
+│   ├── crud/                  # 数据库CRUD操作
 │   │   ├── __init__.py
-│   │   ├── user.py             # User database operations
-│   │   ├── article.py          # Article database operations
-│   │   └── comment.py          # Comment database operations
-│   └── tests/                  # Test files
-├── alembic/
-│   ├── versions/               # Database migration scripts
-│   ├── env.py                  # Alembic environment
-│   └── script.py.mako          # Migration template
-├── scripts/                    # Utility scripts
-│   ├── diagnose_db.py          # Database diagnostic tool
-│   ├── fix_db_connection.py    # Automatic database creation and initialization
-│   └── update_db_config.py     # Database configuration update tool
-├── .env.example                # Environment variables template
-├── .env                        # Environment variables (gitignored)
-├── requirements.txt            # Production dependencies
-├── requirements-test.txt       # Test dependencies
-├── pytest.ini                  # pytest configuration
-├── alembic.ini                 # Alembic configuration
-├── Dockerfile                  # Docker image definition
-└── README.md                   # This file
+│   │   ├── user.py
+│   │   ├── article.py
+│   │   ├── comment.py
+│   │   ├── category.py
+│   │   ├── tag.py
+│   │   ├── friend_link.py
+│   │   ├── portfolio.py
+│   │   ├── timeline_event.py
+│   │   ├── subscription.py
+│   │   ├── image.py
+│   │   └── typewriter_content.py
+│   ├── services/              # 业务逻辑服务
+│   │   ├── __init__.py
+│   │   ├── cache_service.py
+│   │   ├── email_service.py
+│   │   ├── image_service.py
+│   │   └── statistics_service.py
+│   ├── utils/                 # 工具函数
+│   │   ├── __init__.py
+│   │   ├── logger.py
+│   │   └── middleware.py
+│   ├── logs/                  # 日志文件
+│   └── tests/                 # 测试文件
+│       └── [测试文件]
+├── scripts/                   # 脚本文件
+│   ├── __init__.py
+│   ├── create_admin_user.py
+│   ├── run_server.py
+│   ├── simple_server.py
+│   ├── run_migration.py
+│   ├── db_setup.py
+│   ├── diagnose_db.py
+│   ├── fix_db_connection.py
+│   ├── run_migrations.py
+│   └── update_db_config.py
+├── docs/                      # 文档
+│   ├── API_DOCUMENTATION.md
+│   └── PROJECT_STRUCTURE.md
+├── migration_scripts/         # 临时迁移脚本
+│   ├── migrate_to_uuid.py
+│   ├── migrate_to_uuid_complete.py
+│   ├── migrate_to_uuid_final.py
+│   ├── migrate_to_uuid_precise.py
+│   ├── migrate_to_uuid_safe_method.py
+│   └── migrate_to_uuid_safe.py
+├── logs/                      # 日志输出目录
+├── .env.example              # 环境变量示例
+├── .gitignore
+├── alembic.ini               # Alembic配置
+├── requirements.txt          # 生产依赖
+├── requirements-test.txt     # 测试依赖
+├── Dockerfile
+├── docker-compose.yml        # 如果存在
+├── pytest.ini                # Pytest配置
+├── PROJECT_STRUCTURE.md      # 项目结构文档
+├── README.md
+└── init_db.bat              # 初始化数据库脚本（Windows）
 ```
 
 ## Quick Start

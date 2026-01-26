@@ -19,7 +19,7 @@ class ArticleCreate(ArticleBase):
 
 
 class ArticleCreateWithAuthor(ArticleCreate):
-    author_id: int
+    author_id: str
 
 
 # Update schemas
@@ -34,8 +34,8 @@ class ArticleUpdate(BaseModel):
 
 # Response schemas
 class ArticleInDBBase(ArticleBase):
-    id: int
-    author_id: int
+    id: str
+    author_id: str
     view_count: int
     published_at: Optional[datetime] = None
     created_at: datetime

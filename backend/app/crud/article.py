@@ -1,17 +1,42 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 from app.models.article import Article
 from app.schemas.article import ArticleCreate, ArticleUpdate
 
 
-def get_article(db: Session, article_id: int) -> Optional[Article]:
+def get_article(db: Session, article_id: UUID) -> Optional[Article]:
     return db.query(Article).filter(Article.id == article_id).first()
+
+
+def get_article_with_relationships(db: Session, article_id: UUID) -> Optional[Article]:
+    from sqlalchemy.orm import joinedload
+    return (
+        db.query(Article)
+        .options(joinedload(Article.author))
+        .options(joinedload(Article.categories))
+        .options(joinedload(Article.tags))
+        .filter(Article.id == article_id)
+        .first()
+    )
 
 
 def get_article_by_slug(db: Session, slug: str) -> Optional[Article]:
     return db.query(Article).filter(Article.slug == slug).first()
+
+
+def get_article_by_slug_with_relationships(db: Session, slug: str) -> Optional[Article]:
+    from sqlalchemy.orm import joinedload
+    return (
+        db.query(Article)
+        .options(joinedload(Article.author))
+        .options(joinedload(Article.categories))
+        .options(joinedload(Article.tags))
+        .filter(Article.slug == slug)
+        .first()
+    )
 
 
 def get_articles(
@@ -19,11 +44,11 @@ def get_articles(
     skip: int = 0,
     limit: int = 100,
     published_only: bool = True,
-    author_id: Optional[int] = None,
+    author_id: Optional[UUID] = None,
     search: Optional[str] = None,
     order_by_views: bool = False,
-    category_id: Optional[int] = None,
-    tag_id: Optional[int] = None,
+    category_id: Optional[UUID] = None,
+    tag_id: Optional[UUID] = None,
 ):
     query = db.query(Article)
     
@@ -60,7 +85,7 @@ def get_articles(
     return query.offset(skip).limit(limit).all()
 
 
-def create_article(db: Session, article: ArticleCreate, author_id: int) -> Article:
+def create_article(db: Session, article: ArticleCreate, author_id: UUID) -> Article:
     db_article = Article(
         **article.model_dump(),
         author_id=author_id,
@@ -76,7 +101,7 @@ def create_article(db: Session, article: ArticleCreate, author_id: int) -> Artic
     return db_article
 
 
-def update_article(db: Session, article_id: int, article_update: ArticleUpdate) -> Optional[Article]:
+def update_article(db: Session, article_id: UUID, article_update: ArticleUpdate) -> Optional[Article]:
     db_article = get_article(db, article_id)
     if not db_article:
         return None
@@ -99,7 +124,7 @@ def update_article(db: Session, article_id: int, article_update: ArticleUpdate) 
     return db_article
 
 
-def delete_article(db: Session, article_id: int) -> bool:
+def delete_article(db: Session, article_id: UUID) -> bool:
     db_article = get_article(db, article_id)
     if not db_article:
         return False
@@ -109,7 +134,7 @@ def delete_article(db: Session, article_id: int) -> bool:
     return True
 
 
-def increment_view_count(db: Session, article_id: int) -> Optional[Article]:
+def increment_view_count(db: Session, article_id: UUID) -> Optional[Article]:
     db_article = get_article(db, article_id)
     if not db_article:
         return None
@@ -131,7 +156,7 @@ def get_featured_articles(db: Session, limit: int = 10):
     )
 
 
-def get_related_articles(db: Session, article_id: int, limit: int = 5):
+def get_related_articles(db: Session, article_id: UUID, limit: int = 5):
     """Get articles related to a specific article based on category or tags"""
     from app.models.article_category import ArticleCategory
     from app.models.article_tag import ArticleTag
@@ -176,22 +201,39 @@ def get_related_articles(db: Session, article_id: int, limit: int = 5):
     return related_by_category
 
 
-def get_articles_with_categories_and_tags(db: Session, skip: int = 0, limit: int = 100, published_only: bool = True, category_id: int = None, tag_id: int = None):
+def get_articles_with_categories_and_tags(db: Session, skip: int = 0, limit: int = 100, published_only: bool = True, category_id: UUID = None, tag_id: UUID = None, author_id: UUID = None, search: str = None):
     """Get articles with optimized query including joined relationships for categories and tags"""
+    from sqlalchemy.orm import joinedload
     from app.models.article_category import ArticleCategory
     from app.models.article_tag import ArticleTag
     from app.models.category import Category
     from app.models.tag import Tag
-    
-    query = db.query(Article)
-    
+    from sqlalchemy import or_
+
+    query = db.query(Article).options(
+        joinedload(Article.author),
+        joinedload(Article.categories),
+        joinedload(Article.tags)
+    )
+
     if published_only:
         query = query.filter(Article.is_published == True)
-    
+
+    if author_id is not None:
+        query = query.filter(Article.author_id == author_id)
+
     if category_id is not None:
         query = query.join(ArticleCategory).filter(ArticleCategory.category_id == category_id)
-    
+
     if tag_id is not None:
         query = query.join(ArticleTag).filter(ArticleTag.tag_id == tag_id)
-    
+
+    if search:
+        search_filter = or_(
+            Article.title.ilike(f"%{search}%"),
+            Article.content.ilike(f"%{search}%"),
+            Article.excerpt.ilike(f"%{search}%"),
+        )
+        query = query.filter(search_filter)
+
     return query.offset(skip).limit(limit).all()

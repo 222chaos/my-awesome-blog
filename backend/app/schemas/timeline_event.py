@@ -31,7 +31,7 @@ class TimelineEventUpdate(BaseModel):
 
 
 class TimelineEventInDBBase(TimelineEventBase):
-    id: int
+    id: str
     created_at: datetime
 
     class Config:

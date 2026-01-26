@@ -28,7 +28,7 @@ class ImageUpdate(BaseModel):
 
 
 class ImageInDBBase(ImageBase):
-    id: int
+    id: str
     created_at: datetime
 
     class Config:
@@ -63,7 +63,7 @@ class ImageVariantUpdate(BaseModel):
 
 
 class ImageVariantInDBBase(ImageVariantBase):
-    id: int
+    id: str
     created_at: datetime
 
     class Config:

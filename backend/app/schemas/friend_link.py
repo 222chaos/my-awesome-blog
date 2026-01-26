@@ -31,7 +31,7 @@ class FriendLinkUpdate(BaseModel):
 
 
 class FriendLinkInDBBase(FriendLinkBase):
-    id: int
+    id: str
     click_count: int = 0
     created_at: datetime
     updated_at: Optional[datetime] = None

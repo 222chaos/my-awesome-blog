@@ -1,10 +1,11 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.portfolio import Portfolio
 from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
 
 
-def get_portfolio(db: Session, portfolio_id: int) -> Optional[Portfolio]:
+def get_portfolio(db: Session, portfolio_id: UUID) -> Optional[Portfolio]:
     """获取单个项目组合"""
     return db.query(Portfolio).filter(Portfolio.id == portfolio_id).first()
 
@@ -76,7 +77,7 @@ def create_portfolio(db: Session, portfolio: PortfolioCreate) -> Portfolio:
 
 
 def update_portfolio(
-    db: Session, portfolio_id: int, portfolio_update: PortfolioUpdate
+    db: Session, portfolio_id: UUID, portfolio_update: PortfolioUpdate
 ) -> Optional[Portfolio]:
     """更新项目组合"""
     db_portfolio = get_portfolio(db, portfolio_id)
@@ -95,7 +96,7 @@ def update_portfolio(
     return db_portfolio
 
 
-def delete_portfolio(db: Session, portfolio_id: int) -> bool:
+def delete_portfolio(db: Session, portfolio_id: UUID) -> bool:
     """删除项目组合"""
     db_portfolio = get_portfolio(db, portfolio_id)
     if db_portfolio:

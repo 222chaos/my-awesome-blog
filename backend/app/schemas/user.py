@@ -40,7 +40,7 @@ class UserUpdate(BaseModel):
 
 # Response schemas
 class UserInDBBase(UserBase):
-    id: int
+    id: str
     is_active: bool
     is_superuser: bool
     created_at: datetime

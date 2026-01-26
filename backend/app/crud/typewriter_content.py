@@ -1,10 +1,11 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.typewriter_content import TypewriterContent
 from app.schemas.typewriter_content import TypewriterContentCreate, TypewriterContentUpdate
 
 
-def get_typewriter_content(db: Session, content_id: int) -> Optional[TypewriterContent]:
+def get_typewriter_content(db: Session, content_id: UUID) -> Optional[TypewriterContent]:
     """Get a single typewriter content by ID"""
     return db.query(TypewriterContent).filter(TypewriterContent.id == content_id).first()
 
@@ -48,7 +49,7 @@ def create_typewriter_content(
 
 def update_typewriter_content(
     db: Session,
-    content_id: int,
+    content_id: UUID,
     content_update: TypewriterContentUpdate,
 ) -> Optional[TypewriterContent]:
     """Update an existing typewriter content"""
@@ -66,7 +67,7 @@ def update_typewriter_content(
     return db_content
 
 
-def delete_typewriter_content(db: Session, content_id: int) -> bool:
+def delete_typewriter_content(db: Session, content_id: UUID) -> bool:
     """Delete a typewriter content by ID"""
     db_content = get_typewriter_content(db, content_id)
     if not db_content:
@@ -77,7 +78,7 @@ def delete_typewriter_content(db: Session, content_id: int) -> bool:
     return True
 
 
-def deactivate_typewriter_content(db: Session, content_id: int) -> Optional[TypewriterContent]:
+def deactivate_typewriter_content(db: Session, content_id: UUID) -> Optional[TypewriterContent]:
     """Soft delete a typewriter content by setting is_active to False"""
     db_content = get_typewriter_content(db, content_id)
     if not db_content:

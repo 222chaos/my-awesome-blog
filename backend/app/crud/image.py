@@ -1,10 +1,11 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.image import Image, ImageVariant
 from app.schemas.image import ImageCreate, ImageUpdate, ImageVariantCreate, ImageVariantUpdate
 
 
-def get_image(db: Session, image_id: int) -> Optional[Image]:
+def get_image(db: Session, image_id: UUID) -> Optional[Image]:
     """获取单个图片"""
     return db.query(Image).filter(Image.id == image_id).first()
 
@@ -32,7 +33,7 @@ def create_image(db: Session, image: ImageCreate) -> Image:
     return db_image
 
 
-def update_image(db: Session, image_id: int, image_update: ImageUpdate) -> Optional[Image]:
+def update_image(db: Session, image_id: UUID, image_update: ImageUpdate) -> Optional[Image]:
     """更新图片信息"""
     db_image = get_image(db, image_id)
     if db_image:
@@ -44,7 +45,7 @@ def update_image(db: Session, image_id: int, image_update: ImageUpdate) -> Optio
     return db_image
 
 
-def delete_image(db: Session, image_id: int) -> bool:
+def delete_image(db: Session, image_id: UUID) -> bool:
     """删除图片及所有变体"""
     db_image = get_image(db, image_id)
     if db_image:
@@ -57,12 +58,12 @@ def delete_image(db: Session, image_id: int) -> bool:
     return False
 
 
-def get_image_variants(db: Session, image_id: int) -> List[ImageVariant]:
+def get_image_variants(db: Session, image_id: UUID) -> List[ImageVariant]:
     """获取图片的所有变体"""
     return db.query(ImageVariant).filter(ImageVariant.image_id == image_id).all()
 
 
-def get_image_variant_by_name(db: Session, image_id: int, variant_name: str) -> Optional[ImageVariant]:
+def get_image_variant_by_name(db: Session, image_id: UUID, variant_name: str) -> Optional[ImageVariant]:
     """根据名称获取图片变体"""
     return (
         db.query(ImageVariant)
@@ -71,7 +72,7 @@ def get_image_variant_by_name(db: Session, image_id: int, variant_name: str) -> 
     )
 
 
-def create_image_variant(db: Session, image_variant: ImageVariantCreate, image_id: int) -> ImageVariant:
+def create_image_variant(db: Session, image_variant: ImageVariantCreate, image_id: UUID) -> ImageVariant:
     """创建图片变体"""
     db_variant = ImageVariant(**image_variant.model_dump(), image_id=image_id)
     db.add(db_variant)
@@ -81,7 +82,7 @@ def create_image_variant(db: Session, image_variant: ImageVariantCreate, image_i
 
 
 def update_image_variant(
-    db: Session, variant_id: int, variant_update: ImageVariantUpdate
+    db: Session, variant_id: UUID, variant_update: ImageVariantUpdate
 ) -> Optional[ImageVariant]:
     """更新图片变体"""
     db_variant = db.query(ImageVariant).filter(ImageVariant.id == variant_id).first()
@@ -94,7 +95,7 @@ def update_image_variant(
     return db_variant
 
 
-def delete_image_variant(db: Session, variant_id: int) -> bool:
+def delete_image_variant(db: Session, variant_id: UUID) -> bool:
     """删除图片变体"""
     db_variant = db.query(ImageVariant).filter(ImageVariant.id == variant_id).first()
     if db_variant:
@@ -104,7 +105,7 @@ def delete_image_variant(db: Session, variant_id: int) -> bool:
     return False
 
 
-def get_image_with_variants(db: Session, image_id: int) -> Optional[Image]:
+def get_image_with_variants(db: Session, image_id: UUID) -> Optional[Image]:
     """获取图片及其所有变体"""
     return db.query(Image).filter(Image.id == image_id).first()
 
@@ -119,7 +120,7 @@ def get_optimized_images(db: Session, skip: int = 0, limit: int = 100) -> List[I
     )
 
 
-def mark_image_as_optimized(db: Session, image_id: int) -> bool:
+def mark_image_as_optimized(db: Session, image_id: UUID) -> bool:
     """标记图片为已优化"""
     db_image = get_image(db, image_id)
     if db_image:

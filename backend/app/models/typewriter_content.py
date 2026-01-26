@@ -1,13 +1,14 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+import uuid
 from app.core.database import Base
 
 
 class TypewriterContent(Base):
     __tablename__ = "typewriter_contents"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     text = Column(String(500), nullable=False)
     priority = Column(Integer, default=0, index=True)
     is_active = Column(Boolean, default=True, index=True)

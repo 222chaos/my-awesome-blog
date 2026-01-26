@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, Text, Date, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, Date, DateTime, Boolean, UUID
 from sqlalchemy.sql import func
+import uuid
 from app.core.database import Base
 
 
 class TimelineEvent(Base):
     __tablename__ = "timeline_events"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     title = Column(String(200), nullable=False)
     description = Column(Text)
     event_date = Column(Date, nullable=False)

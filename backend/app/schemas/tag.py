@@ -23,7 +23,7 @@ class TagUpdate(BaseModel):
 
 
 class TagInDBBase(TagBase):
-    id: int
+    id: str
     created_at: datetime
 
     class Config:

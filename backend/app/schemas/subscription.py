@@ -19,7 +19,7 @@ class SubscriptionUpdate(BaseModel):
 
 
 class SubscriptionInDBBase(SubscriptionBase):
-    id: int
+    id: str
     verification_token: Optional[str] = None
     subscribed_at: datetime
     verified_at: Optional[datetime] = None

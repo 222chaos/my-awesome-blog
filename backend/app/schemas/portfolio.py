@@ -39,7 +39,7 @@ class PortfolioUpdate(BaseModel):
 
 
 class PortfolioInDBBase(PortfolioBase):
-    id: int
+    id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
 

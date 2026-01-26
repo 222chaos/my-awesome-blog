@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, Index
+from sqlalchemy import Column, Integer, String, DateTime, Text, Index, UUID
 from sqlalchemy.sql import func
+import uuid
 from app.core.database import Base
 
 
@@ -9,7 +10,7 @@ class RequestLog(Base):
     """
     __tablename__ = "request_logs"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     request_id = Column(String(36), nullable=False, index=True)  # UUID
     method = Column(String(10), nullable=False)  # GET, POST, PUT, DELETE, etc.
     url = Column(String(500), nullable=False)
@@ -32,7 +33,7 @@ class RequestLog(Base):
     duration = Column(Integer, nullable=False)  # in milliseconds
     
     # Additional fields
-    user_id = Column(Integer, nullable=True, index=True)  # Foreign key to users table
+    user_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # Foreign key to users table
     session_id = Column(String(100), nullable=True, index=True)
 
 

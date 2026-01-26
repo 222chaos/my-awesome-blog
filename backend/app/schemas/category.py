@@ -29,7 +29,7 @@ class CategoryUpdate(BaseModel):
 
 
 class CategoryInDBBase(CategoryBase):
-    id: int
+    id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
 

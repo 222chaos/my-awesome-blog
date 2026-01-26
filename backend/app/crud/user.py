@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.core.security import pwd_context
 from app.models.user import User
@@ -15,7 +16,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def get_user(db: Session, user_id: int) -> Optional[User]:
+def get_user(db: Session, user_id: UUID) -> Optional[User]:
     return db.query(User).filter(User.id == user_id).first()
 
 
@@ -51,7 +52,7 @@ def create_user(db: Session, user: UserCreate) -> User:
     return db_user
 
 
-def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[User]:
+def update_user(db: Session, user_id: UUID, user_update: UserUpdate) -> Optional[User]:
     db_user = get_user(db, user_id)
     if not db_user:
         return None
@@ -70,7 +71,7 @@ def update_user(db: Session, user_id: int, user_update: UserUpdate) -> Optional[
     return db_user
 
 
-def delete_user(db: Session, user_id: int) -> bool:
+def delete_user(db: Session, user_id: UUID) -> bool:
     db_user = get_user(db, user_id)
     if not db_user:
         return False

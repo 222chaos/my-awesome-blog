@@ -1,4 +1,5 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_, func
 from app.models.category import Category
@@ -6,7 +7,7 @@ from app.models.article_category import ArticleCategory
 from app.schemas.category import CategoryCreate, CategoryUpdate
 
 
-def get_category(db: Session, category_id: int) -> Optional[Category]:
+def get_category(db: Session, category_id: UUID) -> Optional[Category]:
     """获取单个分类"""
     return db.query(Category).filter(Category.id == category_id).first()
 
@@ -72,7 +73,7 @@ def create_category(db: Session, category: CategoryCreate) -> Category:
     return db_category
 
 
-def update_category(db: Session, category_id: int, category_update: CategoryUpdate) -> Optional[Category]:
+def update_category(db: Session, category_id: UUID, category_update: CategoryUpdate) -> Optional[Category]:
     """更新分类"""
     db_category = get_category(db, category_id)
     if db_category:
@@ -84,7 +85,7 @@ def update_category(db: Session, category_id: int, category_update: CategoryUpda
     return db_category
 
 
-def delete_category(db: Session, category_id: int) -> bool:
+def delete_category(db: Session, category_id: UUID) -> bool:
     """删除分类"""
     db_category = get_category(db, category_id)
     if db_category:

@@ -1,10 +1,11 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.friend_link import FriendLink
 from app.schemas.friend_link import FriendLinkCreate, FriendLinkUpdate
 
 
-def get_friend_link(db: Session, friend_link_id: int) -> Optional[FriendLink]:
+def get_friend_link(db: Session, friend_link_id: UUID) -> Optional[FriendLink]:
     """获取单个友情链接"""
     return db.query(FriendLink).filter(FriendLink.id == friend_link_id).first()
 
@@ -61,7 +62,7 @@ def create_friend_link(db: Session, friend_link: FriendLinkCreate) -> FriendLink
 
 
 def update_friend_link(
-    db: Session, friend_link_id: int, friend_link_update: FriendLinkUpdate
+    db: Session, friend_link_id: UUID, friend_link_update: FriendLinkUpdate
 ) -> Optional[FriendLink]:
     """更新友情链接"""
     db_friend_link = get_friend_link(db, friend_link_id)
@@ -74,7 +75,7 @@ def update_friend_link(
     return db_friend_link
 
 
-def delete_friend_link(db: Session, friend_link_id: int) -> bool:
+def delete_friend_link(db: Session, friend_link_id: UUID) -> bool:
     """删除友情链接"""
     db_friend_link = get_friend_link(db, friend_link_id)
     if db_friend_link:
@@ -84,7 +85,7 @@ def delete_friend_link(db: Session, friend_link_id: int) -> bool:
     return False
 
 
-def increment_click_count(db: Session, friend_link_id: int) -> bool:
+def increment_click_count(db: Session, friend_link_id: UUID) -> bool:
     """增加友情链接点击次数"""
     db_friend_link = get_friend_link(db, friend_link_id)
     if db_friend_link:

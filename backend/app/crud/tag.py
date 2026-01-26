@@ -1,4 +1,5 @@
 from typing import List, Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.tag import Tag
@@ -6,7 +7,7 @@ from app.models.article_tag import ArticleTag
 from app.schemas.tag import TagCreate, TagUpdate
 
 
-def get_tag(db: Session, tag_id: int) -> Optional[Tag]:
+def get_tag(db: Session, tag_id: UUID) -> Optional[Tag]:
     """获取单个标签"""
     return db.query(Tag).filter(Tag.id == tag_id).first()
 
@@ -90,7 +91,7 @@ def create_tag(db: Session, tag: TagCreate) -> Tag:
     return db_tag
 
 
-def update_tag(db: Session, tag_id: int, tag_update: TagUpdate) -> Optional[Tag]:
+def update_tag(db: Session, tag_id: UUID, tag_update: TagUpdate) -> Optional[Tag]:
     """更新标签"""
     db_tag = get_tag(db, tag_id)
     if db_tag:
@@ -102,7 +103,7 @@ def update_tag(db: Session, tag_id: int, tag_update: TagUpdate) -> Optional[Tag]
     return db_tag
 
 
-def delete_tag(db: Session, tag_id: int) -> bool:
+def delete_tag(db: Session, tag_id: UUID) -> bool:
     """删除标签"""
     db_tag = get_tag(db, tag_id)
     if db_tag:

@@ -15,19 +15,24 @@ def read_articles(
     skip: int = 0,
     limit: int = 100,
     published_only: bool = Query(True, description="Only return published articles"),
-    author_id: Optional[int] = Query(None, description="Filter by author ID"),
+    author_id: Optional[str] = Query(None, description="Filter by author ID"),
     search: Optional[str] = Query(None, description="Search in title and content"),
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Retrieve articles
     """
-    articles = crud.get_articles(
-        db, 
-        skip=skip, 
-        limit=limit, 
+    from uuid import UUID
+    author_uuid = UUID(author_id) if author_id else None
+
+    articles = crud.get_articles_with_categories_and_tags(
+        db,
+        skip=skip,
+        limit=limit,
         published_only=published_only,
-        author_id=author_id,
+        category_id=None,
+        tag_id=None,
+        author_id=author_uuid,
         search=search
     )
     return articles
@@ -76,7 +81,7 @@ def read_popular_articles(
     """
     Get popular articles based on views in recent days
     """
-    articles = crud.get_articles(
+    articles = crud.get_articles_with_categories_and_tags(
         db,
         skip=0,
         limit=limit,
@@ -91,7 +96,7 @@ def search_articles(
     q: str = Query(..., min_length=1, max_length=100, description="Search query"),
     category_slug: Optional[str] = Query(None, description="Filter by category slug"),
     tag_slug: Optional[str] = Query(None, description="Filter by tag slug"),
-    author_id: Optional[int] = Query(None, description="Filter by author ID"),
+    author_id: Optional[str] = Query(None, description="Filter by author ID"),
     published_only: bool = Query(True, description="Only return published articles"),
     skip: int = 0,
     limit: int = 100,
@@ -110,7 +115,7 @@ def search_articles(
                 detail="Category not found",
             )
         category_id = category.id
-    
+
     # Get tag_id if tag_slug is provided
     tag_id = None
     if tag_slug:
@@ -121,18 +126,21 @@ def search_articles(
                 detail="Tag not found",
             )
         tag_id = tag.id
-    
-    articles = crud.get_articles(
+
+    from uuid import UUID
+    author_uuid = UUID(author_id) if author_id else None
+
+    articles = crud.get_articles_with_categories_and_tags(
         db,
         skip=skip,
         limit=limit,
         published_only=published_only,
-        author_id=author_id,
+        author_id=author_uuid,
         search=q,
         category_id=category_id,
         tag_id=tag_id
     )
-    
+
     return articles
 
 
@@ -144,55 +152,59 @@ def read_article_by_slug(
     """
     Get a specific article by slug
     """
-    article = crud.get_article_by_slug(db, slug=slug)
+    article = crud.get_article_by_slug_with_relationships(db, slug=slug)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Article not found",
         )
-    
+
     # Increment view count
     crud.increment_view_count(db, article_id=article.id)  # type: ignore
-    
+
     return article
 
 
 @router.get("/related/{article_id}", response_model=List[ArticleWithAuthor])
 def read_related_articles(
-    article_id: int,
+    article_id: str,
     limit: int = Query(5, ge=1, le=20, description="Number of related articles to return"),
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get articles related to a specific article
     """
-    article = crud.get_article(db, article_id=article_id)
+    from uuid import UUID
+    article_uuid = UUID(article_id)
+    article = crud.get_article(db, article_id=article_uuid)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Article not found",
         )
-    
-    related_articles = crud.get_related_articles(db, article_id=article_id, limit=limit)
+
+    related_articles = crud.get_related_articles(db, article_id=article_uuid, limit=limit)
     return related_articles
 
 
 @router.get("/{article_id}", response_model=ArticleWithAuthor)
 def read_article_by_id(
-    article_id: int,
+    article_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific article by id
     """
-    article = crud.get_article(db, article_id=article_id)
+    from uuid import UUID
+    article_uuid = UUID(article_id)
+    article = crud.get_article_with_relationships(db, article_id=article_uuid)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Article not found",
         )
-    
+
     # Increment view count
-    crud.increment_view_count(db, article_id=article_id)
-    
+    crud.increment_view_count(db, article_id=article_uuid)
+
     return article

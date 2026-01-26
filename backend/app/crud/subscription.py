@@ -1,12 +1,13 @@
 from typing import List, Optional
 import uuid
+from uuid import UUID
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models.subscription import Subscription
 from app.schemas.subscription import SubscriptionCreate
 
 
-def get_subscription(db: Session, subscription_id: int) -> Optional[Subscription]:
+def get_subscription(db: Session, subscription_id: UUID) -> Optional[Subscription]:
     """获取单个订阅"""
     return db.query(Subscription).filter(Subscription.id == subscription_id).first()
 
@@ -66,7 +67,7 @@ def create_subscription(db: Session, subscription: SubscriptionCreate) -> Subscr
     return db_subscription
 
 
-def update_subscription(db: Session, subscription_id: int, **kwargs) -> Optional[Subscription]:
+def update_subscription(db: Session, subscription_id: UUID, **kwargs) -> Optional[Subscription]:
     """更新订阅信息"""
     db_subscription = get_subscription(db, subscription_id)
     if db_subscription:
@@ -77,7 +78,7 @@ def update_subscription(db: Session, subscription_id: int, **kwargs) -> Optional
     return db_subscription
 
 
-def delete_subscription(db: Session, subscription_id: int) -> bool:
+def delete_subscription(db: Session, subscription_id: UUID) -> bool:
     """删除订阅（硬删除）"""
     db_subscription = get_subscription(db, subscription_id)
     if db_subscription:
@@ -87,7 +88,7 @@ def delete_subscription(db: Session, subscription_id: int) -> bool:
     return False
 
 
-def deactivate_subscription(db: Session, subscription_id: int) -> bool:
+def deactivate_subscription(db: Session, subscription_id: UUID) -> bool:
     """取消订阅（软删除，设置为非活跃）"""
     db_subscription = get_subscription(db, subscription_id)
     if db_subscription and db_subscription.is_active:

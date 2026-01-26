@@ -24,7 +24,7 @@ class TypewriterContentUpdate(BaseModel):
 
 # Response schema
 class TypewriterContentInDBBase(TypewriterContentBase):
-    id: int
+    id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
 
