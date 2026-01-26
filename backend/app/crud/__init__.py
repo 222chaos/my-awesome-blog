@@ -3,6 +3,7 @@ from app.crud.user import (
     create_user, update_user, delete_user, authenticate_user,
     get_password_hash
 )
+from app.core.security import verify_password
 
 from app.crud.article import (
     get_article, get_article_by_slug, get_articles,
