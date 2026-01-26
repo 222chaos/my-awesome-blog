@@ -45,16 +45,16 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, children, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
-    
+
     // 涟漪效果处理
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (onClick) onClick(e);
-      
+
       const button = e.currentTarget;
       const rect = button.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       const ripple = document.createElement('span');
       ripple.style.cssText = `
         position: absolute;
@@ -70,12 +70,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         margin-left: -50px;
         margin-top: -50px;
       `;
-      
+
       button.appendChild(ripple);
-      
+
       setTimeout(() => ripple.remove(), 600);
     };
-    
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}

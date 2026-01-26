@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import type { Post } from '@/types';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { PostCardSkeleton } from '@/components/blog/PostCard';
+import { PostCard, PostCardSkeleton } from '@/components/blog/PostCard';
 import { useTheme } from '@/context/theme-context';
 
 interface PostCardItemProps {
@@ -18,55 +18,18 @@ interface PostCardItemWithThemeProps extends PostCardItemProps {
 }
 
 const PostCardItemWithTheme = React.memo(({ post, index, glassCardClass }: PostCardItemWithThemeProps) => (
-  <Card
+  <PostCard
     key={post.id}
-    className={`${glassCardClass} group h-full flex flex-col animate-fade-scale-up`}
+    id={post.id}
+    title={post.title}
+    excerpt={post.excerpt}
+    date={post.date}
+    readTime={post.readTime}
+    category={post.category}
+    href={`/posts/${post.id}`}
+    className={`animate-fade-scale-up ${glassCardClass}`}
     style={{ animationDelay: `${index * 100}ms` }}
-  >
-    <CardContent className="flex-grow p-6">
-      <span className="inline-block px-3 py-1 text-xs font-semibold bg-glass rounded-full mb-4" style={{ backgroundColor: 'var(--glass-default)', color: 'var(--tech-cyan)' }}>
-        {post.category}
-      </span>
-
-      <h3 className="text-xl font-bold mb-3 group-hover:text-tech-lightcyan transition-colors" style={{ color: 'var(--foreground)' }}>
-        {post.title}
-      </h3>
-
-      <p className="mb-4 line-clamp-3" style={{ color: 'var(--foreground)' }}>{post.excerpt}</p>
-
-      <div className="flex justify-between items-center text-sm" style={{ color: 'var(--muted-foreground)' }}>
-        <span style={{ color: 'var(--muted-foreground)' }}>{post.date}</span>
-        <span style={{ color: 'var(--muted-foreground)' }}>{post.readTime}</span>
-      </div>
-    </CardContent>
-
-    <CardFooter className="mt-auto">
-      <Link
-        href={`/posts/${post.id}`}
-        className="font-medium inline-flex items-center group-hover:translate-x-1 transition-transform"
-        style={{ color: 'var(--tech-cyan)' }}
-        onMouseEnter={(e) => e.currentTarget.style.color = 'var(--tech-lightcyan)'}
-        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--tech-cyan)'}
-        aria-label={`阅读文章: ${post.title}`}
-      >
-        Read more
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </Link>
-    </CardFooter>
-  </Card>
+  />
 ));
 
 PostCardItemWithTheme.displayName = 'PostCardItemWithTheme';
@@ -80,22 +43,22 @@ interface PostGridProps {
 
 export default function PostGrid({ posts, loading = false, hasMore = true, onLoadMore }: PostGridProps) {
   const { resolvedTheme } = useTheme();
-  
+
   const glassCardClass = resolvedTheme === 'dark'
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
-  
+
   const [page, setPage] = useState(1);
   const [hasMoreLocal, setHasMoreLocal] = useState(hasMore);
   const [loadingLocal, setLoadingLocal] = useState(loading);
   const observerRef = useRef<IntersectionObserver>();
-  
+
   const loadMore = useCallback(async () => {
     if (loadingLocal || !hasMoreLocal || !onLoadMore) return;
-    
+
     setLoadingLocal(true);
     onLoadMore();
-    
+
     // 模拟加载数据
     setTimeout(() => {
       setLoadingLocal(false);
@@ -120,10 +83,10 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
 
     return () => observer.disconnect();
   }, [loadMore, hasMoreLocal, loadingLocal]);
-  
+
   // 根据加载状态决定是否显示骨架屏
   const shouldShowSkeleton = loadingLocal && posts.length === 0;
-  
+
   return (
     <section className="py-16 lg:py-20">
       <div className="container mx-auto px-4">
@@ -143,7 +106,7 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
             ))
           )}
         </div>
-        
+
         {(hasMoreLocal || loadingLocal) && (
           <div id="sentinel" className="flex justify-center py-8">
             {loadingLocal && posts.length > 0 && (

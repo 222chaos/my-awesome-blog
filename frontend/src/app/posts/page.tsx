@@ -1,5 +1,6 @@
 import PostCard from '@/components/blog/PostCard';
 import GlassCard from '@/components/ui/GlassCard';
+import Breadcrumb from '@/components/Breadcrumb';
 
 export default function PostsPage() {
   // Sample posts data - in a real app, this would come from a CMS or content directory
@@ -40,7 +41,16 @@ export default function PostsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-20 lg:py-24">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb
+          items={[
+            { label: '首页', href: '/' },
+            { label: '文章', active: true }
+          ]}
+        />
+      </div>
+
+      <div className="container mx-auto px-4 py-12 lg:py-16">
         <GlassCard className="max-w-4xl mx-auto mb-12 text-center animate-fade-in-up">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             最新文章
@@ -52,7 +62,7 @@ export default function PostsPage() {
 
         <div className="max-w-4xl mx-auto space-y-8">
           {samplePosts.map((post, index) => (
-            <div 
+            <div
               key={post.id}
               className="animate-fade-in-up"
               style={{ animationDelay: `${index * 100}ms` }}

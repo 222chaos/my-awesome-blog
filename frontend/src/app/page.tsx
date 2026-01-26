@@ -10,6 +10,7 @@ import TagCloud from '@/components/home/TagCloud';
 import Timeline from '@/components/home/Timeline';
 import FriendLinks from '@/components/home/FriendLinks';
 import Portfolio from '@/components/home/Portfolio';
+import Breadcrumb from '@/components/Breadcrumb';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import type { Post, Category, PopularPost, TimelineItem, FriendLink } from '@/types';
@@ -88,7 +89,7 @@ export default function Home() {
       { id: 'typescript-best-practices', title: 'TypeScript 最佳实践', date: '1月5日' },
       { id: 'api-design-guide', title: '现代 API 设计原则', date: '12月28日' },
     ]);
-    
+
     setTimelineEvents([
       {
         date: '2024年1月',
@@ -111,7 +112,7 @@ export default function Home() {
         description: '为几个开源项目和GitHub仓库做出贡献。',
       },
     ]);
-    
+
     setFriendLinks([
       {
         id: '1',
@@ -147,43 +148,51 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div id="content" className="bg-background">
+        <div className="container mx-auto px-4 py-6">
+          <Breadcrumb
+            items={[
+              { label: '首页', href: '/', active: true }
+            ]}
+          />
+        </div>
+
         <HeroSection />
-        
+
         <div className="container mx-auto px-4 py-16 bg-background">
           <StatsPanel />
         </div>
-        
+
         <div className="container mx-auto px-4 py-16 bg-background">
           <FeaturedSection />
         </div>
-        
+
         <div className="container mx-auto px-4 py-16 bg-background">
           <div className="flex flex-col lg:flex-row gap-8">
             <main className="flex-1">
               <PostGrid posts={posts} />
             </main>
-            
+
             <aside className="lg:w-80">
-              <Sidebar 
-                categories={categories} 
-                popularPosts={popularPosts} 
+              <Sidebar
+                categories={categories}
+                popularPosts={popularPosts}
               />
             </aside>
           </div>
         </div>
-        
+
         <div className="container mx-auto px-4 py-16 bg-background">
           <TagCloud tags={categories.map(cat => ({ name: cat.name, count: cat.count }))} />
         </div>
-        
+
         <div className="container mx-auto px-4 py-16 bg-background">
           <Timeline events={timelineEvents} />
         </div>
-        
+
         <div className="container mx-auto px-4 py-16 bg-background">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <FriendLinks links={friendLinks} />
-            <Portfolio 
+            <Portfolio
               projects={[{
                 id: '1',
                 title: '电商网站',
@@ -198,11 +207,11 @@ export default function Home() {
                 image: '/assets/placeholder-portfolio.jpg',
                 tags: ['Vue.js', 'Firebase', 'Tailwind'],
                 link: '/projects/task-manager',
-              }]} 
+              }]}
             />
           </div>
         </div>
-        
+
         <Card className="container mx-auto px-4 py-8 mt-12 glass-card glow-border">
           <CardContent className="text-center">
             <h3 className="text-2xl font-bold text-foreground mb-4 animate-fade-in-up">

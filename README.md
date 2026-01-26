@@ -166,6 +166,31 @@ The backend uses PostgreSQL by default with the following credentials (configure
 
 For development with SQLite, update `DATABASE_URL` in `.env` file.
 
+### Windows-specific Database Setup
+
+If you're running on Windows, we provide automated tools to help set up your PostgreSQL database:
+
+```bash
+# Step 1: Diagnose database connection
+cd backend
+python scripts/diagnose_db.py
+
+# Step 2: Fix any issues found
+python scripts/fix_db_connection.py
+
+# Step 3: Update database configuration if needed
+python scripts/update_db_config.py
+```
+
+These tools will help you:
+- Check PostgreSQL service status
+- Verify database connection
+- Create missing databases automatically
+- Initialize table structure
+- Update connection credentials
+
+For detailed instructions, see [Backend README](./backend/README.md#database-setup-tools-windows-specific).
+
 ## Testing
 
 ### Backend Tests

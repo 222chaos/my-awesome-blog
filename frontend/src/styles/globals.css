@@ -17,62 +17,86 @@
     --border: #93c5fd;
     --glass-light-border: rgba(30, 58, 138, 0.15);
     --radius: 0.5rem;
-    
+
     /* 扩展的颜色变量 */
     --muted: #34d399;
-    --muted-foreground: #22c55e;
+    --muted-foreground: #4a5568; /* 增强对比度 */
     --popover: #ffffff;
     --popover-foreground: #0a0a0a;
     --input: #34d399;
     --ring: #059669;
-    
+
+    /* 状态颜色 */
+    --success: #10b981;
+    --success-foreground: #ecfdf5;
+    --warning: #f59e0b;
+    --warning-foreground: #fffbeb;
+    --error: #ef4444;
+    --error-foreground: #fef2f2;
+    --info: #3b82f6;
+    --info-foreground: #eff6ff;
+
     /* 玻璃效果专用变量 - 浅色主题 */
     --glass-default: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(5, 150, 105, 0.15);
     --glass-glow: rgba(5, 150, 105, 0.2);
-    
+
     /* 技术颜色变量 - 浅色绿黑主题 */
     --tech-darkblue: #0f172a;
     --tech-deepblue: #166534;
     --tech-cyan: #059669;
     --tech-lightcyan: #34d399;
     --tech-sky: #22c55e;
-    
+
+    /* 高对比度文本颜色 */
+    --text-primary-high-contrast: #0a0a0a;
+    --text-secondary-high-contrast: #4a5568;
+
     /* 动画变量 */
     --transition-duration: 0.3s;
     --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     /* 涟漪效果颜色 - 浅色主题 */
     --ripple-color: rgba(5, 150, 105, 0.3);
-    
+
     /* 纹理叠加颜色 - 浅色主题 */
     --texture-color: rgba(0, 0, 0, 0.1);
-    
+
     /* 技术阴影颜色 - 浅色主题 */
     --shadow-tech-cyan: rgba(5, 150, 105, 0.5);
   }
 
   .dark {
     --background: #000000;
-    --foreground: #e0f2fe;
+    --foreground: #f8fafc; /* 提高对比度 */
     --primary: #059669;
-    --primary-foreground: #e0f2fe;
+    --primary-foreground: #f8fafc; /* 提高对比度 */
     --secondary: #047857;
-    --secondary-foreground: #e0f2fe;
+    --secondary-foreground: #f8fafc; /* 提高对比度 */
     --accent: #065f46;
-    --accent-foreground: #e0f2fe;
+    --accent-foreground: #f8fafc; /* 提高对比度 */
     --card: #111111;
-    --card-foreground: #e0f2fe;
+    --card-foreground: #f8fafc; /* 提高对比度 */
     --border: #10b981;
     --glass-light-border: rgba(16, 185, 129, 0.15);
 
     /* 扩展的颜色变量 */
     --muted: #34d399;
-    --muted-foreground: #22c55e;
+    --muted-foreground: #94a3b8; /* 增强对比度 */
     --popover: #111111;
-    --popover-foreground: #e0f2fe;
+    --popover-foreground: #f8fafc; /* 提高对比度 */
     --input: #34d399;
     --ring: #059669;
+
+    /* 状态颜色 */
+    --success: #34d399;
+    --success-foreground: #ecfdf5;
+    --warning: #fbbf24;
+    --warning-foreground: #fffbeb;
+    --error: #f87171;
+    --error-foreground: #fef2f2;
+    --info: #60a5fa;
+    --info-foreground: #eff6ff;
 
     /* 玻璃效果专用变量 - 深色主题 */
     --glass-default: rgba(30, 30, 30, 0.7);
@@ -85,6 +109,10 @@
     --tech-cyan: #059669;
     --tech-lightcyan: #10b981;
     --tech-sky: #22c55e;
+
+    /* 高对比度文本颜色 */
+    --text-primary-high-contrast: #f8fafc;
+    --text-secondary-high-contrast: #94a3b8;
 
     /* 涟漪效果颜色 - 深色主题 */
     --ripple-color: rgba(5, 150, 105, 0.3);
@@ -102,6 +130,26 @@
     @apply bg-background text-foreground bg-page;
   }
 }
+
+/* 高对比度文本类 */
+.text-high-contrast {
+  color: var(--text-primary-high-contrast);
+}
+
+.text-secondary-contrast {
+  color: var(--text-secondary-high-contrast);
+}
+
+/* 状态颜色类 */
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-error { color: var(--error); }
+.text-info { color: var(--info); }
+
+.bg-success { background-color: var(--success); }
+.bg-warning { background-color: var(--warning); }
+.bg-error { background-color: var(--error); }
+.bg-info { background-color: var(--info); }
 
 /* 轻度磨砂玻璃 - 可读性优先 */
 .glass-card {
@@ -478,6 +526,39 @@ html {
 
 .animate-glow-pulse {
   animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* 为减少动画偏好添加支持 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-glow-pulse {
+    animation: none;
+  }
+
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-fade-in-up,
+  .animate-slide-in-left,
+  .animate-scale-fade-in,
+  .animate-float-improved,
+  .animate-fade-scale-up,
+  .animate-slide-in-right,
+  .animate-glow-pulse {
+    animation: none;
+  }
+
+  .smooth-transition,
+  .glass-hover,
+  .glass-hover-subtle {
+    transition: none;
+  }
 }
 
 /* 全局渐变动态滚动条 */

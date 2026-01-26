@@ -55,6 +55,10 @@ backend/
 │   ├── versions/               # Database migration scripts
 │   ├── env.py                  # Alembic environment
 │   └── script.py.mako          # Migration template
+├── scripts/                    # Utility scripts
+│   ├── diagnose_db.py          # Database diagnostic tool
+│   ├── fix_db_connection.py    # Automatic database creation and initialization
+│   └── update_db_config.py     # Database configuration update tool
 ├── .env.example                # Environment variables template
 ├── .env                        # Environment variables (gitignored)
 ├── requirements.txt            # Production dependencies
@@ -108,6 +112,24 @@ SECRET_KEY=your-super-secret-key-change-this-in-production
 ```
 
 6. Initialize database and run migrations:
+
+**Option A: Automatic Setup (Recommended for Windows)**
+
+Use the provided diagnostic and repair tools:
+
+```bash
+# Step 1: Diagnose database connection
+python scripts/diagnose_db.py
+
+# Step 2: Fix any issues found (creates database if missing)
+python scripts/fix_db_connection.py
+
+# Step 3: Update database configuration if needed
+python scripts/update_db_config.py
+```
+
+**Option B: Manual Setup**
+
 ```bash
 # Create database (PostgreSQL)
 # For SQLite, skip this step
@@ -232,6 +254,94 @@ pip install pre-commit
 ```bash
 pre-commit install
 ```
+
+## Database Setup Tools (Windows-Specific)
+
+We provide automated tools to help set up and troubleshoot your PostgreSQL database on Windows.
+
+### Available Scripts
+
+#### 1. Database Diagnostic Tool (`scripts/diagnose_db.py`)
+
+Diagnoses PostgreSQL connection issues:
+
+```bash
+python scripts/diagnose_db.py
+```
+
+Checks:
+- PostgreSQL service status
+- Port availability (5432)
+- Server connectivity
+- Database existence
+- User credentials
+
+#### 2. Database Repair Tool (`scripts/fix_db_connection.py`)
+
+Automatically creates missing databases and initializes table structure:
+
+```bash
+python scripts/fix_db_connection.py
+```
+
+This script will:
+- Create the database if it doesn't exist
+- Create all required tables
+- Create the default admin user (username: `admin`, password: `admin123`)
+
+#### 3. Configuration Update Tool (`scripts/update_db_config.py`)
+
+Update database connection parameters interactively:
+
+```bash
+python scripts/update_db_config.py
+```
+
+Allows you to update:
+- Host address
+- Port number
+- Database name
+- Username
+- Password
+
+### Troubleshooting Common Issues
+
+#### Database Doesn't Exist
+```bash
+# Run diagnostics first
+python scripts/diagnose_db.py
+
+# Then run the fix script
+python scripts/fix_db_connection.py
+```
+
+#### Authentication Errors
+```bash
+# Update your credentials
+python scripts/update_db_config.py
+```
+
+#### Service Not Running
+```cmd
+# Check service status
+sc query postgresql-x64-17
+
+# Start PostgreSQL service (run as Administrator)
+net start postgresql-x64-17
+```
+
+### Using Docker Compose
+
+Alternatively, use Docker Compose for easy PostgreSQL setup:
+
+```bash
+docker-compose up -d postgres
+```
+
+This will:
+- Start PostgreSQL container on port 5432
+- Create database `my_awesome_blog`
+- Set user `postgres` with password `123456`
 
 ## License
 

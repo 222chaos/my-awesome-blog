@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import SearchBar from '@/components/search/SearchBar';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -80,7 +81,7 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="flex-1"></div>
+          <div className="hidden md:flex-1"></div>
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 text-sm font-medium">
             {navLinks.map((link) => {
               const IconComponent = link.icon;
@@ -104,7 +105,11 @@ export default function Navbar() {
             })}
           </nav>
 
-          <div className="flex items-center space-x-2 ml-4 text-foreground">
+          <div className="hidden md:block w-64 mr-4">
+            <SearchBar />
+          </div>
+
+          <div className="flex items-center space-x-2 ml-2 text-foreground">
             <RopeThemeToggler ropeLength={120} className="hidden md:flex" />
             <RopeThemeToggler ropeLength={60} className="flex md:hidden" />
           </div>
