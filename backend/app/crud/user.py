@@ -80,11 +80,12 @@ def delete_user(db: Session, user_id: int) -> bool:
     return True
 
 
+from app.core.security import verify_password
+
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
     user = get_user_by_username(db, username)
     if not user:
         return None
-    from app.core.security import verify_password
     if not verify_password(password, str(user.hashed_password)):
         return None
     return user
