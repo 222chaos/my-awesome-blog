@@ -237,3 +237,32 @@ def get_articles_with_categories_and_tags(db: Session, skip: int = 0, limit: int
         query = query.filter(search_filter)
 
     return query.offset(skip).limit(limit).all()
+
+
+def get_popular_articles(db: Session, limit: int = 5, days: int = 30):
+    """
+    获取热门文章（基于浏览量和评论数）
+    """
+    from sqlalchemy import func, and_
+    from datetime import datetime, timedelta
+    from app.models.comment import Comment
+
+    # 计算日期范围
+    since_date = datetime.utcnow() - timedelta(days=days)
+
+    # 查询热门文章（考虑浏览量和评论数）
+    popular_articles = (
+        db.query(Article)
+        .join(Comment, Comment.article_id == Article.id, isouter=True)  # 左连接评论表
+        .filter(and_(Article.is_published == True, Article.published_at >= since_date))
+        .group_by(Article.id)  # 按文章分组
+        .order_by(
+            Article.view_count.desc(),  # 首先按浏览量降序
+            func.count(Comment.id).desc(),  # 然后按评论数降序
+            Article.published_at.desc()  # 最后按发布时间降序
+        )
+        .limit(limit)
+        .all()
+    )
+
+    return popular_articles

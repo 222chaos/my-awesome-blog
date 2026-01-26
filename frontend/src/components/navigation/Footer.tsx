@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import GlassCard from '@/components/ui/GlassCard';
 import { useTheme } from '@/context/theme-context';
+import { useThemeUtils } from '@/hooks/useThemeUtils';
 
 export default function Footer() {
   const { resolvedTheme } = useTheme();
-  
+  const { getThemeClass } = useThemeUtils();
+
   const glassCardClass = 'glass-card';
-  
+
   const currentYear = new Date().getFullYear();
 
   return (
@@ -21,7 +23,7 @@ export default function Footer() {
               一个现代的企业级个人博客，分享关于技术、设计和开发的见解。
             </p>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold mb-4 text-foreground">导航</h3>
             <ul className="space-y-2">
@@ -42,14 +44,14 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold mb-4 text-foreground">联系方式</h3>
             <ul className="space-y-2">
               <li>
-                <a 
-                  href="https://twitter.com" 
-                  target="_blank" 
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-tech-cyan transition-colors"
                 >
@@ -57,9 +59,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com" 
-                  target="_blank" 
+                <a
+                  href="https://github.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-tech-cyan transition-colors"
                 >
@@ -67,9 +69,9 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://linkedin.com" 
-                  target="_blank" 
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-tech-cyan transition-colors"
                 >
@@ -78,7 +80,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold mb-4 text-foreground">订阅</h3>
             <p className="text-muted-foreground mb-4">
@@ -88,7 +90,10 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="您的邮箱"
-                className="px-4 py-2 rounded-md bg-glass border border-glass-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+                className={getThemeClass(
+                  "px-4 py-2 rounded-md bg-glass border border-glass-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan",
+                  "px-4 py-2 rounded-md bg-glass border border-glass-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+                )}
               />
               <button className="px-4 py-2 bg-tech-cyan text-foreground rounded-md hover:bg-tech-lightcyan transition-colors">
                 订阅
@@ -96,7 +101,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        
+
         <GlassCard className={`${glassCardClass} text-center py-6`} padding="none">
           <p className="text-muted-foreground text-sm">
             © {currentYear} 我的优秀博客. 保留所有权利。

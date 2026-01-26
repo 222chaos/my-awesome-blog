@@ -11,7 +11,8 @@ from app.models.friend_link import FriendLink
 from app.models.portfolio import Portfolio
 from app.models.timeline_event import TimelineEvent
 from app.models.subscription import Subscription
-from app.crud.relations import get_categories_with_article_count, get_tags_with_article_count
+from app.crud.category import get_categories_with_article_count
+from app.crud.tag import get_tags_with_article_count
 
 
 class StatisticsService:
@@ -177,7 +178,7 @@ class StatisticsService:
         """
         获取热门文章统计
         """
-        from app.crud.relations import get_popular_articles as get_popular
+        from app.crud.article import get_popular_articles as get_popular
         
         articles = get_popular(db, limit, days)
         

@@ -45,13 +45,22 @@ def create_friend_link(
 
 @router.get("/{friend_link_id}", response_model=FriendLink)
 def read_friend_link_by_id(
-    friend_link_id: int,
+    friend_link_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific friend link by id
     """
-    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_id)
+    from uuid import UUID
+    try:
+        friend_link_uuid = UUID(friend_link_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend link ID format",
+        )
+    
+    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_uuid)
     if not friend_link:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -65,21 +74,30 @@ def read_friend_link_by_id(
 def update_friend_link(
     *,
     db: Session = Depends(get_db),
-    friend_link_id: int,
+    friend_link_id: str,
     friend_link_in: FriendLinkUpdate,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Update a friend link
     """
-    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_id)
+    from uuid import UUID
+    try:
+        friend_link_uuid = UUID(friend_link_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend link ID format",
+        )
+    
+    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_uuid)
     if not friend_link:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Friend link not found",
         )
     
-    friend_link = crud.update_friend_link(db, friend_link_id=friend_link_id, friend_link_update=friend_link_in)
+    friend_link = crud.update_friend_link(db, friend_link_id=friend_link_uuid, friend_link_update=friend_link_in)
     return friend_link
 
 
@@ -87,20 +105,29 @@ def update_friend_link(
 def delete_friend_link(
     *,
     db: Session = Depends(get_db),
-    friend_link_id: int,
+    friend_link_id: str,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete a friend link
     """
-    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_id)
+    from uuid import UUID
+    try:
+        friend_link_uuid = UUID(friend_link_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend link ID format",
+        )
+    
+    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_uuid)
     if not friend_link:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Friend link not found",
         )
     
-    deleted = crud.delete_friend_link(db, friend_link_id=friend_link_id)
+    deleted = crud.delete_friend_link(db, friend_link_id=friend_link_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,14 +1,14 @@
 from app.crud.user import (
     get_user, get_user_by_username, get_user_by_email, get_users,
     create_user, update_user, delete_user, authenticate_user,
-    get_password_hash, verify_password
+    get_password_hash, verify_password, get_authors_with_article_count
 )
 
 from app.crud.article import (
     get_article, get_article_by_slug, get_articles,
     create_article, update_article, delete_article,
     increment_view_count, get_featured_articles, get_related_articles,
-    get_articles_with_categories_and_tags
+    get_articles_with_categories_and_tags, get_popular_articles
 )
 
 from app.crud.comment import (

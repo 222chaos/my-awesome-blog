@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from uuid import UUID
+from pydantic import BaseModel, field_serializer
 
 
 # Base schemas
@@ -34,15 +35,18 @@ class ArticleUpdate(BaseModel):
 
 # Response schemas
 class ArticleInDBBase(ArticleBase):
-    id: str
-    author_id: str
+    id: UUID
+    author_id: UUID
     view_count: int
     published_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
+
+    @field_serializer('id', 'author_id')
+    def serialize_uuids(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class Article(ArticleInDBBase):

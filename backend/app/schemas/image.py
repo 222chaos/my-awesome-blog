@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import Optional, List
 from datetime import datetime
+from uuid import UUID
 
 
 class ImageBase(BaseModel):
@@ -28,11 +29,14 @@ class ImageUpdate(BaseModel):
 
 
 class ImageInDBBase(ImageBase):
-    id: str
+    id: UUID
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class Image(ImageInDBBase):
@@ -63,11 +67,14 @@ class ImageVariantUpdate(BaseModel):
 
 
 class ImageVariantInDBBase(ImageVariantBase):
-    id: str
+    id: UUID
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class ImageVariant(ImageVariantInDBBase):

@@ -62,13 +62,22 @@ def create_category(
 
 @router.get("/{category_id}", response_model=CategoryWithArticleCount)
 def read_category_by_id(
-    category_id: int,
+    category_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific category by id
     """
-    category = crud.get_category(db, category_id=category_id)
+    from uuid import UUID
+    try:
+        category_uuid = UUID(category_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid category ID format",
+        )
+    
+    category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -86,14 +95,23 @@ def read_category_by_id(
 def update_category(
     *,
     db: Session = Depends(get_db),
-    category_id: int,
+    category_id: str,
     category_in: CategoryUpdate,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Update a category
     """
-    category = crud.get_category(db, category_id=category_id)
+    from uuid import UUID
+    try:
+        category_uuid = UUID(category_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid category ID format",
+        )
+    
+    category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -117,7 +135,7 @@ def update_category(
                 detail="A category with this name already exists",
             )
     
-    category = crud.update_category(db, category_id=category_id, category_update=category_in)
+    category = crud.update_category(db, category_id=category_uuid, category_update=category_in)
     return category
 
 
@@ -125,13 +143,22 @@ def update_category(
 def delete_category(
     *,
     db: Session = Depends(get_db),
-    category_id: int,
+    category_id: str,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete a category
     """
-    category = crud.get_category(db, category_id=category_id)
+    from uuid import UUID
+    try:
+        category_uuid = UUID(category_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid category ID format",
+        )
+    
+    category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -145,7 +172,7 @@ def delete_category(
             detail="Cannot delete category that has associated articles",
         )
     
-    deleted = crud.delete_category(db, category_id=category_id)
+    deleted = crud.delete_category(db, category_id=category_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -157,7 +184,7 @@ def delete_category(
 
 @router.get("/{category_id}/articles", response_model=List[ArticleWithAuthor])
 def read_articles_by_category(
-    category_id: int,
+    category_id: str,
     skip: int = 0,
     limit: int = 100,
     published_only: bool = True,
@@ -166,7 +193,16 @@ def read_articles_by_category(
     """
     Get articles in a specific category
     """
-    category = crud.get_category(db, category_id=category_id)
+    from uuid import UUID
+    try:
+        category_uuid = UUID(category_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid category ID format",
+        )
+    
+    category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -179,7 +215,7 @@ def read_articles_by_category(
         skip=skip,
         limit=limit,
         published_only=published_only,
-        category_id=category_id
+        category_id=category_uuid
     )
     
     return articles

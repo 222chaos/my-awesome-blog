@@ -45,13 +45,22 @@ def create_portfolio_item(
 
 @router.get("/{portfolio_item_id}", response_model=PortfolioItem)
 def read_portfolio_item_by_id(
-    portfolio_item_id: int,
+    portfolio_item_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific portfolio item by id
     """
-    portfolio_item = crud.get_portfolio_item(db, portfolio_item_id=portfolio_item_id)
+    from uuid import UUID
+    try:
+        item_uuid = UUID(portfolio_item_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid portfolio item ID format",
+        )
+    
+    portfolio_item = crud.get_portfolio_item(db, portfolio_item_id=item_uuid)
     if not portfolio_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -65,14 +74,23 @@ def read_portfolio_item_by_id(
 def update_portfolio_item(
     *,
     db: Session = Depends(get_db),
-    portfolio_item_id: int,
+    portfolio_item_id: str,
     portfolio_item_in: PortfolioItemUpdate,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Update a portfolio item
     """
-    portfolio_item = crud.get_portfolio_item(db, portfolio_item_id=portfolio_item_id)
+    from uuid import UUID
+    try:
+        item_uuid = UUID(portfolio_item_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid portfolio item ID format",
+        )
+    
+    portfolio_item = crud.get_portfolio_item(db, portfolio_item_id=item_uuid)
     if not portfolio_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -81,7 +99,7 @@ def update_portfolio_item(
     
     portfolio_item = crud.update_portfolio_item(
         db, 
-        portfolio_item_id=portfolio_item_id, 
+        portfolio_item_id=item_uuid, 
         portfolio_item_update=portfolio_item_in
     )
     return portfolio_item
@@ -91,20 +109,29 @@ def update_portfolio_item(
 def delete_portfolio_item(
     *,
     db: Session = Depends(get_db),
-    portfolio_item_id: int,
+    portfolio_item_id: str,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete a portfolio item
     """
-    portfolio_item = crud.get_portfolio_item(db, portfolio_item_id=portfolio_item_id)
+    from uuid import UUID
+    try:
+        item_uuid = UUID(portfolio_item_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid portfolio item ID format",
+        )
+    
+    portfolio_item = crud.get_portfolio_item(db, portfolio_item_id=item_uuid)
     if not portfolio_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Portfolio item not found",
         )
     
-    deleted = crud.delete_portfolio_item(db, portfolio_item_id=portfolio_item_id)
+    deleted = crud.delete_portfolio_item(db, portfolio_item_id=item_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

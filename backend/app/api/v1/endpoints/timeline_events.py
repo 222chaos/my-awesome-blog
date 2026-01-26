@@ -45,13 +45,22 @@ def create_timeline_event(
 
 @router.get("/{timeline_event_id}", response_model=TimelineEvent)
 def read_timeline_event_by_id(
-    timeline_event_id: int,
+    timeline_event_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific timeline event by id
     """
-    timeline_event = crud.get_timeline_event(db, timeline_event_id=timeline_event_id)
+    from uuid import UUID
+    try:
+        event_uuid = UUID(timeline_event_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid timeline event ID format",
+        )
+    
+    timeline_event = crud.get_timeline_event(db, timeline_event_id=event_uuid)
     if not timeline_event:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -65,14 +74,23 @@ def read_timeline_event_by_id(
 def update_timeline_event(
     *,
     db: Session = Depends(get_db),
-    timeline_event_id: int,
+    timeline_event_id: str,
     timeline_event_in: TimelineEventUpdate,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Update a timeline event
     """
-    timeline_event = crud.get_timeline_event(db, timeline_event_id=timeline_event_id)
+    from uuid import UUID
+    try:
+        event_uuid = UUID(timeline_event_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid timeline event ID format",
+        )
+    
+    timeline_event = crud.get_timeline_event(db, timeline_event_id=event_uuid)
     if not timeline_event:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -81,7 +99,7 @@ def update_timeline_event(
     
     timeline_event = crud.update_timeline_event(
         db, 
-        timeline_event_id=timeline_event_id, 
+        timeline_event_id=event_uuid, 
         timeline_event_update=timeline_event_in
     )
     return timeline_event
@@ -91,20 +109,29 @@ def update_timeline_event(
 def delete_timeline_event(
     *,
     db: Session = Depends(get_db),
-    timeline_event_id: int,
+    timeline_event_id: str,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete a timeline event
     """
-    timeline_event = crud.get_timeline_event(db, timeline_event_id=timeline_event_id)
+    from uuid import UUID
+    try:
+        event_uuid = UUID(timeline_event_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid timeline event ID format",
+        )
+    
+    timeline_event = crud.get_timeline_event(db, timeline_event_id=event_uuid)
     if not timeline_event:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Timeline event not found",
         )
     
-    deleted = crud.delete_timeline_event(db, timeline_event_id=timeline_event_id)
+    deleted = crud.delete_timeline_event(db, timeline_event_id=event_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

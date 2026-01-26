@@ -55,13 +55,22 @@ def create_subscription(
 
 @router.get("/{subscription_id}", response_model=Subscription)
 def read_subscription_by_id(
-    subscription_id: int,
+    subscription_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific subscription by id
     """
-    subscription = crud.get_subscription(db, subscription_id=subscription_id)
+    from uuid import UUID
+    try:
+        subscription_uuid = UUID(subscription_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid subscription ID format",
+        )
+    
+    subscription = crud.get_subscription(db, subscription_id=subscription_uuid)
     if not subscription:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -75,14 +84,23 @@ def read_subscription_by_id(
 def update_subscription(
     *,
     db: Session = Depends(get_db),
-    subscription_id: int,
+    subscription_id: str,
     subscription_in: SubscriptionUpdate,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Update a subscription
     """
-    subscription = crud.get_subscription(db, subscription_id=subscription_id)
+    from uuid import UUID
+    try:
+        subscription_uuid = UUID(subscription_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid subscription ID format",
+        )
+    
+    subscription = crud.get_subscription(db, subscription_id=subscription_uuid)
     if not subscription:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -91,7 +109,7 @@ def update_subscription(
     
     subscription = crud.update_subscription(
         db, 
-        subscription_id=subscription_id, 
+        subscription_id=subscription_uuid, 
         subscription_update=subscription_in
     )
     return subscription
@@ -101,20 +119,29 @@ def update_subscription(
 def delete_subscription(
     *,
     db: Session = Depends(get_db),
-    subscription_id: int,
+    subscription_id: str,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete a subscription
     """
-    subscription = crud.get_subscription(db, subscription_id=subscription_id)
+    from uuid import UUID
+    try:
+        subscription_uuid = UUID(subscription_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid subscription ID format",
+        )
+    
+    subscription = crud.get_subscription(db, subscription_id=subscription_uuid)
     if not subscription:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Subscription not found",
         )
     
-    deleted = crud.delete_subscription(db, subscription_id=subscription_id)
+    deleted = crud.delete_subscription(db, subscription_id=subscription_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

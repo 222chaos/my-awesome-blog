@@ -103,14 +103,23 @@ def upload_image(
 
 @router.get("/{image_id}", response_model=Image)
 def read_image_by_id(
-    image_id: int,
+    image_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ) -> Any:
     """
     Get a specific image by id
     """
-    image = crud.get_image(db, image_id=image_id)
+    from uuid import UUID
+    try:
+        image_uuid = UUID(image_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid image ID format",
+        )
+    
+    image = crud.get_image(db, image_id=image_uuid)
     if not image:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -123,7 +132,7 @@ def read_image_by_id(
 @router.put("/{image_id}", response_model=Image)
 def update_image(
     *,
-    image_id: int,
+    image_id: str,
     image_in: ImageUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_superuser)
@@ -131,7 +140,16 @@ def update_image(
     """
     Update an image
     """
-    image = crud.get_image(db, image_id=image_id)
+    from uuid import UUID
+    try:
+        image_uuid = UUID(image_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid image ID format",
+        )
+    
+    image = crud.get_image(db, image_id=image_uuid)
     if not image:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -140,7 +158,7 @@ def update_image(
     
     image = crud.update_image(
         db, 
-        image_id=image_id, 
+        image_id=image_uuid, 
         image_update=image_in
     )
     return image
@@ -149,14 +167,23 @@ def update_image(
 @router.delete("/{image_id}", response_model=dict)
 def delete_image(
     *,
-    image_id: int,
+    image_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete an image
     """
-    image = crud.get_image(db, image_id=image_id)
+    from uuid import UUID
+    try:
+        image_uuid = UUID(image_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid image ID format",
+        )
+    
+    image = crud.get_image(db, image_id=image_uuid)
     if not image:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -174,7 +201,7 @@ def delete_image(
         if os.path.exists(variant_path):
             os.remove(variant_path)
     
-    deleted = crud.delete_image(db, image_id=image_id)
+    deleted = crud.delete_image(db, image_id=image_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

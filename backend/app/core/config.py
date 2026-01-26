@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: Optional[str] = None
     
     # CORS
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000", "http://localhost:8989", "http://localhost:3001"]
     
     model_config = SettingsConfigDict(
         env_file=".env",

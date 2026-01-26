@@ -311,7 +311,7 @@
 
 /* Focus styles for accessibility */
 :focus-visible {
-  @apply outline-none ring-2 ring-primary ring-offset-2;
+  @apply outline-none ring-2 ring-tech-cyan ring-offset-2 ring-offset-transparent;
 }
 
 /* Typography enhancements */

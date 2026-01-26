@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 
 class FriendLinkBase(BaseModel):
@@ -31,13 +32,16 @@ class FriendLinkUpdate(BaseModel):
 
 
 class FriendLinkInDBBase(FriendLinkBase):
-    id: str
+    id: UUID
     click_count: int = 0
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class FriendLink(FriendLinkInDBBase):

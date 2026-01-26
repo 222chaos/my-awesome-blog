@@ -5,9 +5,14 @@ from app.models.typewriter_content import TypewriterContent
 from app.schemas.typewriter_content import TypewriterContentCreate, TypewriterContentUpdate
 
 
-def get_typewriter_content(db: Session, content_id: UUID) -> Optional[TypewriterContent]:
+def get_typewriter_content(db: Session, content_id: str) -> Optional[TypewriterContent]:
     """Get a single typewriter content by ID"""
-    return db.query(TypewriterContent).filter(TypewriterContent.id == content_id).first()
+    from uuid import UUID
+    try:
+        uuid_obj = UUID(content_id)
+    except ValueError:
+        return None
+    return db.query(TypewriterContent).filter(TypewriterContent.id == uuid_obj).first()
 
 
 def get_typewriter_contents(
@@ -49,11 +54,17 @@ def create_typewriter_content(
 
 def update_typewriter_content(
     db: Session,
-    content_id: UUID,
+    content_id: str,
     content_update: TypewriterContentUpdate,
 ) -> Optional[TypewriterContent]:
     """Update an existing typewriter content"""
-    db_content = get_typewriter_content(db, content_id)
+    from uuid import UUID
+    try:
+        uuid_obj = UUID(content_id)
+    except ValueError:
+        return None
+    
+    db_content = db.query(TypewriterContent).filter(TypewriterContent.id == uuid_obj).first()
     if not db_content:
         return None
     
@@ -67,9 +78,15 @@ def update_typewriter_content(
     return db_content
 
 
-def delete_typewriter_content(db: Session, content_id: UUID) -> bool:
+def delete_typewriter_content(db: Session, content_id: str) -> bool:
     """Delete a typewriter content by ID"""
-    db_content = get_typewriter_content(db, content_id)
+    from uuid import UUID
+    try:
+        uuid_obj = UUID(content_id)
+    except ValueError:
+        return False
+    
+    db_content = db.query(TypewriterContent).filter(TypewriterContent.id == uuid_obj).first()
     if not db_content:
         return False
     
@@ -78,9 +95,15 @@ def delete_typewriter_content(db: Session, content_id: UUID) -> bool:
     return True
 
 
-def deactivate_typewriter_content(db: Session, content_id: UUID) -> Optional[TypewriterContent]:
+def deactivate_typewriter_content(db: Session, content_id: str) -> Optional[TypewriterContent]:
     """Soft delete a typewriter content by setting is_active to False"""
-    db_content = get_typewriter_content(db, content_id)
+    from uuid import UUID
+    try:
+        uuid_obj = UUID(content_id)
+    except ValueError:
+        return None
+    
+    db_content = db.query(TypewriterContent).filter(TypewriterContent.id == uuid_obj).first()
     if not db_content:
         return None
     

@@ -1,19 +1,9 @@
 from typing import Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
-from app.core.security import pwd_context
+from app.core.security import get_password_hash
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
-
-
-def get_password_hash(password: str) -> str:
-    # Truncate password if it exceeds bcrypt's 72-byte limit
-    # Convert to bytes to properly measure length considering multi-byte characters
-    if len(password.encode('utf-8')) > 72:
-        # Truncate to 71 bytes to stay under the limit, preserving UTF-8 encoding
-        truncated = password.encode('utf-8')[:71].decode('utf-8', errors='ignore')
-        return pwd_context.hash(truncated)
-    return pwd_context.hash(password)
 
 
 def get_user(db: Session, user_id: UUID) -> Optional[User]:
@@ -90,3 +80,25 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
     if not verify_password(password, str(user.hashed_password)):
         return None
     return user
+
+
+def get_authors_with_article_count(db: Session):
+    """
+    获取所有作者及其发布的文章数量
+    """
+    from sqlalchemy import func
+    from app.models.article import Article
+    
+    # 查询每个作者及其发布的文章数量
+    result = (
+        db.query(
+            User,
+            func.count(Article.id).label('article_count')
+        )
+        .outerjoin(Article, User.id == Article.author_id)
+        .filter(Article.is_published == True)
+        .group_by(User.id)
+        .all()
+    )
+    
+    return result

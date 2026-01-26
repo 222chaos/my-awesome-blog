@@ -1,5 +1,5 @@
 """
-管理员用户创建脚本
+管理员用户创建脚本 - 简化版本
 用于创建超级管理员用户
 """
 
@@ -8,16 +8,15 @@ import os
 from pathlib import Path
 
 # 添加项目根目录到Python路径
-project_root = Path(__file__).parent.parent  # 指向backend目录
+project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-# 设置环境变量
-os.environ.setdefault("DATABASE_URL", "postgresql://postgres:123456@localhost:5432/my_awesome_blog")
 
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
-from app import crud
-from app.schemas.user import UserCreate
+from app.models.user import User
+from app.core.security import pwd_context
+from sqlalchemy import create_engine
+from app.core.config import settings
 
 
 def create_admin_user():
@@ -29,24 +28,33 @@ def create_admin_user():
     
     try:
         # 检查是否已存在管理员用户
-        admin_user = crud.get_user_by_username(db, username="admin")
+        admin_user = db.query(User).filter(User.username == "admin").first()
         if admin_user:
             print(f"管理员用户已存在: {admin_user.username}")
-            print("如果需要重置密码，请使用更新功能。")
             return True
         
-        # 创建管理员用户数据
-        admin_data = UserCreate(
+        # 创建密码哈希（确保不超过72字节限制）
+        password = "admin123"
+        if len(password.encode('utf-8')) > 72:
+            password = password.encode('utf-8')[:71].decode('utf-8', errors='ignore')
+        
+        hashed_password = pwd_context.hash(password)
+        
+        # 创建管理员用户
+        admin_user = User(
             username="admin",
             email="admin@example.com",
-            password="admin123",  # 密码会在CRUD函数中被正确处理
+            hashed_password=hashed_password,
             full_name="Administrator",
             is_active=True,
             is_superuser=True
         )
         
-        # 创建用户
-        admin_user = crud.create_user(db, admin_data)
+        # 添加到数据库
+        db.add(admin_user)
+        db.commit()
+        db.refresh(admin_user)
+        
         print(f"管理员用户创建成功！")
         print(f"用户名: {admin_user.username}")
         print(f"邮箱: {admin_user.email}")
@@ -57,6 +65,7 @@ def create_admin_user():
         
     except Exception as e:
         print(f"创建管理员用户时出错: {e}")
+        db.rollback()
         import traceback
         traceback.print_exc()
         return False

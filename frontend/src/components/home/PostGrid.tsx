@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import type { Post } from '@/types';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { PostCard, PostCardSkeleton } from '@/components/blog/PostCard';
+import PostCard, { PostCardSkeleton } from '@/components/blog/PostCard';
 import { useTheme } from '@/context/theme-context';
 
 interface PostCardItemProps {

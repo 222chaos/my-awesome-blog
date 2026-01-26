@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 
 class SubscriptionBase(BaseModel):
@@ -19,14 +20,17 @@ class SubscriptionUpdate(BaseModel):
 
 
 class SubscriptionInDBBase(SubscriptionBase):
-    id: str
+    id: UUID
     verification_token: Optional[str] = None
     subscribed_at: datetime
     verified_at: Optional[datetime] = None
     unsubscribed_at: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class Subscription(SubscriptionInDBBase):

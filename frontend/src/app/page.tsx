@@ -148,6 +148,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div id="content" className="bg-background">
+        <HeroSection />
+
         <div className="container mx-auto px-4 py-6">
           <Breadcrumb
             items={[
@@ -155,8 +157,6 @@ export default function Home() {
             ]}
           />
         </div>
-
-        <HeroSection />
 
         <div className="container mx-auto px-4 py-16 bg-background">
           <StatsPanel />

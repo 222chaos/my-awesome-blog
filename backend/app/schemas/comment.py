@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from uuid import UUID
+from pydantic import BaseModel, field_serializer
 
 
 # Base schemas
@@ -22,16 +23,19 @@ class CommentUpdate(BaseModel):
 
 # Response schemas
 class CommentInDBBase(CommentBase):
-    id: str
-    article_id: str
-    author_id: str
-    parent_id: Optional[str] = None
+    id: UUID
+    article_id: UUID
+    author_id: UUID
+    parent_id: Optional[UUID] = None
     is_approved: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
+
+    @field_serializer('id', 'article_id', 'author_id', 'parent_id')
+    def serialize_uuids(self, value: Optional[UUID]) -> Optional[str]:
+        return str(value) if value is not None else None
+
+    model_config = {'from_attributes': True}
 
 
 class Comment(CommentInDBBase):

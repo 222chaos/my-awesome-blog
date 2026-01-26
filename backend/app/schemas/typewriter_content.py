@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel
+from uuid import UUID
+from pydantic import BaseModel, field_serializer
 
 
 # Base schema
@@ -24,9 +25,13 @@ class TypewriterContentUpdate(BaseModel):
 
 # Response schema
 class TypewriterContentInDBBase(TypewriterContentBase):
-    id: str
+    id: UUID
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
 
     model_config = {'from_attributes': True}
 

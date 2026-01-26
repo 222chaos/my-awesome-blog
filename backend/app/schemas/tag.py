@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 
 class TagBase(BaseModel):
@@ -23,11 +24,14 @@ class TagUpdate(BaseModel):
 
 
 class TagInDBBase(TagBase):
-    id: str
+    id: UUID
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class Tag(TagInDBBase):

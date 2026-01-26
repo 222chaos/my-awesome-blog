@@ -13,7 +13,7 @@ interface RopeThemeTogglerProps extends React.ComponentPropsWithoutRef<'div'> {
 }
 
 // 检测View Transitions API支持
-const hasViewTransitionSupport = typeof document !== 'undefined' && 
+const hasViewTransitionSupport = typeof document !== 'undefined' &&
   'startViewTransition' in document;
 
 export const RopeThemeToggler = ({
@@ -27,20 +27,28 @@ export const RopeThemeToggler = ({
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [isPulling, setIsPulling] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 根据当前主题确定图标显示：亮色主题显示太阳图标，暗色主题显示月亮图标
   const isDark = resolvedTheme === 'dark';
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // 移除MutationObserver，直接使用resolvedTheme
 
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current || typeof document === 'undefined') return;
 
+    // 检查是否用户设置了减少动画偏好
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // 触发绳子拉动动画
     setIsPulling(true);
-    
+
     // 获取当前主题状态
     const currentIsDark = document.documentElement.classList.contains('dark');
     const newTheme = currentIsDark ? 'light' : 'dark';
@@ -53,7 +61,7 @@ export const RopeThemeToggler = ({
     // 在动画结束后切换主题
     setTimeout(async () => {
       // 如果支持View Transitions API，使用动画切换
-      if (hasViewTransitionSupport) {
+      if (hasViewTransitionSupport && !prefersReducedMotion) {
         await document.startViewTransition(() => {
           setTheme(newTheme);
         }).ready;
@@ -82,20 +90,22 @@ export const RopeThemeToggler = ({
           );
         }
       } else {
-        // 不支持的浏览器，直接切换主题
+        // 不支持的浏览器或用户设置了减少动画，直接切换主题
         setTheme(newTheme);
 
-        // 使用CSS动画作为fallback
-        document.documentElement.animate(
-          [
-            { opacity: 0.8 },
-            { opacity: 1 },
-          ],
-          {
-            duration: 200,
-            easing: 'ease-out',
-          }
-        );
+        // 使用CSS动画作为fallback（除非用户设置了减少动画）
+        if (!prefersReducedMotion) {
+          document.documentElement.animate(
+            [
+              { opacity: 0.8 },
+              { opacity: 1 },
+            ],
+            {
+              duration: 200,
+              easing: 'ease-out',
+            }
+          );
+        }
       }
 
       // 动画完成后重置拉动状态
@@ -172,15 +182,22 @@ export const RopeThemeToggler = ({
             'relative w-9 h-9 flex items-center justify-center rounded-full bg-glass backdrop-blur-xl border border-glass-border',
             'hover:shadow-lg hover:scale-110',
             'transition-all duration-300 ease-in-out cursor-pointer',
-            'focus:outline-none focus:ring-2 focus:ring-brown-500/50',
+            'focus:outline-none focus:ring-2 focus:ring-tech-cyan focus:ring-offset-2 focus:ring-offset-transparent',
             'z-10'
           )}
-          aria-label="切换主题"
+          aria-label={`切换到${isDark ? '浅色' : '深色'}主题，当前为${mounted ? resolvedTheme || 'auto' : 'auto'}模式`}
+          title={`切换到${isDark ? '浅色' : '深色'}主题`}
         >
           {!isDark ? (
-            <Sun className="h-5 w-5 transition-transform duration-500 text-tech-cyan" />
+            <Sun
+              className="h-5 w-5 transition-transform duration-500 text-tech-cyan"
+              aria-hidden="true"
+            />
           ) : (
-            <Moon className="h-5 w-5 transition-transform duration-500 text-tech-sky" />
+            <Moon
+              className="h-5 w-5 transition-transform duration-500 text-tech-sky"
+              aria-hidden="true"
+            />
           )}
         </button>
         </div>

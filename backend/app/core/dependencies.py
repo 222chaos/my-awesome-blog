@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
@@ -32,7 +33,7 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
     
-    user = crud.get_user(db, user_id=int(user_id))
+    user = crud.get_user(db, user_id=UUID(user_id))
     if user is None:
         raise credentials_exception
     

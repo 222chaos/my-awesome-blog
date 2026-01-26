@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from uuid import UUID
+from pydantic import BaseModel, EmailStr, Field, field_serializer
 
 
 # Base schemas
@@ -40,14 +41,17 @@ class UserUpdate(BaseModel):
 
 # Response schemas
 class UserInDBBase(UserBase):
-    id: str
+    id: UUID
     is_active: bool
     is_superuser: bool
     created_at: datetime
     updated_at: Optional[datetime] = None
-    
-    class Config:
-        from_attributes = True
+
+    @field_serializer('id')
+    def serialize_id(self, value: UUID) -> str:
+        return str(value)
+
+    model_config = {'from_attributes': True}
 
 
 class User(UserInDBBase):

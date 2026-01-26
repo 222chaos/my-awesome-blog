@@ -188,7 +188,19 @@ SECRET_KEY=your-super-secret-key-change-this-in-production
 
 6. Initialize database and run migrations:
 
-**Option A: Automatic Setup (Recommended for Windows)**
+**Option A: Automatic Setup (Recommended)**
+
+Use the provided database initialization script:
+
+```bash
+# Windows
+python scripts/init_db_simple.py
+
+# Or use the batch script
+init_db.bat
+```
+
+**Option B: Using Diagnostic Tools (Windows-specific)**
 
 Use the provided diagnostic and repair tools:
 
@@ -203,12 +215,9 @@ python scripts/fix_db_connection.py
 python scripts/update_db_config.py
 ```
 
-**Option B: Manual Setup**
+**Option C: Manual Setup**
 
 ```bash
-# Create database (PostgreSQL)
-# For SQLite, skip this step
-
 # Run migrations
 alembic upgrade head
 ```

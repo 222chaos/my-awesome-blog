@@ -60,13 +60,22 @@ def create_tag(
 
 @router.get("/{tag_id}", response_model=TagWithArticleCount)
 def read_tag_by_id(
-    tag_id: int,
+    tag_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific tag by id
     """
-    tag = crud.get_tag(db, tag_id=tag_id)
+    from uuid import UUID
+    try:
+        tag_uuid = UUID(tag_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid tag ID format",
+        )
+    
+    tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -84,14 +93,23 @@ def read_tag_by_id(
 def update_tag(
     *,
     db: Session = Depends(get_db),
-    tag_id: int,
+    tag_id: str,
     tag_in: TagUpdate,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Update a tag
     """
-    tag = crud.get_tag(db, tag_id=tag_id)
+    from uuid import UUID
+    try:
+        tag_uuid = UUID(tag_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid tag ID format",
+        )
+    
+    tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -115,7 +133,7 @@ def update_tag(
                 detail="A tag with this name already exists",
             )
     
-    tag = crud.update_tag(db, tag_id=tag_id, tag_update=tag_in)
+    tag = crud.update_tag(db, tag_id=tag_uuid, tag_update=tag_in)
     return tag
 
 
@@ -123,13 +141,22 @@ def update_tag(
 def delete_tag(
     *,
     db: Session = Depends(get_db),
-    tag_id: int,
+    tag_id: str,
     current_user: User = Depends(get_current_superuser)
 ) -> Any:
     """
     Delete a tag
     """
-    tag = crud.get_tag(db, tag_id=tag_id)
+    from uuid import UUID
+    try:
+        tag_uuid = UUID(tag_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid tag ID format",
+        )
+    
+    tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -143,7 +170,7 @@ def delete_tag(
             detail="Cannot delete tag that has associated articles",
         )
     
-    deleted = crud.delete_tag(db, tag_id=tag_id)
+    deleted = crud.delete_tag(db, tag_id=tag_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -155,7 +182,7 @@ def delete_tag(
 
 @router.get("/{tag_id}/articles", response_model=List[ArticleWithAuthor])
 def read_articles_by_tag(
-    tag_id: int,
+    tag_id: str,
     skip: int = 0,
     limit: int = 100,
     published_only: bool = True,
@@ -164,7 +191,16 @@ def read_articles_by_tag(
     """
     Get articles with a specific tag
     """
-    tag = crud.get_tag(db, tag_id=tag_id)
+    from uuid import UUID
+    try:
+        tag_uuid = UUID(tag_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid tag ID format",
+        )
+    
+    tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -177,7 +213,7 @@ def read_articles_by_tag(
         skip=skip,
         limit=limit,
         published_only=published_only,
-        tag_id=tag_id
+        tag_id=tag_uuid
     )
     
     return articles

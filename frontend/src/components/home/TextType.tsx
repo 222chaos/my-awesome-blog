@@ -121,7 +121,7 @@ const TextType = ({
   }, [showCursor, cursorBlinkDuration]);
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || textArray.length === 0) return;
 
     let timeout: ReturnType<typeof setTimeout>;
 

@@ -178,9 +178,7 @@ python scripts/diagnose_db.py
 # Step 2: Fix any issues found
 python scripts/fix_db_connection.py
 
-# Step 3: Update database configuration if needed
-python scripts/update_db_config.py
-```
+
 
 These tools will help you:
 - Check PostgreSQL service status

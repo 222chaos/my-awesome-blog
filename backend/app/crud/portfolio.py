@@ -2,7 +2,7 @@ from typing import List, Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.portfolio import Portfolio
-from app.schemas.portfolio import PortfolioCreate, PortfolioUpdate
+from app.schemas.portfolio import PortfolioItemCreate as PortfolioCreate, PortfolioItemUpdate as PortfolioUpdate
 
 
 def get_portfolio(db: Session, portfolio_id: UUID) -> Optional[Portfolio]:
