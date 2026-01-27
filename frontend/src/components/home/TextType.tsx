@@ -32,7 +32,7 @@ const TextType = ({
   as: Component = 'div',
   typingSpeed = 50,
   initialDelay = 0,
-  pauseDuration = 2000,
+  pauseDuration = 3000,
   deletingSpeed = 30,
   loop = true,
   className = '',
@@ -64,7 +64,15 @@ const TextType = ({
     if (fetchFromApi && !text) {
       setIsLoading(true);
       getActiveTypewriterContents().then((fetchedTexts) => {
-        setDynamicTexts(fetchedTexts);
+        // Convert string array to TypewriterContent array
+        const convertedTexts: TypewriterContent[] = fetchedTexts.map((text, index) => ({
+          id: `api-${index}`,
+          text,
+          priority: index,
+          is_active: true,
+          created_at: new Date().toISOString(),
+        }));
+        setDynamicTexts(convertedTexts);
         setIsLoading(false);
       });
     }
@@ -125,40 +133,46 @@ const TextType = ({
 
     let timeout: ReturnType<typeof setTimeout>;
 
-    const currentText = textArray[currentTextIndex];
+    const currentText = textArray[currentTextIndex] || '';
     const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
 
     const executeTypingAnimation = () => {
       if (isDeleting) {
         if (displayedText === '') {
           setIsDeleting(false);
-          if (currentTextIndex === textArray.length - 1 && !loop) {
-            return;
-          }
+          if (currentTextIndex === textArray.length - 1 && !loop) return;
 
-          if (onSentenceComplete) {
-            onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
-          }
+          if (onSentenceComplete) onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
 
+          // 立即切换到下一个文字，不等待pauseDuration
           setCurrentTextIndex(prev => (prev + 1) % textArray.length);
           setCurrentCharIndex(0);
-          timeout = setTimeout(() => {}, pauseDuration);
+          // 直接开始输入下一个文字
+          setDisplayedText(''); // 清空当前显示的文字
+          // 立即开始输入下一个文字，无需等待
+          setTimeout(() => {
+            setCurrentTextIndex(prev => (prev + 1) % textArray.length);
+            setCurrentCharIndex(0);
+            setIsDeleting(false);
+          }, 50); // 小延迟以确保状态更新
         } else {
           timeout = setTimeout(() => {
             setDisplayedText(prev => prev.slice(0, -1));
           }, deletingSpeed);
         }
       } else {
-        if (currentCharIndex < processedText.length) {
+        if (currentText && currentCharIndex < processedText.length) {
           timeout = setTimeout(
             () => {
-              setDisplayedText(prev => prev + processedText[currentCharIndex]);
-              setCurrentCharIndex(prev => prev + 1);
-            },
-            variableSpeed ? getRandomSpeed() : typingSpeed
-          );
+            setDisplayedText(prev => prev + processedText[currentCharIndex]);
+            setCurrentCharIndex(prev => prev + 1);
+          },
+          variableSpeed ? getRandomSpeed() : typingSpeed
+        );
         } else if (textArray.length >= 1) {
-          if (!loop && currentTextIndex === textArray.length - 1) return;
+          if (!loop && currentTextIndex === textArray.length - 1) {
+            return;
+          }
           timeout = setTimeout(() => {
             setIsDeleting(true);
           }, pauseDuration);

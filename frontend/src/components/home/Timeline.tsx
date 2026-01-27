@@ -54,7 +54,7 @@ function TimelineEventItem({ event, index }: { event: TimelineEvent; index: numb
 }
 
 export default function Timeline({ events }: TimelineProps) {
-  const { resolvedTheme } = useTheme();
+
   
   if (!events || events.length === 0) {
     return null;

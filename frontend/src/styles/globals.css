@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -18,15 +18,15 @@
     --glass-light-border: rgba(30, 58, 138, 0.15);
     --radius: 0.5rem;
 
-    /* 扩展的颜色变量 */
+    /* 鎵 pornos鐨勯鑹插彉閲?*/
     --muted: #64748b;
-    --muted-foreground: #4a5568; /* 增强对比度 */
+    --muted-foreground: #4a5568; /* 澧炲己瀵规瘮搴?*/
     --popover: #ffffff;
     --popover-foreground: #0a0a0a;
     --input: #3b82f6;
     --ring: #2563eb;
 
-    /* 状态颜色 */
+    /* 鐘舵€侀鑹?*/
     --success: #22c55e;
     --success-foreground: #ecfdf5;
     --warning: #f59e0b;
@@ -36,59 +36,62 @@
     --info: #3b82f6;
     --info-foreground: #eff6ff;
 
-    /* 玻璃效果专用变量 - 浅色主题 */
+    /* 鐜荤拑鏁堟灉涓撶敤鍙橀噺 - 娴呰壊涓婚 */
     --glass-default: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(37, 99, 235, 0.15);
     --glass-glow: rgba(37, 99, 235, 0.2);
 
-    /* 技术颜色变量 - 浅色蓝黑主题 */
+    /* 鎶€鏈鑹插彉閲?- 娴呰壊钃粦涓婚 */
     --tech-darkblue: #0f172a;
     --tech-deepblue: #1e40af;
     --tech-cyan: #2563eb;
     --tech-lightcyan: #60a5fa;
     --tech-sky: #3b82f6;
+    --tech-cyan-rgb: 37, 99, 235;
+    --tech-lightcyan-rgb: 96, 165, 250;
+    --tech-sky-rgb: 59, 130, 246;
 
-    /* 高对比度文本颜色 */
+    /* 楂樺姣斿害鏂囨湰棰滆壊 */
     --text-primary-high-contrast: #0a0a0a;
     --text-secondary-high-contrast: #4a5568;
 
-    /* 动画变量 */
+    /* 鍔ㄧ敾鍙橀噺 */
     --transition-duration: 0.3s;
     --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* 涟漪效果颜色 - 浅色主题 */
+    /* 娑熸吉鏁堟灉棰滆壊 - 娴呰壊涓婚 */
     --ripple-color: rgba(59, 130, 246, 0.3);
 
-    /* 纹理叠加颜色 - 浅色主题 */
+    /* 绾圭悊鍙犲姞棰滆壊 - 娴呰壊涓婚 */
     --texture-color: rgba(0, 0, 0, 0.1);
 
-    /* 技术阴影颜色 - 浅色主题 */
+    /* 鎶€鏈槾褰遍鑹?- 娴呰壊涓婚 */
     --shadow-tech-cyan: rgba(59, 130, 246, 0.5);
   }
 
   .dark {
     --background: #000000;
-    --foreground: #f8fafc; /* 提高对比度 */
+    --foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --primary: #059669;
-    --primary-foreground: #f8fafc; /* 提高对比度 */
+    --primary-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --secondary: #047857;
-    --secondary-foreground: #f8fafc; /* 提高对比度 */
+    --secondary-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --accent: #065f46;
-    --accent-foreground: #f8fafc; /* 提高对比度 */
+    --accent-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --card: #111111;
-    --card-foreground: #f8fafc; /* 提高对比度 */
+    --card-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --border: #10b981;
     --glass-light-border: rgba(16, 185, 129, 0.15);
 
-    /* 扩展的颜色变量 */
+    /* 鎵 pornos鐨勯鑹插彉閲?*/
     --muted: #34d399;
-    --muted-foreground: #94a3b8; /* 增强对比度 */
+    --muted-foreground: #94a3b8; /* 澧炲己瀵规瘮搴?*/
     --popover: #111111;
-    --popover-foreground: #f8fafc; /* 提高对比度 */
+    --popover-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --input: #34d399;
     --ring: #059669;
 
-    /* 状态颜色 */
+    /* 鐘舵€侀鑹?*/
     --success: #34d399;
     --success-foreground: #ecfdf5;
     --warning: #fbbf24;
@@ -98,29 +101,32 @@
     --info: #60a5fa;
     --info-foreground: #eff6ff;
 
-    /* 玻璃效果专用变量 - 深色主题 */
+    /* 鐜荤拑鏁堟灉涓撶敤鍙橀噺 - 娣辫壊涓婚 */
     --glass-default: rgba(17, 17, 17, 0.7);
     --glass-border: rgba(16, 185, 129, 0.2);
     --glass-glow: rgba(16, 185, 129, 0.3);
 
-    /* 技术颜色变量 - 深色绿黑主题 */
+    /* 鎶€鏈鑹插彉閲?- 娣辫壊缁块粦涓婚 */
     --tech-darkblue: #064e3b;
     --tech-deepblue: #047857;
     --tech-cyan: #059669;
     --tech-lightcyan: #10b981;
     --tech-sky: #22c55e;
+    --tech-cyan-rgb: 5, 150, 105;
+    --tech-lightcyan-rgb: 16, 185, 129;
+    --tech-sky-rgb: 34, 197, 94;
 
-    /* 高对比度文本颜色 */
+    /* 楂樺姣斿害鏂囨湰棰滆壊 */
     --text-primary-high-contrast: #f8fafc;
     --text-secondary-high-contrast: #94a3b8;
 
-    /* 涟漪效果颜色 - 深色主题 */
+    /* 娑熸吉鏁堟灉棰滆壊 - 娣辫壊涓婚 */
     --ripple-color: rgba(5, 150, 105, 0.3);
 
-    /* 纹理叠加颜色 - 深色主题 */
+    /* 绾圭悊鍙犲姞棰滆壊 - 娣辫壊涓婚 */
     --texture-color: rgba(0, 0, 0, 0.2);
 
-    /* 技术阴影颜色 - 深色主题 */
+    /* 鎶€鏈槾褰遍鑹?- 娣辫壊涓婚 */
     --shadow-tech-cyan: rgba(16, 185, 129, 0.5);
   }
 
@@ -128,7 +134,7 @@
     @apply bg-background text-foreground bg-page;
   }
 
-  /* 添加全局主题过渡 */
+  /* 娣诲姞鍏ㄥ眬涓婚杩囨浮 */
   *,
   *::before,
   *::after {
@@ -139,27 +145,27 @@
 
   .dark {
     --background: #000000;
-    --foreground: #f8fafc; /* 提高对比度 */
+    --foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --primary: #059669;
-    --primary-foreground: #f8fafc; /* 提高对比度 */
+    --primary-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --secondary: #047857;
-    --secondary-foreground: #f8fafc; /* 提高对比度 */
+    --secondary-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --accent: #065f46;
-    --accent-foreground: #f8fafc; /* 提高对比度 */
+    --accent-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --card: #111111;
-    --card-foreground: #f8fafc; /* 提高对比度 */
+    --card-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --border: #10b981;
     --glass-light-border: rgba(16, 185, 129, 0.15);
 
-    /* 扩展的颜色变量 */
+    /* 鎵 pornos鐨勯鑹插彉閲?*/
     --muted: #64748b;
-    --muted-foreground: #94a3b8; /* 增强对比度 */
+    --muted-foreground: #94a3b8; /* 澧炲己瀵规瘮搴?*/
     --popover: #111111;
-    --popover-foreground: #f8fafc; /* 提高对比度 */
+    --popover-foreground: #f8fafc; /* 鎻愰珮瀵规瘮搴?*/
     --input: #10b981;
     --ring: #059669;
 
-    /* 状态颜色 */
+    /* 鐘舵€侀鑹?*/
     --success: #22c55e;
     --success-foreground: #ecfdf5;
     --warning: #fbbf24;
@@ -169,34 +175,34 @@
     --info: #60a5fa;
     --info-foreground: #eff6ff;
 
-    /* 玻璃效果专用变量 - 深色主题 */
+    /* 鐜荤拑鏁堟灉涓撶敤鍙橀噺 - 娣辫壊涓婚 */
     --glass-default: rgba(30, 30, 30, 0.7);
     --glass-border: rgba(5, 150, 105, 0.15);
     --glass-glow: rgba(5, 150, 105, 0.2);
 
-    /* 技术颜色变量 - 深色绿黑主题 */
+    /* 鎶€鏈鑹插彉閲?- 娣辫壊缁块粦涓婚 */
     --tech-darkblue: #064e3b;
     --tech-deepblue: #047857;
     --tech-cyan: #059669;
     --tech-lightcyan: #10b981;
     --tech-sky: #22c55e;
 
-    /* 高对比度文本颜色 */
+    /* 楂樺姣斿害鏂囨湰棰滆壊 */
     --text-primary-high-contrast: #f8fafc;
     --text-secondary-high-contrast: #94a3b8;
 
-    /* 涟漪效果颜色 - 深色主题 */
+    /* 娑熸吉鏁堟灉棰滆壊 - 娣辫壊涓婚 */
     --ripple-color: rgba(5, 150, 105, 0.3);
 
-    /* 纹理叠加颜色 - 深色主题 */
+    /* 绾圭悊鍙犲姞棰滆壊 - 娣辫壊涓婚 */
     --texture-color: rgba(0, 0, 0, 0.2);
 
-    /* 技术阴影颜色 - 深色主题 */
+    /* 鎶€鏈槾褰遍鑹?- 娣辫壊涓婚 */
     --shadow-tech-cyan: rgba(16, 185, 129, 0.5);
   }
 }
 
-/* 高对比度文本类 */
+/* 楂樺姣斿害鏂囨湰绫?*/
 .text-high-contrast {
   color: var(--text-primary-high-contrast);
 }
@@ -205,7 +211,7 @@
   color: var(--text-secondary-high-contrast);
 }
 
-/* 状态颜色类 */
+/* 鐘舵€侀鑹茬被 */
 .text-success { color: var(--success); }
 .text-warning { color: var(--warning); }
 .text-error { color: var(--error); }
@@ -216,7 +222,7 @@
 .bg-error { background-color: var(--error); }
 .bg-info { background-color: var(--info); }
 
-/* 轻度磨砂玻璃 - 可读性优先 */
+/* 杞诲害纾ㄧ爞鐜荤拑 - 鍙鎬т紭鍏?*/
 .glass-card {
   background: var(--glass-default);
   backdrop-filter: blur(16px);
@@ -227,7 +233,7 @@
   transition: all var(--transition-duration) var(--transition-easing);
 }
 
-/* 主背景 - 确保整个页面应用主题 */
+/* 涓昏儗鏅?- 纭繚鏁翠釜椤甸潰搴旂敤涓婚 */
 .bg-page {
   background: var(--background);
   color: var(--foreground);
@@ -239,7 +245,7 @@
   color: var(--foreground);
 }
 
-/* 主题感知的玻璃效果 */
+/* 涓婚鎰熺煡鐨勭幓鐠冩晥鏋?*/
 .glass {
   background: var(--glass-default);
   backdrop-filter: blur(16px);
@@ -258,19 +264,19 @@
   transition: all 0.3s ease;
 }
 
-/* 深色模式下的玻璃效果调整 */
+/* 娣辫壊妯″紡涓殑鐜荤拑鏁堟灉璋冩暣 */
 .dark .glass {
   background: var(--glass-default);
   border: 1px solid var(--glass-border);
 }
 
-/* 浅色模式下的玻璃效果调整 */
+/* 娴呰壊妯″紡涓殑鐜荤拑鏁堟灉璋冩暣 */
 .light .glass {
   background: var(--glass-default);
   border: 1px solid var(--glass-border);
 }
 
-/* 悬停增强效果 */
+/* 鎸仠澧炲己鏁堟灉 */
 .glass-hover {
   transition: all var(--transition-duration) var(--transition-easing);
   will-change: transform;
@@ -285,7 +291,7 @@
   transition: all var(--transition-duration) var(--transition-easing);
 }
 
-/* 轻微悬停效果 - 用于较小的元素 */
+/* 杞诲井鎮仠鏁堟灉 - 鐢ㄤ簬杈冨皬鐨勫厓绱?*/
 .glass-hover-subtle {
   transition: all 0.2s ease;
 }
@@ -298,7 +304,7 @@
   transform: translateY(-2px);
 }
 
-/* 发光效果 */
+/* 鍙戝厜鏁堟灉 */
 .glass-glow {
   box-shadow: 0 0 15px var(--shadow-tech-cyan);
 }
@@ -307,7 +313,7 @@
   box-shadow: 0 0 30px var(--shadow-tech-cyan);
 }
 
-/* Gradient backgrounds - 使用CSS变量 */
+/* Gradient backgrounds - 浣跨敤CSS鍙橀噺 */
 .gradient-bg {
   background: linear-gradient(-45deg, var(--background), var(--tech-deepblue), var(--tech-cyan), var(--tech-sky));
   background-size: 400% 400%;
@@ -326,7 +332,11 @@
   100% { background-position: 0% 50%; }
 }
 
-/* 背景漂移动画 */
+.animate-gradient-move {
+  animation: gradient-move 8s ease infinite;
+}
+
+/* 鑳屾櫙婕傜Щ鍔ㄧ敾 */
 @keyframes drift {
   0%, 100% { transform: scale(1) translateX(0) translateY(0); }
   50% { transform: scale(1.02) translateX(-10px) translateY(-5px); }
@@ -396,7 +406,7 @@
   @apply rounded-lg;
 }
 
-/* 淡入上移动画 */
+/* 娣″叆涓婄Щ鍔ㄧ敾 */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -412,7 +422,7 @@
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
-/* 淡入动画 */
+/* 娣″叆鍔ㄧ敾 */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -426,7 +436,7 @@
   animation: fade-in 0.6s ease-out forwards;
 }
 
-/* 从左侧滑入 */
+/* 浠庡乏渚ф粦鍏?*/
 @keyframes slide-in-left {
   from {
     opacity: 0;
@@ -442,7 +452,7 @@
   animation: slide-in-left 0.6s ease-out forwards;
 }
 
-/* 缩放淡入 */
+/* 缂╂斁娣″叆 */
 @keyframes scale-fade-in {
   from {
     opacity: 0;
@@ -460,7 +470,7 @@
 
 
 
-/* 下划线展开动画 - 浅色白蓝 */
+/* 涓嬪垝绾垮睍寮€鍔ㄧ敾 - 娴呰壊鐧借摑 */
 .nav-link {
   position: relative;
 }
@@ -485,7 +495,7 @@
   width: 100%;
 }
 
-/* 文本渐变 - 使用CSS变量 */
+/* 鏂囨湰娓愬彉 - 浣跨敤CSS鍙橀噺 */
 .text-gradient {
   background: linear-gradient(135deg, var(--tech-cyan), var(--tech-sky), var(--tech-cyan));
   -webkit-background-clip: text;
@@ -500,7 +510,7 @@
   background-clip: text;
 }
 
-/* 发光边框 - 浅色白蓝 */
+/* 鍙戝厜杈规 - 娴呰壊鐧借摑 */
 .glow-border {
   position: relative;
 }
@@ -520,12 +530,12 @@
   background: linear-gradient(45deg, var(--tech-lightcyan), var(--tech-sky), var(--tech-lightcyan), var(--tech-lightcyan));
 }
 
-/* 平滑滚动 */
+/* 骞虫粦婊氬姩 */
 html {
   scroll-behavior: smooth;
 }
 
-/* 改进的玻璃浮动动画 */
+/* 鏀硅繘鐨勭幓鐠冩诞鍔ㄥ姩鐢?*/
 @keyframes float-improved {
   0%, 100% {
     transform: translateY(0px) translateX(0px) scale(1);
@@ -545,7 +555,7 @@ html {
   animation: float-improved 8s ease-in-out infinite;
 }
 
-/* 渐入缩放动画 - 用于卡片 */
+/* 娓愬叆缂╂斁鍔ㄧ敾 - 鐢ㄤ簬鍗＄墖 */
 @keyframes fade-scale-up {
   from {
     opacity: 0;
@@ -561,7 +571,7 @@ html {
   animation: fade-scale-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* 从右侧滑入 */
+/* 浠庡彸渚ф粦鍏?*/
 @keyframes slide-in-right {
   from {
     opacity: 0;
@@ -577,7 +587,7 @@ html {
   animation: slide-in-right 0.6s ease-out forwards;
 }
 
-/* 发光脉冲动画 - 用于重要元素 */
+/* 鍙戝厜鑴夊啿鍔ㄧ敾 - 鐢ㄤ簬閲嶈鍏冪礌 */
 @keyframes glow-pulse {
   0%, 100% {
     box-shadow: 0 0 20px rgba(6, 182, 212, 0.3),
@@ -593,7 +603,7 @@ html {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
-/* 为减少动画偏好添加支持 */
+/* 涓哄噺灏戝姩鐢诲亸濂芥坊鍔犳敮鎸?*/
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -626,7 +636,7 @@ html {
   }
 }
 
-/* 全局渐变动态滚动条 */
+/* 鍏ㄥ眬娓愬彉鍔ㄦ€佹粴鍔ㄦ潯 */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -660,7 +670,7 @@ html {
   100% { background-position: 0% 50%; }
 }
 
-/* 自定义滚动条 */
+/* 鑷畾涔夋粴鍔ㄦ潯 */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -679,7 +689,7 @@ html {
   background: var(--tech-lightcyan);
 }
 
-/* 动画延迟类 */
+/* 鍔ㄧ敾寤惰繜绫?*/
 .animate-delay-50 { animation-delay: 50ms; }
 .animate-delay-100 { animation-delay: 100ms; }
 .animate-delay-150 { animation-delay: 150ms; }
@@ -689,7 +699,7 @@ html {
 .animate-delay-400 { animation-delay: 400ms; }
 .animate-delay-500 { animation-delay: 500ms; }
 
-/* 主题切换器动画 */
+/* 涓婚鍒囨崲鍣ㄥ姩鐢?*/
 @keyframes spin-slow {
   from {
     transform: rotate(0deg);
@@ -703,12 +713,12 @@ html {
   animation: spin-slow 8s linear infinite;
 }
 
-/* 平滑的主题切换过渡 */
+/* 骞虫粦鐨勪富棰樺 RuntimeException */
 .theme-transition {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-/* 主题切换时的淡入淡出效果 */
+/* 涓婚鍒囨崲鏃剁殑娣″叆娣″嚭鏁堟灉 */
 @keyframes theme-switch-fade {
   0% {
     opacity: 1;
@@ -725,7 +735,7 @@ html {
   animation: theme-switch-fade 0.3s ease-in-out;
 }
 
-/* 优化的卡片悬停效果 */
+/* 浼樺寲鐨勫崱鐗囨偓鍋滄晥鏋?*/
 .card-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -742,28 +752,28 @@ html {
   mix-blend-mode: normal;
 }
 
-/* 绳子主题切换器动画 - 使用恒定duration */
+/* 缁冲瓙涓婚鍒囨崲鍣ㄥ姩鐢?- 浣跨敤鎭掑畾duration */
 @keyframes rope-swing {
   0%, 100% { transform: rotate(-3deg); }
   50% { transform: rotate(3deg); }
 }
 
-/* 摇摆容器 - 恒定动画时长 */
+/* 鎽囨憜瀹瑰櫒 - 鎭掑畾鍔ㄧ敾鏃堕暱 */
 .rope-swing {
   animation: rope-swing 3s ease-in-out infinite;
 }
 
-/* 摇摆容器hover增强 - 叠加transform增强摇摆 */
+/* 鎽囨憜瀹瑰櫒hover澧炲己 - 鍙犲姞transform澧炲己鎽囨憜 */
 .rope-swing-wrapper:hover .rope-swing {
   animation: rope-swing 1.5s ease-in-out infinite;
 }
 
-/* 摇摆容器下拉动画 */
+/* 鎽囨憜瀹瑰櫒涓嬫媺鍔ㄧ敾 */
 .rope-pull {
   animation: rope-pull 0.3s ease-in-out;
 }
 
-/* 玻璃卡片变体 */
+/* 鐜荤拑鍗＄墖鍙樹綋 */
 .glass-card-primary {
   @apply backdrop-blur-xl border border-glass-border rounded-2xl;
   background: var(--glass-default);
@@ -774,7 +784,7 @@ html {
   background: var(--glass-default);
 }
 
-/* 波浪组件样式 */
+/* 娉㈡氮缁勪欢鏍峰紡 */
 .wave-container {
   position: relative;
   width: 100%;
@@ -801,7 +811,7 @@ html {
   overflow: hidden;
 }
 
-/* 文本渐变变体 - 浅色白蓝 */
+/* 鏂囨湰娓愬彉鍙樹綋 - 娴呰壊鐧借摑 */
 .text-gradient-primary {
   background: linear-gradient(135deg, var(--tech-cyan), var(--tech-sky), var(--tech-cyan));
   -webkit-background-clip: text;
@@ -816,3 +826,274 @@ html {
   background-clip: text;
 }
 
+/* Logo鍔ㄧ敾keyframes */
+@keyframes logo-opacity {
+  0% {
+    border-right: 1px solid transparent;
+  }
+  10% {
+    border-right: 1px solid var(--tech-cyan);
+  }
+  80% {
+    border-right: 1px solid var(--tech-cyan);
+  }
+  100% {
+    border-right: 1px solid transparent;
+  }
+}
+
+@keyframes logo-trail {
+  0% {
+    background: linear-gradient(90deg, transparent 0%, rgba(var(--tech-cyan-rgb), 0.8) 50%, transparent 100%);
+    opacity: 0;
+    transform: translateX(-100%) skewX(-45deg);
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) skewX(-45deg);
+  }
+}
+
+.animate-trail {
+  animation: logo-trail 1s ease-in-out;
+}
+
+/* ===== 3D 缈昏浆鍗＄墖鏍峰紡 ===== */
+.flip-card {
+  perspective: 1000px;
+  background-color: transparent;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+}
+
+.flip-card-front {
+  z-index: 2;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+/* 鎵厜鏃嬭浆鍔ㄧ敾 */
+@keyframes sweep-rotate {
+  0% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+/* 鸣诞鍦嗗湀鍔ㄧ敾 */
+@keyframes float-circle {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+.float-circle {
+  animation: float-circle 4s ease-in-out infinite;
+}
+
+/* ===== 浼樺寲鐨勬壂鍏夊姩鐢?===== */
+
+/* 涓诲厜鏉熸棆杞姩鐢?- 瀹藉厜鏉燂紝鎱㈤€?*/
+@keyframes sweep-main {
+  0% {
+    transform: translateX(-50%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* 杈呭姪鍏夋潫1 - 绐勫厜鏉燂紝蹇€?*/
+@keyframes sweep-fast {
+  0% {
+    transform: translateX(-50%) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.4;
+  }
+  95% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* 杈呭姪鍏夋潫2 - 涓厜鏉燂紝鍙嶅悜 */
+@keyframes sweep-reverse {
+  0% {
+    transform: translateX(-50%) rotate(360deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(-50%) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+/* 鏌斿拰鍏夋檿鑴夊姩鍔ㄧ敾 */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.1);
+  }
+}
+
+/* 涓诲厜鏉?*/
+.sweep-beam-main {
+  animation: sweep-main 5s ease-in-out infinite;
+}
+
+/* 蹇€熷厜鏉?*/
+.sweep-beam-fast {
+  animation: sweep-fast 3s ease-in-out infinite;
+}
+
+/* 反向光束 */
+  .sweep-beam-reverse {
+  animation: sweep-reverse 4s ease-in-out infinite;
+}
+
+/* 扫光动画 - 用于友链卡片 */
+  @keyframes sweep {
+  0% {
+    transform: translateX(-100%) skewX(20deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-40deg);
+  }
+}
+
+  /* 鎵厜鏁堟灉 */
+  .animate-sweep {
+  animation: sweep 3s ease-in-out infinite;
+}
+
+  /* 鍔ㄧ敾寤惰繜绫?*/
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
+  }
+  .animation-delay-2000 {
+    animation-delay: 2000ms;
+  }
+  .animation-delay-3000 {
+    animation-delay: 3000ms;
+  }
+
+/* ===== 友链卡片角部扩展动画 ===== */
+
+/* 主容器样式 */
+.friend-link-corner {
+  position: relative;
+}
+
+/* ::before 元素 - 右上角 */
+.friend-link-corner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20%;
+  height: 20%;
+  background: var(--tech-cyan);
+  border-radius: 0 0 0 100%;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  opacity: 0.3;
+}
+
+/* ::after 元素 - 左下角 */
+.friend-link-corner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 20%;
+  height: 20%;
+  background: var(--tech-sky);
+  border-radius: 100% 0 0 0;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  opacity: 0.3;
+}
+
+/* 悬停状态 - 右上角 */
+.friend-link-corner:hover::before {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  opacity: 0.8;
+}
+
+/* 悬停状态 - 左下角 */
+.friend-link-corner:hover::after {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  opacity: 0.8;
+}
+
+/* 深色模式适配 - 使用更亮的颜色 */
+.dark .friend-link-corner::before {
+  background: var(--tech-lightcyan);
+}
+
+.dark .friend-link-corner::after {
+  background: var(--tech-cyan);
+}

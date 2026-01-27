@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, Code2, Layout, Zap, TrendingUp, MessageSquare } from 'lucide-react';
+import { Code2, Layout, Zap, TrendingUp, MessageSquare } from 'lucide-react';
 
 export default function AboutPage() {
   const features = [

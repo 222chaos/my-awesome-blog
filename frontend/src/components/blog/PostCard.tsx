@@ -12,12 +12,15 @@ interface PostCardProps {
   title: string;
   excerpt: string;
   date: string;
-  readTime: string;
+  readTime?: string;
   category?: string;
   href?: string;
   className?: string;
   showCategory?: boolean;
   showMeta?: boolean;
+  coverImage?: string;
+  likes?: number;
+  comments?: number;
 }
 
 export default function PostCard({
@@ -27,10 +30,13 @@ export default function PostCard({
   date,
   readTime,
   category,
-  href = `/posts/${id}`,
+  href,
   className,
   showCategory = true,
-  showMeta = true
+  showMeta = true,
+  coverImage,
+  likes = 0,
+  comments = 0
 }: PostCardProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -53,68 +59,54 @@ export default function PostCard({
       role="article"
       aria-labelledby={`post-title-${id}`}
     >
-      <div className="p-6 md:p-8 flex-grow flex flex-col">
-        {showCategory && category && (
-          <span
-            className="inline-block px-3 py-1 text-xs font-semibold bg-glass rounded-full mb-4 w-fit"
-            style={{
-              backgroundColor: 'var(--glass-default)',
-              color: 'var(--tech-cyan)'
-            }}
-            aria-label={`分类: ${category}`}
-          >
-            {category}
-          </span>
-        )}
-
-        <div className="flex-grow">
-          <h2
-            id={`post-title-${id}`}
-            className="text-xl md:text-2xl font-bold mb-3 group-hover:text-tech-lightcyan transition-colors break-words"
-            style={{ color: 'var(--foreground)' }}
-          >
-            {title}
-          </h2>
-          <p
-            className="mb-4 line-clamp-3 break-words"
-            style={{ color: 'var(--foreground)' }}
-          >
-            {excerpt}
-          </p>
-        </div>
-
-        {showMeta && (
-          <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-2">
-            <div
-              className="flex flex-wrap gap-3 text-sm"
-              style={{ color: 'var(--muted-foreground)' }}
+      <div className="p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <h2
+              id={`post-title-${id}`}
+              className="text-lg sm:text-xl font-bold mb-2 text-foreground group-hover:text-tech-cyan transition-colors break-words"
             >
-              <span className="flex items-center gap-1">
+              {title}
+            </h2>
+            <p className="text-muted-foreground mb-3 sm:mb-4 line-clamp-2 text-sm sm:text-base">
+              {excerpt}
+            </p>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+              <div className="flex items-center gap-1" aria-label={`发布日期：${date}`}>
                 <CalendarIcon className="w-4 h-4" />
                 <time>{date}</time>
-              </span>
-              <span className="flex items-center gap-1">
-                <ClockIcon className="w-4 h-4" />
-                {readTime}
-              </span>
+              </div>
+              <div className="flex items-center gap-1" aria-label={`点赞数：${likes}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-heart w-4 h-4" aria-hidden="true">
+                  <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
+                </svg>
+                <span>{likes}</span>
+              </div>
+              <div className="flex items-center gap-1" aria-label={`评论数：${comments}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-message-circle w-4 h-4" aria-hidden="true">
+                  <path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path>
+                </svg>
+                <span>{comments}</span>
+              </div>
+              {showCategory && category && (
+                <span className="px-2 sm:px-3 py-1 rounded-full bg-tech-cyan/20 text-tech-cyan text-xs font-medium">
+                  {category}
+                </span>
+              )}
             </div>
-
-            <Button
-              asChild
-              variant="ghost"
-              className="group p-0 h-auto font-medium"
-              style={{ color: 'var(--tech-cyan)' }}
-              aria-label={`阅读文章: ${title}`}
-            >
-              <Link href={`/posts/${id}`}>
-                阅读更多
-                <ArrowRightIcon
-                  className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1"
-                />
-              </Link>
-            </Button>
           </div>
-        )}
+          <div className="flex-shrink-0">
+            <Link
+              href={href ? href as any : `/posts/${id}` as any}
+              className="w-10 h-10 rounded-full bg-tech-cyan/20 flex items-center justify-center group-hover:bg-tech-cyan transition-colors"
+              aria-label={`查看文章: ${title}`}
+            >
+              <ArrowRightIcon
+                className="w-5 h-5 text-tech-cyan group-hover:text-white transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+          </div>
+        </div>
       </div>
     </article>
   );
@@ -128,48 +120,46 @@ export function PostCardSkeleton() {
       role="status"
       aria-label="加载中"
     >
-      <div className="p-6 md:p-8 flex-grow flex flex-col">
-        <div
-          className="inline-block px-3 py-1 text-xs font-semibold rounded-full mb-4 w-16 h-6"
-          style={{ backgroundColor: 'var(--muted)' }}
-        />
-
-        <div className="flex-grow">
-          <div
-            className="text-xl md:text-2xl font-bold text-transparent rounded mb-3 w-3/4 h-6 mb-4"
-            style={{ backgroundColor: 'var(--muted)' }}
-          />
-          <div className="space-y-2">
+      <div className="p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
             <div
-              className="text-transparent rounded w-full h-4"
-              style={{ backgroundColor: 'var(--muted)' }}
+              className="h-5 w-3/4 bg-gray-300 dark:bg-gray-700 rounded mb-2"
+              aria-hidden="true"
             />
             <div
-              className="text-transparent rounded w-5/6 h-4"
-              style={{ backgroundColor: 'var(--muted)' }}
+              className="h-4 w-full bg-gray-300 dark:bg-gray-700 rounded mb-3"
+              aria-hidden="true"
             />
             <div
-              className="text-transparent rounded w-4/6 h-4"
-              style={{ backgroundColor: 'var(--muted)' }}
+              className="h-4 w-5/6 bg-gray-300 dark:bg-gray-700 rounded mb-3"
+              aria-hidden="true"
+            />
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div
+                className="h-4 w-16 bg-gray-300 dark:bg-gray-700 rounded"
+                aria-hidden="true"
+              />
+              <div
+                className="h-4 w-16 bg-gray-300 dark:bg-gray-700 rounded"
+                aria-hidden="true"
+              />
+              <div
+                className="h-4 w-16 bg-gray-300 dark:bg-gray-700 rounded"
+                aria-hidden="true"
+              />
+              <div
+                className="h-6 w-16 bg-gray-300 dark:bg-gray-700 rounded-full"
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+          <div className="flex-shrink-0">
+            <div
+              className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700"
+              aria-hidden="true"
             />
           </div>
-        </div>
-
-        <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-3">
-            <div
-              className="w-16 h-4 rounded"
-              style={{ backgroundColor: 'var(--muted)' }}
-            />
-            <div
-              className="w-12 h-4 rounded"
-              style={{ backgroundColor: 'var(--muted)' }}
-            />
-          </div>
-          <div
-            className="w-16 h-6 rounded"
-            style={{ backgroundColor: 'var(--muted)' }}
-          />
         </div>
       </div>
     </article>

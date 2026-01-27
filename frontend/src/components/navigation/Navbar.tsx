@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import AnimatedLogo from './AnimatedLogo';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, User, UserCircle, LayoutDashboard, FileText, Settings, LogOut } from 'lucide-react';
@@ -86,14 +86,9 @@ export default function Navbar() {
         }`}
       >
         <div className="w-full h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-tech-cyan to-tech-lightcyan rounded-lg group-hover:scale-110 transition-transform duration-300">
-              <span className="text-white font-bold text-lg">A</span>
-            </div>
-            <span className="font-bold text-xl text-gradient-primary hidden sm:inline-block text-foreground">
-              Awesome Blog
-            </span>
-          </Link>
+          <div className="flex items-center flex-shrink-0">
+            <AnimatedLogo />
+          </div>
 
           <div className="hidden md:flex items-center space-x-4">
             <nav className="flex items-center space-x-4 lg:space-x-6 text-sm font-medium">

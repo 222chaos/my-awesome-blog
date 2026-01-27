@@ -87,7 +87,9 @@ const NavigationMenuContent = React.forwardRef<
 >(({ className, ...props }, ref) => {
   const context = React.useContext(NavigationMenuContext);
   
-  if (!context || !context.open) return null;
+  if (!context || !context.open) {
+    return null;
+  }
   
   return (
     <div

@@ -48,7 +48,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // 涟漪效果处理
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (onClick) onClick(e);
+      if (onClick) {
+        onClick(e);
+      }
 
       const button = e.currentTarget;
       const rect = button.getBoundingClientRect();

@@ -24,9 +24,9 @@ export const RopeThemeToggler = ({
   className,
   ...props
 }: RopeThemeTogglerProps) => {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [isPulling, setIsPulling] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+
   const [mounted, setMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,9 @@ export const RopeThemeToggler = ({
   const isDark = mounted && resolvedTheme === 'dark';
 
   const toggleTheme = useCallback(async () => {
-    if (!buttonRef.current || typeof document === 'undefined') return;
+    if (!buttonRef.current || typeof document === 'undefined') {
+      return;
+    }
 
     // 检查是否用户设置了减少动画偏好
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -118,8 +120,7 @@ export const RopeThemeToggler = ({
     <div
       ref={containerRef}
       className={cn("rope-container relative flex flex-col items-start", className)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+
       {...props}
     >
       {/* 摇摆容器wrapper - 用于hover增强 */}

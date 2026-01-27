@@ -7,6 +7,8 @@ export interface Post {
   readTime: string;
   category: string;
   image?: string;
+  likes?: number;
+  comments?: number;
 }
 
 // 分类类型
@@ -76,4 +78,18 @@ export interface PopularPost {
   id: string;
   title: string;
   date: string;
+}
+
+// 用户相关类型
+export interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  fullName?: string;
+  avatar?: string;
+  bio?: string;
+  website?: string;
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
 }

@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import HeroSection from '@/components/home/HeroSection';
-import PostGrid from '@/components/home/PostGrid';
-import Sidebar from '@/components/home/Sidebar';
 import FeaturedSection from '@/components/home/FeaturedSection';
-import ProfilePanel from '@/components/home/ProfilePanel';
+import StatsPanel from '@/components/home/StatsPanel';
 import TagCloud from '@/components/home/TagCloud';
 import Timeline from '@/components/home/Timeline';
 import FriendLinks from '@/components/home/FriendLinks';
 import Portfolio from '@/components/home/Portfolio';
-import Breadcrumb from '@/components/Breadcrumb';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import type { Post, Category, PopularPost, TimelineItem, FriendLink } from '@/types';
@@ -31,6 +29,9 @@ export default function Home() {
         date: '2024年1月15日',
         readTime: '5分钟阅读',
         category: '开发',
+        image: '/assets/placeholder-post-image-1.jpg',
+        likes: 128,
+        comments: 32,
       },
       {
         id: 'tailwind-css-tips',
@@ -39,6 +40,9 @@ export default function Home() {
         date: '2024年1月10日',
         readTime: '8分钟阅读',
         category: '设计',
+        image: '/assets/placeholder-post-image-2.jpg',
+        likes: 95,
+        comments: 24,
       },
       {
         id: 'typescript-best-practices',
@@ -47,6 +51,9 @@ export default function Home() {
         date: '2024年1月5日',
         readTime: '6分钟阅读',
         category: '开发',
+        image: '/assets/placeholder-post-image-3.jpg',
+        likes: 210,
+        comments: 42,
       },
       {
         id: 'api-design-guide',
@@ -55,6 +62,9 @@ export default function Home() {
         date: '2023年12月28日',
         readTime: '10分钟阅读',
         category: '后端',
+        image: '/assets/placeholder-post-image-4.jpg',
+        likes: 87,
+        comments: 18,
       },
       {
         id: 'state-management-options',
@@ -63,6 +73,9 @@ export default function Home() {
         date: '2023年12月20日',
         readTime: '12分钟阅读',
         category: '前端',
+        image: '/assets/placeholder-post-image-5.jpg',
+        likes: 156,
+        comments: 36,
       },
       {
         id: 'web-security-basics',
@@ -71,6 +84,9 @@ export default function Home() {
         date: '2023年12月15日',
         readTime: '9分钟阅读',
         category: '安全',
+        image: '/assets/placeholder-post-image-6.jpg',
+        likes: 74,
+        comments: 15,
       },
     ]);
 
@@ -150,35 +166,12 @@ export default function Home() {
       <div id="content" className="bg-background">
         <HeroSection />
 
-        <div className="container mx-auto px-4 py-6">
-          <Breadcrumb
-            items={[
-              { label: '首页', href: '/', active: true }
-            ]}
-          />
-        </div>
-
         <div className="container mx-auto px-4 py-16 bg-background">
-          <ProfilePanel />
+          <StatsPanel />
         </div>
 
         <div className="container mx-auto px-4 py-16 bg-background">
           <FeaturedSection />
-        </div>
-
-        <div className="container mx-auto px-4 py-16 bg-background">
-          <div className="flex flex-col lg:flex-row gap-8">
-            <main className="flex-1">
-              <PostGrid posts={posts} />
-            </main>
-
-            <aside className="lg:w-80">
-              <Sidebar
-                categories={categories}
-                popularPosts={popularPosts}
-              />
-            </aside>
-          </div>
         </div>
 
         <div className="container mx-auto px-4 py-16 bg-background">

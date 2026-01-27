@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sun, Moon, Monitor, Palette, Type, Palette as PaletteIcon, Zap } from 'lucide-react';
+import { Sun, Moon, Monitor, Palette, Type, Palette as PaletteIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/context/theme-context';
 import GlassCard from '@/components/ui/GlassCard';

@@ -1,4 +1,4 @@
-import { UserProfile } from '@/lib/types';
+import { UserProfile } from '@/types';
 
 // 模拟用户数据
 const mockUsers: Record<string, UserProfile> = {
@@ -233,7 +233,7 @@ export const validateSocialLink = (platform: string, url: string): { isValid: bo
       // 对于其他平台，验证是否为有效的URL
       try {
         new URL(url.startsWith('http') ? url : `http://${url}`);
-      } catch (e) {
+      } catch (_) {
         return { 
           isValid: false, 
           message: '链接格式不正确' 

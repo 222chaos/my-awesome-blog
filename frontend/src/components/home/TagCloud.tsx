@@ -29,7 +29,7 @@ function getColorClass(count: number, maxCount: number): string {
 }
 
 export default function TagCloud({ tags }: TagCloudProps) {
-  const { resolvedTheme } = useTheme();
+
   
   if (!tags || tags.length === 0) {
     return null;

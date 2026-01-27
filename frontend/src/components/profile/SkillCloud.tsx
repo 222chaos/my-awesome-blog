@@ -43,94 +43,106 @@ export default function SkillCloud() {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-foreground flex items-center gap-2">
-        <Cpu className="w-4 h-4 text-primary" />
+        <Cpu className="w-4 h-4 text-tech-cyan" />
         技能专长
       </h3>
 
-      <GlassCard padding="lg" className="border-border">
+      <GlassCard padding="lg" className="border-tech-cyan/20">
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => setSelectedCategory('All')}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer ${
               selectedCategory === 'All'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                ? 'bg-gradient-to-r from-tech-cyan to-tech-sky text-white shadow-lg hover:shadow-xl hover:scale-105'
+                : 'bg-muted text-muted-foreground hover:bg-tech-cyan/10 hover:text-tech-cyan'
             }`}
           >
             全部
           </button>
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer animate-fade-in-up ${
                 selectedCategory === category
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  ? 'bg-gradient-to-r from-tech-cyan to-tech-sky text-white shadow-lg hover:shadow-xl hover:scale-105'
+                  : 'bg-muted text-muted-foreground hover:bg-tech-cyan/10 hover:text-tech-cyan'
               }`}
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               {category}
             </button>
           ))}
         </div>
 
-        <div className="space-y-4">
-          {filteredSkills.map((skill) => (
+        <div className="space-y-5">
+          {filteredSkills.map((skill, index) => (
             <div
               key={skill.name}
-              className="group"
+              className="group relative"
               onMouseEnter={() => setHoveredSkill(skill.name)}
               onMouseLeave={() => setHoveredSkill(null)}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg bg-primary/10 text-primary transition-all duration-300 ${
-                    hoveredSkill === skill.name ? 'scale-110 bg-primary/20' : ''
-                  }`}>
-                    {skill.icon}
+              {/* 悬停光晕效果 */}
+              <div className={`absolute -inset-2 bg-gradient-to-r from-tech-cyan/0 via-tech-cyan/5 to-tech-cyan/0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${hoveredSkill === skill.name ? 'opacity-100' : ''}`} />
+              
+              <div className="relative">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2.5 rounded-xl bg-tech-cyan/10 text-tech-cyan transition-all duration-500 group-hover:scale-110 group-hover:bg-tech-cyan/20 group-hover:rotate-3 ${
+                      hoveredSkill === skill.name ? 'shadow-[0_0_20px_var(--shadow-tech-cyan)]' : ''
+                    }`}>
+                      {skill.icon}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-foreground group-hover:text-tech-cyan transition-colors">{skill.name}</div>
+                      <div className="text-xs text-muted-foreground">{skill.category}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium text-foreground">{skill.name}</div>
-                    <div className="text-xs text-muted-foreground">{skill.category}</div>
+                  <div className={`text-2xl font-bold text-gradient-primary transition-all duration-300 ${hoveredSkill === skill.name ? 'scale-110' : ''}`}>
+                    {skill.level}%
                   </div>
                 </div>
-                <div className="text-sm font-semibold text-primary">
-                  {skill.level}%
+                
+                {/* 进度条 */}
+                <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">
+                  {/* 背景发光 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-tech-cyan/0 via-tech-cyan/10 to-tech-cyan/0" />
+                  
+                  <div
+                    className={`h-full bg-gradient-to-r from-tech-cyan/60 to-tech-sky rounded-full transition-all duration-700 relative ${
+                      hoveredSkill === skill.name ? 'shadow-[0_0_15px_var(--shadow-tech-cyan)]' : ''
+                    }`}
+                    style={{ width: `${skill.level}%` }}
+                  >
+                    {/* 进度条光效 */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+                  </div>
                 </div>
-              </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className={`h-full bg-gradient-to-r from-primary/60 to-primary rounded-full transition-all duration-500 ${
-                    hoveredSkill === skill.name ? 'from-primary/80 to-primary' : ''
-                  }`}
-                  style={{ width: `${skill.level}%` }}
-                />
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 pt-6 border-t border-border">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-primary">16</div>
-              <div className="text-xs text-muted-foreground">技能总数</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-primary">4</div>
-              <div className="text-xs text-muted-foreground">专业领域</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-primary">88%</div>
-              <div className="text-xs text-muted-foreground">平均熟练度</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-primary">95%</div>
-              <div className="text-xs text-muted-foreground">最高技能</div>
-            </div>
+        <div className="mt-8 pt-6 border-t border-border">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {[
+              { value: filteredSkills.length, label: '技能总数', color: 'from-tech-cyan to-tech-sky' },
+              { value: categories.length, label: '专业领域', color: 'from-purple-500 to-pink-500' },
+              { value: `${Math.round(filteredSkills.reduce((sum, skill) => sum + skill.level, 0) / filteredSkills.length)}%`, label: '平均熟练度', color: 'from-green-500 to-emerald-500' },
+              { value: `${Math.max(...filteredSkills.map(s => s.level))}%`, label: '最高技能', color: 'from-orange-500 to-red-500' }
+            ].map((stat, index) => (
+              <div key={stat.label} className="space-y-2 animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                <div className={`text-3xl font-bold text-gradient-${stat.color.replace('from-', '').split(' to-')[0]}-${stat.color.split(' to-')[1]}`}>
+                  {stat.value}
+                </div>
+                <div className="text-xs text-muted-foreground font-medium">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </GlassCard>
     </div>
   );
 }
+

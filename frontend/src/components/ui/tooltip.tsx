@@ -15,7 +15,7 @@ interface TooltipProps {
   onOpenChange?: (open: boolean) => void
 }
 
-const Tooltip = ({ children, open, defaultOpen, onOpenChange }: TooltipProps) => {
+const Tooltip = ({ children }: TooltipProps) => {
   return <>{children}</>
 }
 

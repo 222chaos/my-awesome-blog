@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import GlassCard from '@/components/ui/GlassCard';
+import FriendLinkCard from '@/components/ui/FriendLinkCard';
 import { useTheme } from '@/context/theme-context';
 import { useState, useEffect } from 'react';
 
@@ -50,11 +50,12 @@ export default function FriendLinks({ links }: FriendLinksProps) {
               rel="noopener noreferrer"
               className="group"
             >
-              <GlassCard
-                className={`${glassCardClass} h-full flex flex-col items-center justify-center p-6`}
+              <FriendLinkCard
+                className="h-full flex flex-col items-center justify-center"
                 hoverEffect={true}
                 glowEffect={true}
                 padding="md"
+                cornerAnimation={true}
               >
                 {/* Favicon */}
                 <img
@@ -72,7 +73,7 @@ export default function FriendLinks({ links }: FriendLinksProps) {
                 {link.description && (
                   <p className="text-muted-foreground text-sm">{link.description}</p>
                 )}
-              </GlassCard>
+              </FriendLinkCard>
             </a>
           ))}
         </div>

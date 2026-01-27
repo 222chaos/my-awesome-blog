@@ -31,7 +31,9 @@ export function ThemeProvider({
   const [isMounted, setIsMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => {
     // 服务端渲染时返回默认值
-    if (typeof window === 'undefined') return defaultTheme;
+    if (typeof window === 'undefined') {
+      return defaultTheme;
+    }
 
     // 客户端尝试从本地存储获取主题
     try {
@@ -49,7 +51,9 @@ export function ThemeProvider({
   }, []);
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window === 'undefined') return 'dark';
+    if (typeof window === 'undefined') {
+      return 'dark';
+    }
 
     try {
       const stored = localStorage.getItem(storageKey);
@@ -82,7 +86,9 @@ export function ThemeProvider({
 
   // 计算实际主题
   useEffect(() => {
-    if (!isMounted || typeof window === 'undefined') return;
+    if (!isMounted || typeof window === 'undefined') {
+      return;
+    }
 
     const root = window.document.documentElement;
 
@@ -112,7 +118,9 @@ export function ThemeProvider({
 
   // 监听系统主题变化
   useEffect(() => {
-    if (!isMounted || typeof window === 'undefined') return;
+    if (!isMounted || typeof window === 'undefined') {
+      return;
+    }
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     let timeoutId: NodeJS.Timeout;

@@ -67,6 +67,7 @@ const TabsTrigger = React.forwardRef<
     </button>
   );
 });
+TabsTrigger.displayName = "TabsTrigger";
 
 const TabsContent = React.forwardRef<
   HTMLDivElement,

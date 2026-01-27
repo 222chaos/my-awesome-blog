@@ -9,29 +9,45 @@ interface StatCardProps {
   value: string | number;
   trend?: string;
   trendUp?: boolean;
+  color?: string;
 }
 
-const StatCard = ({ icon, label, value, trend, trendUp }: StatCardProps) => (
-  <GlassCard padding="md" className="border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group cursor-pointer">
-    <div className="flex items-start justify-between">
+const StatCard = ({ icon, label, value, trend, trendUp, color = 'text-tech-cyan' }: StatCardProps) => (
+  <GlassCard 
+    padding="md" 
+    className="border-tech-cyan/20 hover:border-tech-cyan/40 hover:shadow-[0_0_25px_var(--shadow-tech-cyan)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 group cursor-pointer relative overflow-hidden"
+    hoverEffect={true}
+    glowEffect={true}
+  >
+    {/* 背景流光效果 */}
+    <div className="absolute inset-0 bg-gradient-to-br from-tech-cyan/5 via-transparent to-tech-sky/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    
+    <div className="relative flex items-start justify-between">
       <div className="flex-1">
         <div className="flex items-center gap-2 text-muted-foreground mb-1">
-          {icon}
+          <div className={`p-1.5 rounded-lg ${color} bg-tech-cyan/10 group-hover:bg-tech-cyan/20 group-hover:scale-110 transition-all duration-300`}>
+            {icon}
+          </div>
           <span className="text-sm font-medium">{label}</span>
         </div>
-        <div className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+        <div className="text-2xl font-bold text-foreground group-hover:text-gradient-primary transition-colors">
           {value}
         </div>
       </div>
       {trend && (
-        <div className={`flex items-center gap-1 text-xs font-medium ${
-          trendUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+        <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full transition-all duration-300 group-hover:scale-110 ${
+          trendUp 
+            ? 'bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20' 
+            : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
         }`}>
           <TrendingUp className={`w-3 h-3 ${!trendUp ? 'rotate-180' : ''}`} />
           <span>{trend}</span>
         </div>
       )}
     </div>
+
+    {/* 底部发光线 */}
+    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-tech-cyan to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
   </GlassCard>
 );
 

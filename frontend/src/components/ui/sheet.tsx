@@ -35,7 +35,9 @@ const SheetTrigger = React.forwardRef<HTMLDivElement, SheetTriggerProps>(
   ({ children, asChild = false, ...props }, ref) => {
     const context = React.useContext(SheetContext);
     
-    if (!context) return null;
+    if (!context) {
+      return null;
+    }
     
     const { setOpen } = context;
     
@@ -68,7 +70,9 @@ const SheetClose = React.forwardRef<HTMLDivElement, SheetCloseProps>(
   ({ children, asChild = false, ...props }, ref) => {
     const context = React.useContext(SheetContext);
     
-    if (!context) return null;
+    if (!context) {
+      return null;
+    }
     
     const { setOpen } = context;
     
@@ -122,11 +126,15 @@ const SheetContent = React.forwardRef<HTMLDivElement, SheetContentProps>(
   ({ side = 'right', className, children, ...props }, ref) => {
     const context = React.useContext(SheetContext);
     
-    if (!context) return null;
+    if (!context) {
+      return null;
+    }
     
     const { open, setOpen } = context;
     
-    if (!open) return null;
+    if (!open) {
+      return null;
+    }
     
     return (
       <>
