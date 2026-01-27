@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '@/context/theme-context';
+import { useState, useEffect } from 'react';
 
 interface WaveProps {
   position?: 'top' | 'bottom';
@@ -9,8 +10,14 @@ interface WaveProps {
 
 export default function Wave({ position = 'bottom', className = '' }: WaveProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const waveColor = resolvedTheme === 'dark' ? 'url(#waveGradient)' : '#ffffff';
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const waveColor = mounted && resolvedTheme === 'dark' ? 'url(#waveGradient)' : '#ffffff';
 
   return (
     <div className={`absolute w-full overflow-hidden leading-none ${position === 'top' ? 'top-0' : 'bottom-0'} ${className}`}>
@@ -21,7 +28,7 @@ export default function Wave({ position = 'bottom', className = '' }: WaveProps)
         viewBox="0 0 1200 120"
         preserveAspectRatio="none"
       >
-        {resolvedTheme === 'dark' && (
+        {mounted && resolvedTheme === 'dark' && (
           <defs>
             <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#34d399" />

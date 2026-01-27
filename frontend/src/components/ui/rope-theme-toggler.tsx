@@ -31,14 +31,13 @@ export const RopeThemeToggler = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 根据当前主题确定图标显示：亮色主题显示太阳图标，暗色主题显示月亮图标
-  const isDark = resolvedTheme === 'dark';
-
+  // 在组件挂载后设置mounted状态，确保hydration一致性
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // 移除MutationObserver，直接使用resolvedTheme
+  // 根据当前主题确定图标显示：亮色主题显示太阳图标，暗色主题显示月亮图标
+  const isDark = mounted && resolvedTheme === 'dark';
 
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current || typeof document === 'undefined') return;

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Code, Palette, Zap } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { useTheme } from '@/context/theme-context';
+import { useState, useEffect } from 'react';
 
 interface FeaturedItem {
   id: string;
@@ -15,8 +16,14 @@ interface FeaturedItem {
 
 export default function FeaturedSection() {
   const { resolvedTheme } = useTheme();
-  
-  const glassCardClass = resolvedTheme === 'dark'
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const glassCardClass = mounted && resolvedTheme === 'dark'
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
   
