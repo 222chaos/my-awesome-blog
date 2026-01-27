@@ -65,9 +65,6 @@ export default function AvatarUploader({
         {/* 悬浮效果的光环 */}
         <div className="absolute inset-0 rounded-full border-2 border-tech-cyan/0 group-hover:border-tech-cyan/30 transition-all duration-500" />
       </div>
-
-      {/* 科技感装饰元素 */}
-      <div className="absolute -inset-4 rounded-full border border-tech-cyan/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>
   );
 }

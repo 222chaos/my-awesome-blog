@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { User, Mail, Globe, Twitter, Github, Linkedin, FileText, Save, X, Check } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';

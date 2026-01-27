@@ -80,61 +80,39 @@ export default function ProfileHeader({
 
       {/* 主要内容区域 */}
       <div className="px-6 pb-8 pt-4">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* 左侧：头像 */}
-          <div className="flex-shrink-0 lg:ml-16">
-            <div className="relative -mt-16 lg:-mt-20">
-              <AvatarUploader
-                avatar={profile.avatar}
-                name={profile.fullName || profile.username}
-                isEditing={isEditing}
-                onAvatarChange={onAvatarChange || (() => {})}
-              />
-            </div>
-          </div>
-
-          {/* 右侧：用户信息 */}
-          <div className="flex-grow pt-2">
-            <div className="space-y-4">
-              {/* 用户名和邮箱 */}
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                  <span className="text-gradient-primary animate-fade-in-up">
-                    {profile.fullName || profile.username}
-                  </span>
-                  {isEditing && (
-                    <Sparkles className="w-5 h-5 text-tech-cyan animate-pulse" />
-                  )}
-                </h1>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2 hover:text-tech-cyan transition-colors cursor-pointer group">
-                    <AtSign className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform" />
-                    <span className="group-hover:text-tech-cyan transition-colors">@{profile.username}</span>
-                  </div>
-                  <div className="flex items-center gap-2 hover:text-tech-cyan transition-colors cursor-pointer group">
-                    <Mail className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform" />
-                    <span className="group-hover:text-tech-cyan transition-colors">{profile.email}</span>
-                  </div>
+        {/* 右侧：用户信息 */}
+        <div className="flex-grow pt-2">
+          <div className="space-y-4">
+            {/* 用户名和邮箱 */}
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <span className="text-gradient-primary animate-fade-in-up">
+                  {profile.fullName || profile.username}
+                </span>
+                {isEditing && (
+                  <Sparkles className="w-5 h-5 text-tech-cyan animate-pulse" />
+                )}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 hover:text-tech-cyan transition-colors cursor-pointer group">
+                  <AtSign className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform" />
+                  <span className="group-hover:text-tech-cyan transition-colors">@{profile.username}</span>
+                </div>
+                <div className="flex items-center gap-2 hover:text-tech-cyan transition-colors cursor-pointer group">
+                  <Mail className="w-4 h-4 text-tech-cyan group-hover:scale-110 transition-transform" />
+                  <span className="group-hover:text-tech-cyan transition-colors">{profile.email}</span>
                 </div>
               </div>
-
-              {/* 个人简介 */}
-              {profile.bio && (
-                <div className="max-w-2xl">
-                  <p className="text-foreground leading-relaxed animate-fade-in-up">
-                    {profile.bio}
-                  </p>
-                </div>
-              )}
-
-              {/* 社交链接 */}
-              <div className="pt-2">
-                <SocialLinksCard
-                  socialLinks={socialLinks}
-                  isEditing={isEditing}
-                />
-              </div>
             </div>
+
+            {/* 个人简介 */}
+            {profile.bio && (
+              <div className="max-w-2xl">
+                <p className="text-foreground leading-relaxed animate-fade-in-up">
+                  {profile.bio}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

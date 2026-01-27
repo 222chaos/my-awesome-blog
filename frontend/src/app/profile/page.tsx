@@ -4,64 +4,89 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import ProfileHeader from './components/ProfileHeader';
 import EditModeForm from './components/EditModeForm';
-import AvatarUploader from './components/AvatarUploader';
+import TabNavigation from './components/TabNavigation';
+import StatsGrid from './components/StatsGrid';
+import SettingsView from './components/SettingsView';
+import ActivityView from './components/ActivityView';
+import { UserProfile, getMockUserProfile, getMockUserStats, UserStats } from '@/lib/api/profile';
+import { FormErrors, validateForm, sanitizeFormData } from '@/lib/validation/profileValidation';
 
-interface UserProfile {
-  id: string;
-  username: string;
-  email: string;
-  fullName?: string;
-  avatar?: string;
-  bio?: string;
-  website?: string;
-  twitter?: string;
-  github?: string;
-  linkedin?: string;
-}
+type TabType = 'profile' | 'settings' | 'activity';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [showAvatarUploader, setShowAvatarUploader] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
+  const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [loading, setLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [saveStatus, setSaveStatus] = useState<{success: boolean; message: string} | null>(null);
 
   useEffect(() => {
     fetchUserProfile();
+    fetchUserStats();
   }, []);
 
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      const mockProfile: UserProfile = {
-        id: '1',
-        username: 'johndoe',
-        email: 'john@example.com',
-        fullName: 'John Doe',
-        avatar: '/assets/微信图片.jpg',
-        bio: 'Software developer passionate about creating amazing web experiences with modern technologies.',
-        website: 'https://example.com',
-        twitter: '@johndoe',
-        github: 'johndoe',
-        linkedin: 'johndoe'
-      };
+      // 在实际项目中，使用 fetchCurrentUserProfile()
+      const mockProfile = getMockUserProfile();
       setProfile(mockProfile);
       setFormData(mockProfile);
     } catch (error) {
-
+      console.error('获取用户资料失败:', error);
+      setSaveStatus({ success: false, message: '获取用户资料失败' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAvatarChange = (avatar: string) => {
-    setFormData(prev => ({ ...prev, avatar }));
-    if (profile) {
-      setProfile(prev => ({ ...prev!, avatar }));
+  const fetchUserStats = async () => {
+    try {
+      setStatsLoading(true);
+      // 在实际项目中，使用 fetchCurrentUserStats()
+      const mockStats = getMockUserStats();
+      setStats(mockStats);
+    } catch (error) {
+      console.error('获取用户统计数据失败:', error);
+    } finally {
+      setStatsLoading(false);
     }
+  };
+
+  const handleSave = async (data: Partial<UserProfile>) => {
+    // 表单验证
+    const validationErrors = validateForm(data);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    try {
+      // 清理表单数据
+      const sanitizedData = sanitizeFormData(data);
+      
+      // 在实际项目中，使用 updateUserProfile(sanitizedData)
+      setProfile(prev => ({ ...prev!, ...sanitizedData }) as UserProfile);
+      setIsEditing(false);
+      setErrors({});
+      setSaveStatus({ success: true, message: '个人资料已成功更新!' });
+      setTimeout(() => setSaveStatus(null), 3000);
+    } catch (error) {
+      console.error('更新用户资料失败:', error);
+      setSaveStatus({ success: false, message: '更新失败，请稍后再试' });
+      setTimeout(() => setSaveStatus(null), 3000);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setFormData(profile || {});
+    setErrors({});
   };
 
   if (loading) {
@@ -83,7 +108,7 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
-        <GlassCard padding="lg" className="max-w-md w-full mx-4 border-tech-cyan/20 hover:shadow-[0_0_30px_var(--shadow-tech-cyan)] transition-all duration-300">
+        <GlassCard padding="lg" className="max-w-md w-full mx-4 border-tech-cyan/20 backdrop-blur-xl bg-card/40 hover:shadow-[0_0_30px_var(--shadow-tech-cyan)] transition-all duration-300">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-tech-cyan/10 flex items-center justify-center animate-float">
               <svg className="w-8 h-8 text-tech-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,48 +148,40 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* 个人资料头部 */}
-        <GlassCard padding="none" className="overflow-hidden border-tech-cyan/20 shadow-xl hover:shadow-[0_0_40px_var(--shadow-tech-cyan)] transition-all duration-500">
-          <ProfileHeader
-            profile={profile}
-            isEditing={isEditing}
-            onEditToggle={() => setIsEditing(!isEditing)}
-          />
-        </GlassCard>
+        {/* 选项卡导航 */}
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* 头像上传器 */}
-        <AvatarUploader
-          currentAvatar={formData.avatar}
-          onAvatarChange={handleAvatarChange}
-          isOpen={showAvatarUploader}
-          onClose={() => setShowAvatarUploader(false)}
-        />
+        {/* 不同选项卡的内容 */}
+        <div className="animate-fade-in-up">
+          {activeTab === 'profile' && (
+            <div className="space-y-8">
+              {/* 统计数据 */}
+              <StatsGrid stats={stats!} loading={statsLoading} />
 
-        {/* 编辑模式表单或查看模式内容 */}
-        {isEditing ? (
-          <div className="mt-8 animate-fade-in-up">
-            <EditModeForm
-              initialData={formData}
-              onSave={async (data) => {
-                setProfile(prev => ({ ...prev!, ...data }) as UserProfile);
-                setIsEditing(false);
-                setSaveStatus({ success: true, message: '个人资料已成功更新!' });
-                setTimeout(() => setSaveStatus(null), 3000);
-              }}
-              onCancel={() => {
-                setIsEditing(false);
-                setFormData(profile);
-                setErrors({});
-              }}
-            />
-          </div>
-        ) : (
-          <div className="mt-8 space-y-8">
-            <GlassCard padding="lg" className="border-tech-cyan/20 text-center">
-              <p className="text-muted-foreground">个人资料展示内容</p>
-            </GlassCard>
-          </div>
-        )}
+              {/* 编辑模式表单或查看模式内容 */}
+              {isEditing ? (
+                <EditModeForm
+                  initialData={formData}
+                  onSave={handleSave}
+                  onCancel={handleCancelEdit}
+                  errors={errors}
+                />
+              ) : (
+                <GlassCard padding="lg" className="border-tech-cyan/20 backdrop-blur-xl bg-card/40 hover:shadow-[0_0_30px_var(--shadow-tech-cyan)] transition-all duration-300">
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold text-foreground mb-4">个人资料</h3>
+                    <p className="text-muted-foreground">
+                      {profile.bio || '这个人很懒，还没有填写个人简介。'}
+                    </p>
+                  </div>
+                </GlassCard>
+              )}
+            </div>
+          )}
+          
+          {activeTab === 'settings' && <SettingsView />}
+          {activeTab === 'activity' && <ActivityView />}
+        </div>
       </div>
     </div>
   );
