@@ -5,7 +5,7 @@ import HeroSection from '@/components/home/HeroSection';
 import PostGrid from '@/components/home/PostGrid';
 import Sidebar from '@/components/home/Sidebar';
 import FeaturedSection from '@/components/home/FeaturedSection';
-import StatsPanel from '@/components/home/StatsPanel';
+import ProfilePanel from '@/components/home/ProfilePanel';
 import TagCloud from '@/components/home/TagCloud';
 import Timeline from '@/components/home/Timeline';
 import FriendLinks from '@/components/home/FriendLinks';
@@ -159,7 +159,7 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 py-16 bg-background">
-          <StatsPanel />
+          <ProfilePanel />
         </div>
 
         <div className="container mx-auto px-4 py-16 bg-background">

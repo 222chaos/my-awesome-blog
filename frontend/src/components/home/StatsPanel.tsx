@@ -33,6 +33,13 @@ function useNumberAnimation(target: number, duration: number = 2000) {
 
 export default function StatsPanel() {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const stats: Stat[] = [
     { label: '文章', value: 105, icon: FileText },
     { label: '分类', value: 12, icon: Folder },
@@ -56,7 +63,7 @@ export default function StatsPanel() {
               <div
                 key={stat.label}
                 className={`rounded-xl p-6 text-center hover:scale-105 transition-transform duration-300 group ${
-                  resolvedTheme === 'dark'
+                  mounted && resolvedTheme === 'dark'
                     ? 'glass-card'
                     : 'bg-white shadow-lg border border-tech-cyan/20'
                 }`}

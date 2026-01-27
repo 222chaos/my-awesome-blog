@@ -43,8 +43,14 @@ interface PostGridProps {
 
 export default function PostGrid({ posts, loading = false, hasMore = true, onLoadMore }: PostGridProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const glassCardClass = resolvedTheme === 'dark'
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const glassCardClass = mounted && resolvedTheme === 'dark'
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
 

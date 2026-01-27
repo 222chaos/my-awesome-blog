@@ -1,4 +1,5 @@
 import { useTheme } from '@/context/theme-context';
+import { useState, useEffect } from 'react';
 
 interface WaveStackProps {
   className?: string;
@@ -12,8 +13,14 @@ function pseudoRandom(index: number, seed: number = 12345): number {
 
 export default function WaveStack({ className = '', waveCount = 3 }: WaveStackProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const waveColor = resolvedTheme === 'dark' ? 'url(#waveStackGradient)' : '#ffffff';
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const waveColor = mounted && resolvedTheme === 'dark' ? 'url(#waveStackGradient)' : '#ffffff';
 
   // 多峰谷波浪路径
   const wavePath = "M0,64 C120,32 240,96 360,64 S480,32 600,64 S720,96 840,64 S960,32 1080,64 S1200,96 1200,64 L1200,120 L0,120 Z";
@@ -47,7 +54,7 @@ export default function WaveStack({ className = '', waveCount = 3 }: WaveStackPr
         }
       `}</style>
       <div className={`relative w-full h-[150px] overflow-hidden ${className}`}>
-        {resolvedTheme === 'dark' && (
+        {mounted && resolvedTheme === 'dark' && (
           <svg style={{ position: 'absolute', width: 0, height: 0 }}>
             <defs>
               <linearGradient id="waveStackGradient" x1="0%" y1="0%" x2="0%" y2="100%">

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import GlassCard from '@/components/ui/GlassCard';
 import { useTheme } from '@/context/theme-context';
+import { useState, useEffect } from 'react';
 
 interface FriendLink {
   id: string;
@@ -18,8 +19,14 @@ interface FriendLinksProps {
 
 export default function FriendLinks({ links }: FriendLinksProps) {
   const { resolvedTheme } = useTheme();
-  
-  const glassCardClass = resolvedTheme === 'dark'
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const glassCardClass = mounted && resolvedTheme === 'dark'
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
   

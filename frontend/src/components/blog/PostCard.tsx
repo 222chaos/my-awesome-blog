@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { CalendarIcon, ClockIcon, ArrowRightIcon } from 'lucide-react';
@@ -32,8 +33,14 @@ export default function PostCard({
   showMeta = true
 }: PostCardProps) {
   const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
-  const glassCardClass = resolvedTheme === 'dark'
+  // 防止 hydration 错误
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const glassCardClass = mounted && resolvedTheme === 'dark'
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
 
@@ -99,7 +106,7 @@ export default function PostCard({
               style={{ color: 'var(--tech-cyan)' }}
               aria-label={`阅读文章: ${title}`}
             >
-              <Link href={href}>
+              <Link href={`/posts/${id}`}>
                 阅读更多
                 <ArrowRightIcon
                   className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1"

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import type { Category, PopularPost } from '@/types';
 import { Twitter, Github, Linkedin, FileText, Folder, Eye } from 'lucide-react';
 import { useTheme } from '@/context/theme-context';
+import { useState, useEffect } from 'react';
 
 interface StatsItem {
   icon: React.ElementType;
@@ -32,8 +33,14 @@ export default function Sidebar({
   ],
 }: SidebarProps) {
   const { resolvedTheme } = useTheme();
-  
-  const glassCardClass = resolvedTheme === 'dark'
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const glassCardClass = mounted && resolvedTheme === 'dark'
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
   

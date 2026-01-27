@@ -24,23 +24,33 @@ export default function Navbar() {
   const { getThemeClass } = useThemeUtils();
   const [scrolled, setScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // 防止 hydration 错误
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 根据主题选择下拉框样式
   const dropdownBgClass = getThemeClass(
-    'bg-glass/95 backdrop-blur-xl border-glass-border/50',
-    'bg-white/95 backdrop-blur-xl border-gray-200 shadow-lg'
+    'bg-glass/90 backdrop-blur-xl border border-glass-border',
+    'bg-white/95 backdrop-blur-xl border-gray-200'
   );
   const dropdownItemClass = getThemeClass(
-    'focus:bg-tech-cyan/10',
-    'focus:bg-gray-100'
+    'focus:bg-tech-cyan/10 hover:bg-glass/30',
+    'focus:bg-gray-100 hover:bg-gray-100'
   );
   const textColorClass = getThemeClass(
     'text-foreground/90 group-hover:text-tech-cyan',
     'text-gray-700 group-hover:text-tech-cyan'
   );
   const separatorClass = getThemeClass(
-    'bg-glass-border/30',
+    'bg-glass-border',
     'bg-gray-200'
+  );
+  const dropdownShadowClass = getThemeClass(
+    'shadow-xl shadow-glass-glow/20',
+    'shadow-lg'
   );
 
   useEffect(() => {
@@ -120,32 +130,34 @@ export default function Navbar() {
                   <User className="h-5 w-5 text-foreground" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className={`w-56 ${dropdownBgClass} shadow-2xl z-[200]`}>
-                <DropdownMenuLabel className={`text-sm font-semibold py-2 ${resolvedTheme === 'dark' ? 'text-foreground/80' : 'text-gray-900'}`}>
+              <DropdownMenuContent align="end" className={`w-56 ${dropdownBgClass} ${dropdownShadowClass} z-[200]`}>
+                <DropdownMenuLabel className={`text-sm font-semibold py-2 px-2 ${mounted && resolvedTheme === 'dark' ? 'text-foreground/80' : 'text-gray-900'}`}>
                   我的账户
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className={separatorClass} />
-                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
-                  <UserCircle className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
-                  <span className={`${textColorClass} transition-colors`}>个人资料</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                <Link href="/profile">
+                  <DropdownMenuItem className={`group cursor-pointer py-3 ${dropdownItemClass}`}>
+                    <UserCircle className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
+                    <span className={`${textColorClass} transition-colors`}>个人资料</span>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem className={`group cursor-pointer py-3 ${dropdownItemClass}`}>
                   <LayoutDashboard className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
                   <span className={`${textColorClass} transition-colors`}>仪表板</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                <DropdownMenuItem className={`group cursor-pointer py-3 ${dropdownItemClass}`}>
                   <FileText className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
                   <span className={`${textColorClass} transition-colors`}>文章管理</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className={separatorClass} />
-                <DropdownMenuItem className={`group cursor-pointer ${dropdownItemClass}`}>
+                <DropdownMenuItem className={`group cursor-pointer py-3 ${dropdownItemClass}`}>
                   <Settings className="h-4 w-4 mr-3 text-tech-cyan group-hover:scale-110 transition-transform" />
                   <span className={`${textColorClass} transition-colors`}>设置</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className={separatorClass} />
-                <DropdownMenuItem className={`group cursor-pointer ${resolvedTheme === 'dark' ? 'focus:bg-red-500/10' : 'focus:bg-red-50'}`}>
+                <DropdownMenuItem className={`group cursor-pointer py-3 ${mounted && resolvedTheme === 'dark' ? 'focus:bg-red-500/10 hover:bg-red-500/20' : 'focus:bg-red-50 hover:bg-red-50'}`}>
                   <LogOut className="h-4 w-4 mr-3 text-red-500 group-hover:scale-110 transition-transform" />
-                  <span className={`text-foreground/90 group-hover:text-red-500 transition-colors ${resolvedTheme === 'dark' ? '' : 'text-gray-700'}`}>退出登录</span>
+                  <span className={`text-foreground/90 group-hover:text-red-500 transition-colors ${mounted && resolvedTheme === 'dark' ? '' : 'text-gray-700'}`}>退出登录</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

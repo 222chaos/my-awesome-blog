@@ -3,7 +3,7 @@
 import { ElementType, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getActiveTypewriterContents } from '@/lib/api';
+import { getActiveTypewriterContents, TypewriterContent } from '@/lib/api';
 
 interface TextTypeProps {
   className?: string;
@@ -54,7 +54,7 @@ const TextType = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
-  const [dynamicTexts, setDynamicTexts] = useState<string[]>([]);
+  const [dynamicTexts, setDynamicTexts] = useState<TypewriterContent[]>([]);
   const [isLoading, setIsLoading] = useState(fetchFromApi);
   const cursorRef = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLElement>(null);
@@ -73,7 +73,7 @@ const TextType = ({
   // Determine which texts to use (dynamic or static)
   const textArray = useMemo(() => {
     if (fetchFromApi && !text) {
-      return dynamicTexts.length > 0 ? dynamicTexts : [];
+      return dynamicTexts.length > 0 ? dynamicTexts.map(item => item.text) : [];
     }
     return text ? (Array.isArray(text) ? text : [text]) : [];
   }, [text, fetchFromApi, dynamicTexts]);
