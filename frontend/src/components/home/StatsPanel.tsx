@@ -60,6 +60,7 @@ interface Article {
   date: string;
   likes: number;
   comments: number;
+  image?: string;
 }
 
 // 模拟文章数据
@@ -71,7 +72,8 @@ const mockArticles: Article[] = [
     category: '前端开发',
     date: '2025-01-25',
     likes: 128,
-    comments: 32
+    comments: 32,
+    image: '/assets/react-hooks-cover.jpg'
   },
   {
     id: 2,
@@ -80,7 +82,8 @@ const mockArticles: Article[] = [
     category: 'TypeScript',
     date: '2025-01-20',
     likes: 95,
-    comments: 18
+    comments: 18,
+    image: '/assets/typescript-cover.jpg'
   },
   {
     id: 3,
@@ -89,7 +92,8 @@ const mockArticles: Article[] = [
     category: '框架技术',
     date: '2025-01-18',
     likes: 87,
-    comments: 24
+    comments: 24,
+    image: '/assets/nextjs-cover.jpg'
   }
 ];
 
@@ -235,48 +239,62 @@ function ArticleCard({ article, delayClass }: { article: Article; delayClass: st
     >
       <Card
         key={article.id}
-        className={`hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer animate-fade-in-up ${delayClass}`}
+        className={`glass-card backdrop-blur-xl bg-card/40 hover:bg-card/60 hover:shadow-[0_0_40px_var(--shadow-tech-cyan),0_8px_32px_rgba(0,0,0,0.12)] border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] cursor-pointer animate-fade-in-up ${delayClass} overflow-hidden`}
       >
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              {/* 文章标题 */}
-              <h3 className="text-lg sm:text-xl font-bold mb-2 text-foreground group-hover:text-tech-cyan transition-colors">
-                {article.title}
-              </h3>
-
-              {/* 文章摘要 */}
-              <p className="text-muted-foreground mb-3 sm:mb-4 line-clamp-2 text-sm sm:text-base">
-                {article.excerpt}
-              </p>
-
-              {/* 文章元信息 */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                <div className="flex items-center gap-1" aria-label={`发布日期：${article.date}`}>
-                  <Calendar className="w-4 h-4" />
-                  <time>{article.date}</time>
-                </div>
-                <div className="flex items-center gap-1" aria-label={`点赞数：${article.likes}`}>
-                  <Heart className="w-4 h-4" />
-                  <span>{article.likes}</span>
-                </div>
-                <div className="flex items-center gap-1" aria-label={`评论数：${article.comments}`}>
-                  <MessageCircle className="w-4 h-4" />
-                  <span>{article.comments}</span>
-                </div>
-                <span className="px-2 sm:px-3 py-1 rounded-full bg-tech-cyan/20 text-tech-cyan text-xs font-medium">
-                  {article.category}
-                </span>
-              </div>
+        <CardContent className="p-0">
+          <div className="flex flex-col sm:flex-row">
+            {/* 左侧图片 */}
+            <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
+              <img
+                src={article.image || 'https://placehold.co/400x400/1e293b/ffffff?text=Article'}
+                alt={article.title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125"
+              />
             </div>
 
-            {/* 箭头图标 */}
-            <div className="flex-shrink-0">
-              <div
-                className="w-10 h-10 rounded-full bg-tech-cyan/20 flex items-center justify-center group-hover:bg-tech-cyan transition-colors"
-                aria-label="查看文章详情"
-              >
-                <ArrowRight className="w-5 h-5 text-tech-cyan group-hover:text-white transition-transform group-hover:translate-x-1" />
+            {/* 右侧内容 */}
+            <div className="flex-1 p-4 sm:p-6 flex flex-col">
+              <div className="flex items-start justify-between gap-4 flex-1">
+                <div className="flex-1 transition-transform duration-300 group-hover:translate-x-2">
+                  {/* 文章标题 */}
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 text-foreground group-hover:text-tech-cyan transition-colors">
+                    {article.title}
+                  </h3>
+
+                  {/* 文章摘要 */}
+                  <p className="text-muted-foreground mb-3 sm:mb-4 line-clamp-2 text-sm sm:text-base">
+                    {article.excerpt}
+                  </p>
+
+                  {/* 文章元信息 */}
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1" aria-label={`发布日期：${article.date}`}>
+                      <Calendar className="w-4 h-4" />
+                      <time>{article.date}</time>
+                    </div>
+                    <div className="flex items-center gap-1" aria-label={`点赞数：${article.likes}`}>
+                      <Heart className="w-4 h-4" />
+                      <span>{article.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1" aria-label={`评论数：${article.comments}`}>
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{article.comments}</span>
+                    </div>
+                    <span className="px-2 sm:px-3 py-1 rounded-full bg-tech-cyan/20 text-tech-cyan text-xs font-medium">
+                      {article.category}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 箭头图标 */}
+                <div className="flex-shrink-0">
+                  <div
+                    className="w-10 h-10 rounded-full bg-tech-cyan/20 flex items-center justify-center group-hover:bg-tech-cyan transition-colors"
+                    aria-label="查看文章详情"
+                  >
+                    <ArrowRight className="w-5 h-5 text-tech-cyan group-hover:text-white transition-transform group-hover:translate-x-1" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

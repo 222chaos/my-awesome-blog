@@ -4,13 +4,9 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import ProfileHeader from '@/components/profile/ProfileHeader';
-import EditModeForm from '@/components/profile/EditModeForm';
-import AvatarUploader from '@/components/profile/AvatarUploader';
-import UserStats from '@/components/profile/UserStats';
-import SkillCloud from '@/components/profile/SkillCloud';
-import ActivityTimeline from '@/components/profile/ActivityTimeline';
-import BadgeCollection from '@/components/profile/BadgeCollection';
+import ProfileHeader from './components/ProfileHeader';
+import EditModeForm from './components/EditModeForm';
+import AvatarUploader from './components/AvatarUploader';
 
 interface UserProfile {
   id: string;
@@ -65,77 +61,6 @@ export default function ProfilePage() {
     setFormData(prev => ({ ...prev, avatar }));
     if (profile) {
       setProfile(prev => ({ ...prev!, avatar }));
-    }
-  };
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateSocialLink = (type: string, value: string) => {
-    if (!value) return { isValid: true };
-    
-    let regex: RegExp;
-    switch (type) {
-      case 'twitter':
-        regex = /^@[a-zA-Z0-9_]{1,15}$/;
-        break;
-      case 'github':
-        regex = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
-        break;
-      case 'linkedin':
-        regex = /^[a-zA-Z0-9\-_]+$/;
-        break;
-      case 'website':
-        regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-        break;
-      default:
-        return { isValid: true };
-    }
-    
-    return {
-      isValid: regex.test(value),
-      message: `Invalid ${type} format`
-    };
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    
-    // 验证社交链接格式
-    if (['twitter', 'github', 'linkedin', 'website'].includes(name)) {
-      const validation = validateSocialLink(name, value);
-      if (!validation.isValid) {
-        setErrors(prev => ({ ...prev, [name]: validation.message || '' }));
-      } else {
-        setErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors[name];
-          return newErrors;
-        });
-      }
-    }
-    
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // 在实际应用中，这里会调用API更新用户信息
-
-      
-      // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setProfile(prev => ({ ...prev!, ...formData }) as UserProfile);
-      setIsEditing(false);
-      setSaveStatus({ success: true, message: '个人资料已成功更新!' });
-      setTimeout(() => setSaveStatus(null), 3000);
-    } catch (error) {
-
-      setSaveStatus({ success: false, message: '更新个人资料时出错，请重试。' });
-      setTimeout(() => setSaveStatus(null), 3000);
     }
   };
 
@@ -219,10 +144,13 @@ export default function ProfilePage() {
         {isEditing ? (
           <div className="mt-8 animate-fade-in-up">
             <EditModeForm
-              formData={formData}
-              errors={errors}
-              onChange={handleInputChange}
-              onSubmit={handleSubmit}
+              initialData={formData}
+              onSave={async (data) => {
+                setProfile(prev => ({ ...prev!, ...data }) as UserProfile);
+                setIsEditing(false);
+                setSaveStatus({ success: true, message: '个人资料已成功更新!' });
+                setTimeout(() => setSaveStatus(null), 3000);
+              }}
               onCancel={() => {
                 setIsEditing(false);
                 setFormData(profile);
@@ -232,25 +160,9 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="mt-8 space-y-8">
-            {/* 数据概览 */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              <UserStats />
-            </div>
-
-            {/* 技能云 */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              <SkillCloud />
-            </div>
-
-            {/* 活动时间线 */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-              <ActivityTimeline />
-            </div>
-
-            {/* 成就徽章 */}
-            <div className="animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-              <BadgeCollection />
-            </div>
+            <GlassCard padding="lg" className="border-tech-cyan/20 text-center">
+              <p className="text-muted-foreground">个人资料展示内容</p>
+            </GlassCard>
           </div>
         )}
       </div>
