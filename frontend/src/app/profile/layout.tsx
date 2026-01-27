@@ -1,5 +1,4 @@
-import Navbar from '@/components/navigation/Navbar';
-import Footer from '@/components/navigation/Footer';
+import ThemeWrapper from '@/components/theme-wrapper';
 
 export default function ProfileLayout({
   children,
@@ -7,12 +6,10 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-grow">
+    <ThemeWrapper>
+      <main className="flex-grow py-8 sm:py-12">
         {children}
       </main>
-      <Footer />
-    </div>
+    </ThemeWrapper>
   );
 }

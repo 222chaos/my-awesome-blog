@@ -37,9 +37,9 @@
     --info-foreground: #eff6ff;
 
     /* 玻璃效果专用变量 - 浅色主题 */
-    --glass-default: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(5, 150, 105, 0.15);
-    --glass-glow: rgba(5, 150, 105, 0.2);
+    --glass-default: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(5, 150, 105, 0.2);
+    --glass-glow: rgba(5, 150, 105, 0.3);
 
     /* 技术颜色变量 - 浅色绿黑主题 */
     --tech-darkblue: #0f172a;
@@ -99,6 +99,77 @@
     --info-foreground: #eff6ff;
 
     /* 玻璃效果专用变量 - 深色主题 */
+    --glass-default: rgba(17, 17, 17, 0.7);
+    --glass-border: rgba(16, 185, 129, 0.2);
+    --glass-glow: rgba(16, 185, 129, 0.3);
+
+    /* 技术颜色变量 - 深色绿黑主题 */
+    --tech-darkblue: #064e3b;
+    --tech-deepblue: #047857;
+    --tech-cyan: #059669;
+    --tech-lightcyan: #10b981;
+    --tech-sky: #22c55e;
+
+    /* 高对比度文本颜色 */
+    --text-primary-high-contrast: #f8fafc;
+    --text-secondary-high-contrast: #94a3b8;
+
+    /* 涟漪效果颜色 - 深色主题 */
+    --ripple-color: rgba(5, 150, 105, 0.3);
+
+    /* 纹理叠加颜色 - 深色主题 */
+    --texture-color: rgba(0, 0, 0, 0.2);
+
+    /* 技术阴影颜色 - 深色主题 */
+    --shadow-tech-cyan: rgba(16, 185, 129, 0.5);
+  }
+
+  body {
+    @apply bg-background text-foreground bg-page;
+  }
+  
+  /* 添加全局主题过渡 */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+
+  .dark {
+    --background: #000000;
+    --foreground: #f8fafc; /* 提高对比度 */
+    --primary: #059669;
+    --primary-foreground: #f8fafc; /* 提高对比度 */
+    --secondary: #047857;
+    --secondary-foreground: #f8fafc; /* 提高对比度 */
+    --accent: #065f46;
+    --accent-foreground: #f8fafc; /* 提高对比度 */
+    --card: #111111;
+    --card-foreground: #f8fafc; /* 提高对比度 */
+    --border: #10b981;
+    --glass-light-border: rgba(16, 185, 129, 0.15);
+
+    /* 扩展的颜色变量 */
+    --muted: #34d399;
+    --muted-foreground: #94a3b8; /* 增强对比度 */
+    --popover: #111111;
+    --popover-foreground: #f8fafc; /* 提高对比度 */
+    --input: #34d399;
+    --ring: #059669;
+
+    /* 状态颜色 */
+    --success: #34d399;
+    --success-foreground: #ecfdf5;
+    --warning: #fbbf24;
+    --warning-foreground: #fffbeb;
+    --error: #f87171;
+    --error-foreground: #fef2f2;
+    --info: #60a5fa;
+    --info-foreground: #eff6ff;
+
+    /* 玻璃效果专用变量 - 深色主题 */
     --glass-default: rgba(30, 30, 30, 0.7);
     --glass-border: rgba(5, 150, 105, 0.15);
     --glass-glow: rgba(5, 150, 105, 0.2);
@@ -121,13 +192,7 @@
     --texture-color: rgba(0, 0, 0, 0.2);
 
     /* 技术阴影颜色 - 深色主题 */
-    --shadow-tech-cyan: rgba(5, 150, 105, 0.5);
-  }
-}
-
-@layer base {
-  body {
-    @apply bg-background text-foreground bg-page;
+    --shadow-tech-cyan: rgba(16, 185, 129, 0.5);
   }
 }
 
@@ -636,6 +701,38 @@ html {
 
 .animate-spin-slow {
   animation: spin-slow 8s linear infinite;
+}
+
+/* 平滑的主题切换过渡 */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 主题切换时的淡入淡出效果 */
+@keyframes theme-switch-fade {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.theme-switch-animation {
+  animation: theme-switch-fade 0.3s ease-in-out;
+}
+
+/* 优化的卡片悬停效果 */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
 }
 
 /* View Transitions API */
