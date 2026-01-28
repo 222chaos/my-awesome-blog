@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
 import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link as LinkIcon, MapPin, Calendar } from 'lucide-react';
-import { UserProfile, getMockUserProfile, getMockUserStats, UserStats } from '@/lib/api/profile';
+import { UserProfile, UserStats, fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
 import { validateSocialLink } from '@/services/userService';
 import TabNavigation from './components/TabNavigation';
 import ProfileView from './components/ProfileView';
@@ -10,6 +13,7 @@ import SettingsView from './components/SettingsView';
 import ActivityView from './components/ActivityView';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'activity'>('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -25,8 +29,8 @@ export default function ProfilePage() {
   const loadProfileData = async () => {
     try {
       setLoading(true);
-      const profileData = await getMockUserProfile();
-      const statsData = await getMockUserStats();
+      const profileData = await fetchCurrentUserProfile();
+      const statsData = await fetchCurrentUserStats();
       setProfile(profileData);
       setStats(statsData);
       setFormData(profileData);
@@ -37,33 +41,39 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      try {
+        const file = e.target.files[0];
+        // 调用API上传头像
+        const result = await uploadAvatar(file);
         setFormData((prev: Partial<UserProfile>) => ({
           ...prev,
-          avatar: reader.result as string
+          avatar: result.avatar_url
         }));
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
+        setSaveStatus({ success: false, message: '上传头像失败，请重试。' });
+        setTimeout(() => setSaveStatus(null), 3000);
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // 在实际应用中，这里会调用API更新用户信息
-      console.log('Updating profile:', formData);
+      // 调用API更新用户信息
+      await updateUserProfile(formData);
       
-      // 模拟API调用
-      setTimeout(() => {
-        setProfile((prev: UserProfile | null) => ({ ...prev!, ...formData }) as UserProfile);
-        setIsEditing(false);
-        setSaveStatus({ success: true, message: '个人资料已成功更新!' });
-        setTimeout(() => setSaveStatus(null), 3000);
-      }, 500);
+      // 重新获取用户资料和统计数据
+      const updatedProfile = await fetchCurrentUserProfile();
+      const updatedStats = await fetchCurrentUserStats();
+      
+      setProfile(updatedProfile);
+      setStats(updatedStats);
+      setIsEditing(false);
+      setSaveStatus({ success: true, message: '个人资料已成功更新!' });
+      setTimeout(() => setSaveStatus(null), 3000);
     } catch (error) {
       console.error('Error updating profile:', error);
       setSaveStatus({ success: false, message: '更新个人资料时出错，请重试。' });
@@ -91,9 +101,15 @@ export default function ProfilePage() {
             请先登录以查看您的个人资料
           </p>
           <div className="flex justify-center">
-            <button className="cursor-pointer transition-all duration-200 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
-              前往登录
-            </button>
+            <Button
+              asChild
+              variant="glass"
+              className="hover:scale-105 transition-all duration-200"
+            >
+              <Link href="/login">
+                前往登录
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -145,20 +161,20 @@ export default function ProfilePage() {
         {stats && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
             <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.posts}</p>
+              <p className="text-2xl font-bold text-tech-cyan">{stats.article_count || stats.posts || 0}</p>
               <p className="text-sm text-muted-foreground">文章数</p>
             </div>
             <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.followers}</p>
-              <p className="text-sm text-muted-foreground">关注者</p>
+              <p className="text-2xl font-bold text-tech-cyan">{stats.comment_count || 0}</p>
+              <p className="text-sm text-muted-foreground">评论数</p>
             </div>
             <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.following}</p>
-              <p className="text-sm text-muted-foreground">关注</p>
+              <p className="text-2xl font-bold text-tech-cyan">{stats.total_views || 0}</p>
+              <p className="text-sm text-muted-foreground">总浏览量</p>
             </div>
             <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.likes}</p>
-              <p className="text-sm text-muted-foreground">获赞数</p>
+              <p className="text-2xl font-bold text-tech-cyan">{stats.joined_date || '-'}</p>
+              <p className="text-sm text-muted-foreground">加入日期</p>
             </div>
           </div>
         )}

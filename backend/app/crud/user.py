@@ -10,6 +10,17 @@ def get_user(db: Session, user_id: UUID) -> Optional[User]:
     return db.query(User).filter(User.id == user_id).first()
 
 
+def get_user_with_relations(db: Session, user_id: UUID) -> Optional[User]:
+    from sqlalchemy.orm import joinedload
+    return (
+        db.query(User)
+        .options(joinedload(User.articles))
+        .options(joinedload(User.comments))
+        .filter(User.id == user_id)
+        .first()
+    )
+
+
 def get_user_by_username(db: Session, username: str) -> Optional[User]:
     return db.query(User).filter(User.username == username).first()
 
@@ -102,3 +113,44 @@ def get_authors_with_article_count(db: Session):
     )
     
     return result
+
+
+def get_user_stats(db: Session, user_id: UUID):
+    """
+    获取指定用户的统计数据
+    包括文章数、评论数、加入日期和总浏览量
+    """
+    from sqlalchemy import func
+    from app.models.article import Article
+    from app.models.comment import Comment
+    
+    # 获取用户基本信息
+    user = get_user(db, user_id)
+    if not user:
+        return None
+    
+    # 查询统计数据
+    article_count = db.query(func.count(Article.id)).filter(
+        Article.author_id == user_id,
+        Article.is_published == True
+    ).scalar()
+    
+    comment_count = db.query(func.count(Comment.id)).filter(
+        Comment.author_id == user_id
+    ).scalar()
+    
+    total_views = db.query(func.sum(Article.view_count)).filter(
+        Article.author_id == user_id,
+        Article.is_published == True
+    ).scalar()
+    
+    # 格式化加入日期
+    joined_date = user.created_at.strftime('%Y-%m-%d') if user.created_at else ''
+    
+    from app.schemas.user import UserStats
+    return UserStats(
+        article_count=article_count or 0,
+        comment_count=comment_count or 0,
+        joined_date=joined_date,
+        total_views=total_views or 0
+    )

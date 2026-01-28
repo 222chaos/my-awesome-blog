@@ -65,11 +65,21 @@ jobs:
         export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db
         export SECRET_KEY=test-secret-key
         export DEBUG=True
-        pytest -v --cov=app --cov-report=xml
+        pytest -v --cov=app --cov-report=xml --cov-config=.coveragerc
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
         SECRET_KEY: test-secret-key
         DEBUG: True
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+        REDIS_DB: 0
+        SMTP_HOST: smtp.test.com
+        SMTP_PORT: 587
+        SMTP_USERNAME: test@test.com
+        SMTP_PASSWORD: testpassword
+        SMTP_FROM: test@test.com
+        EMAIL_ENABLED: false
+        FRONTEND_URL: http://localhost:3000
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

@@ -27,6 +27,17 @@ jobs:
       - name: Deploy to production
         run: |
           echo "Deploying to production..."
-          # Add your deployment commands here
-          # For example, deploying to Vercel:
-          # npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+          # Run database migrations
+          cd backend
+          export DATABASE_URL=${{ secrets.DATABASE_URL }}
+          export SECRET_KEY=${{ secrets.SECRET_KEY }}
+          export REDIS_HOST=${{ secrets.REDIS_HOST }}
+          export REDIS_PORT=${{ secrets.REDIS_PORT }}
+          export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          alembic upgrade head
+          
+          # Start the application
+          # For example, using Docker:
+          # docker-compose up -d
+          # Or using a process manager like pm2:
+          # pm2 start start_server.py

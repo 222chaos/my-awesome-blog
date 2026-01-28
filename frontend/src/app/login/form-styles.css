@@ -1,0 +1,72 @@
+.form-control {
+  position: relative;
+  margin: 20px 0 40px;
+  width: 100%;
+}
+
+.form-control input {
+  background-color: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  display: block;
+  width: 100%;
+  padding: 15px 0;
+  font-size: 18px;
+  color: var(--foreground, #fff);
+  outline: none !important;
+  -webkit-appearance: none;
+}
+
+.form-control input:focus,
+.form-control input:valid {
+  outline: none !important;
+  border-bottom-color: var(--tech-cyan, #06b6d4);
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.form-control input:focus-visible {
+  outline: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.form-control input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+.form-control input::-webkit-focus-ring {
+  outline: none !important;
+}
+
+.form-control input::-webkit-outer-spin-button,
+.form-control input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form-control input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.form-control label {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  pointer-events: none;
+}
+
+.form-control label span {
+  display: inline-block;
+  font-size: 18px;
+  min-width: 5px;
+  color: var(--foreground, #fff);
+  transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.form-control input:focus + label span,
+.form-control input:valid + label span {
+  color: var(--tech-cyan, #06b6d4);
+  transform: translateY(-30px);
+}

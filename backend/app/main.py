@@ -9,6 +9,8 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.utils.logger import app_logger
 from app.utils.middleware import RequestLoggingMiddleware
+from app.core.exception_handler import add_exception_handlers
+from app.services.cache_service import cache_service
 
 # Create FastAPI app
 app = FastAPI(
@@ -34,6 +36,23 @@ if settings.BACKEND_CORS_ORIGINS:
 
 # Include API router
 app.include_router(api_router, prefix="/api/v1")
+
+# Add exception handlers
+add_exception_handlers(app)
+
+
+@app.on_event("startup")
+async def startup_event():
+    app_logger.info("Connecting to Redis...")
+    await cache_service.connect()
+    app_logger.info("Application startup complete")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    app_logger.info("Closing Redis connection...")
+    await cache_service.close()
+    app_logger.info("Application shutdown complete")
 
 # Health check endpoint
 @app.get("/health")

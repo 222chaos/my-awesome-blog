@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_, or_
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 from app.models.article import Article
 from app.models.category import Category
@@ -73,19 +73,19 @@ class StatisticsService:
         total_views = db.query(func.sum(Article.view_count)).scalar() or 0
 
         # 今日浏览量
-        today = datetime.utcnow().date()
+        today = datetime.now(timezone.utc).date()
         today_views = db.query(func.sum(Article.view_count)).filter(
             func.date(Article.updated_at) == today
         ).scalar() or 0
 
         # 本周浏览量
-        week_ago = datetime.utcnow() - timedelta(days=7)
+        week_ago = datetime.now(timezone.utc) - timedelta(days=7)
         week_views = db.query(func.sum(Article.view_count)).filter(
             Article.updated_at >= week_ago
         ).scalar() or 0
 
         # 本月浏览量
-        month_ago = datetime.utcnow() - timedelta(days=30)
+        month_ago = datetime.now(timezone.utc) - timedelta(days=30)
         month_views = db.query(func.sum(Article.view_count)).filter(
             Article.updated_at >= month_ago
         ).scalar() or 0
@@ -232,7 +232,7 @@ class StatisticsService:
         """
         获取增长统计
         """
-        start_date = datetime.utcnow() - timedelta(days=days)
+        start_date = datetime.now(timezone.utc) - timedelta(days=days)
         
         # 每日新增文章数
         daily_articles = db.query(

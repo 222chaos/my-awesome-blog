@@ -6,6 +6,9 @@ from app.core.dependencies import get_current_active_user, get_current_superuser
 from app import crud
 from app.schemas.article import Article, ArticleCreate, ArticleUpdate, ArticleWithAuthor
 from app.models.user import User
+from uuid import UUID
+from app.services.cache_service import cache_service
+from app.utils.pagination import CursorPaginationParams
 
 router = APIRouter()
 
@@ -39,7 +42,7 @@ def read_articles(
 
 
 @router.post("/", response_model=Article)
-def create_article(
+async def create_article(
     *,
     db: Session = Depends(get_db),
     article_in: ArticleCreate,
@@ -57,6 +60,11 @@ def create_article(
         )
     
     article = crud.create_article(db, article=article_in, author_id=current_user.id)  # type: ignore
+    
+    # Clear related caches
+    from app.services.cache_service import cache_service
+    await cache_service.delete(f"article:slug:{article_in.slug}")
+    
     return article
 
 
@@ -145,14 +153,14 @@ def search_articles(
 
 
 @router.get("/slug/{slug}", response_model=ArticleWithAuthor)
-def read_article_by_slug(
+async def read_article_by_slug(
     slug: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific article by slug
     """
-    article = crud.get_article_by_slug_with_relationships(db, slug=slug)
+    article = await crud.get_article_by_slug_with_relationships_async(db, slug=slug)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -160,13 +168,13 @@ def read_article_by_slug(
         )
 
     # Increment view count
-    crud.increment_view_count(db, article_id=article.id)  # type: ignore
+    await crud.increment_view_count(db, article_id=article.id)  # type: ignore
 
     return article
 
 
 @router.get("/related/{article_id}", response_model=List[ArticleWithAuthor])
-def read_related_articles(
+async def read_related_articles(
     article_id: str,
     limit: int = Query(5, ge=1, le=20, description="Number of related articles to return"),
     db: Session = Depends(get_db)
@@ -174,9 +182,8 @@ def read_related_articles(
     """
     Get articles related to a specific article
     """
-    from uuid import UUID
     article_uuid = UUID(article_id)
-    article = crud.get_article(db, article_id=article_uuid)
+    article = await crud.get_article_async(db, article_id=article_uuid)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -188,16 +195,15 @@ def read_related_articles(
 
 
 @router.get("/{article_id}", response_model=ArticleWithAuthor)
-def read_article_by_id(
+async def read_article_by_id(
     article_id: str,
     db: Session = Depends(get_db)
 ) -> Any:
     """
     Get a specific article by id
     """
-    from uuid import UUID
     article_uuid = UUID(article_id)
-    article = crud.get_article_with_relationships(db, article_id=article_uuid)
+    article = await crud.get_article_async(db, article_id=article_uuid)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -205,6 +211,111 @@ def read_article_by_id(
         )
 
     # Increment view count
-    crud.increment_view_count(db, article_id=article_uuid)
+    await crud.increment_view_count(db, article_id=article_uuid)
 
     return article
+
+
+@router.put("/{article_id}", response_model=Article)
+async def update_article(
+    article_id: str,
+    article_update: ArticleUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+) -> Any:
+    """
+    Update an article
+    """
+    article_uuid = UUID(article_id)
+    article = await crud.update_article(db, article_id=article_uuid, article_update=article_update)
+    if not article:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
+        )
+    
+    # Clear related caches
+    await cache_service.delete(f"article:{article_id}")
+    if hasattr(article_update, 'slug') and article_update.slug:
+        await cache_service.delete(f"article:slug:{article_update.slug}")
+    
+    return article
+
+
+@router.delete("/{article_id}", response_model=dict)
+async def delete_article(
+    article_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_superuser)  # Only superusers can delete
+) -> Any:
+    """
+    Delete an article
+    """
+    article_uuid = UUID(article_id)
+    success = await crud.delete_article(db, article_id=article_uuid)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Article not found",
+        )
+    
+    # Clear related caches
+    await cache_service.delete(f"article:{article_id}")
+    
+    return {"message": "Article deleted successfully"}
+
+
+@router.get("/cursor-paginated", response_model=dict)
+async def read_articles_cursor_paginated(
+    cursor: Optional[str] = Query(None, description="Cursor for pagination"),
+    limit: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    published_only: bool = Query(True, description="Only return published articles"),
+    author_id: Optional[str] = Query(None, description="Filter by author ID"),
+    search: Optional[str] = Query(None, description="Search in title and content"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Retrieve articles with cursor-based pagination
+    """
+    from uuid import UUID
+    
+    # Parse parameters
+    cursor_params = CursorPaginationParams(cursor=cursor, limit=limit)
+    author_uuid = UUID(author_id) if author_id else None
+    
+    # Perform cursor-based pagination
+    result = await crud.get_articles_with_cursor_pagination(
+        db=db,
+        cursor_params=cursor_params,
+        published_only=published_only,
+        author_id=author_uuid,
+        search=search
+    )
+    
+    return {
+        "items": result.items,
+        "next_cursor": result.next_cursor,
+        "has_more": result.has_more
+    }
+
+
+@router.get("/search-fulltext", response_model=List[ArticleWithAuthor])
+async def search_articles_fulltext(
+    search_query: str = Query(..., min_length=1, max_length=100, description="Fulltext search query"),
+    published_only: bool = Query(True, description="Only return published articles"),
+    skip: int = 0,
+    limit: int = Query(100, le=100, description="Max limit is 100"),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Search articles using PostgreSQL fulltext search
+    """
+    articles = crud.search_articles_fulltext(
+        db=db,
+        search_query=search_query,
+        published_only=published_only,
+        skip=skip,
+        limit=limit
+    )
+    
+    return articles

@@ -59,7 +59,7 @@ def get_recent_timeline_events(db: Session, days: int = 365, limit: int = 20) ->
     from datetime import datetime, timedelta
     from sqlalchemy import and_
     
-    cutoff_date = datetime.utcnow().date() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc).date() - timedelta(days=days)
     
     return (
         db.query(TimelineEvent)

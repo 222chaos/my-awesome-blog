@@ -1,213 +1,149 @@
-import redis
+import aioredis
 import json
-import logging
-from typing import Optional, Any, Union
+import pickle
+from typing import Any, Optional, Union
 from app.core.config import settings
+from app.utils.logger import app_logger
 
 
 class CacheService:
+    """
+    Redis缓存服务类
+    """
+    
     def __init__(self):
+        self.redis = None
+        
+    async def connect(self):
+        """
+        连接到Redis服务器
+        """
         try:
-            self.redis_client = redis.Redis(
-                host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
-                db=settings.REDIS_DB,
+            self.redis = aioredis.from_url(
+                f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}",
                 password=settings.REDIS_PASSWORD,
-                decode_responses=True,
-                socket_connect_timeout=5,
-                socket_timeout=5,
-                retry_on_timeout=True
+                encoding="utf-8",
+                decode_responses=False  # We'll handle serialization ourselves
             )
-            # 测试连接
-            self.redis_client.ping()
-            self.enabled = True
-            logging.info("Redis缓存服务初始化成功")
+            app_logger.info("Connected to Redis successfully")
         except Exception as e:
-            logging.error(f"Redis连接失败: {e}")
-            self.redis_client = None
-            self.enabled = False
-
-    def get(self, key: str) -> Optional[Any]:
+            app_logger.error(f"Failed to connect to Redis: {e}")
+            raise
+    
+    async def close(self):
         """
-        从缓存获取数据
+        关闭Redis连接
         """
-        if not self.enabled:
-            return None
+        if self.redis:
+            await self.redis.close()
             
-        try:
-            value = self.redis_client.get(key)
-            if value:
-                return json.loads(value)
-            return None
-        except Exception as e:
-            logging.error(f"从缓存获取数据失败 {key}: {e}")
-            return None
-
-    def set(self, key: str, value: Any, expire: int = 3600) -> bool:
+    async def set(
+        self, 
+        key: str, 
+        value: Any, 
+        expire: Optional[int] = 3600
+    ) -> bool:
         """
-        设置缓存数据
+        设置缓存值
+        :param key: 键
+        :param value: 值
+        :param expire: 过期时间（秒）
+        :return: 是否设置成功
         """
-        if not self.enabled:
-            return False
-            
         try:
-            serialized_value = json.dumps(value, default=str)
-            result = self.redis_client.setex(
-                key,
-                expire,
-                serialized_value
-            )
+            # 序列化值
+            serialized_value = pickle.dumps(value)
+            result = await self.redis.set(key, serialized_value, ex=expire)
             return result is not None
         except Exception as e:
-            logging.error(f"设置缓存数据失败 {key}: {e}")
+            app_logger.error(f"Failed to set cache: {e}")
             return False
-
-    def delete(self, key: str) -> bool:
+    
+    async def get(self, key: str) -> Optional[Any]:
         """
-        删除缓存
+        获取缓存值
+        :param key: 键
+        :return: 缓存的值，如果不存在则返回None
         """
-        if not self.enabled:
-            return False
-            
         try:
-            result = self.redis_client.delete(key)
+            value = await self.redis.get(key)
+            if value is not None:
+                # 反序列化值
+                return pickle.loads(value)
+            return None
+        except Exception as e:
+            app_logger.error(f"Failed to get cache: {e}")
+            return None
+    
+    async def delete(self, key: str) -> bool:
+        """
+        删除缓存值
+        :param key: 键
+        :return: 是否删除成功
+        """
+        try:
+            result = await self.redis.delete(key)
             return result > 0
         except Exception as e:
-            logging.error(f"删除缓存失败 {key}: {e}")
+            app_logger.error(f"Failed to delete cache: {e}")
             return False
-
-    def invalidate_pattern(self, pattern: str) -> int:
+    
+    async def exists(self, key: str) -> bool:
         """
-        删除匹配模式的所有缓存
+        检查缓存键是否存在
+        :param key: 键
+        :return: 是否存在
         """
-        if not self.enabled:
-            return 0
-            
         try:
-            keys = self.redis_client.keys(pattern)
-            if keys:
-                result = self.redis_client.delete(*keys)
-                return result
-            return 0
+            result = await self.redis.exists(key)
+            return result > 0
         except Exception as e:
-            logging.error(f"清除模式匹配的缓存失败 {pattern}: {e}")
-            return 0
-
-    def exists(self, key: str) -> bool:
-        """
-        检查缓存是否存在
-        """
-        if not self.enabled:
+            app_logger.error(f"Failed to check cache existence: {e}")
             return False
-            
-        try:
-            return self.redis_client.exists(key) > 0
-        except Exception as e:
-            logging.error(f"检查缓存存在性失败 {key}: {e}")
-            return False
-
-    def expire(self, key: str, ttl: int) -> bool:
-        """
-        设置缓存过期时间
-        """
-        if not self.enabled:
-            return False
-            
-        try:
-            result = self.redis_client.expire(key, ttl)
-            return result
-        except Exception as e:
-            logging.error(f"设置缓存过期时间失败 {key}: {e}")
-            return False
-
-    def hash_get(self, name: str, key: str) -> Optional[Any]:
-        """
-        从哈希缓存中获取数据
-        """
-        if not self.enabled:
-            return None
-            
-        try:
-            value = self.redis_client.hget(name, key)
-            if value:
-                return json.loads(value)
-            return None
-        except Exception as e:
-            logging.error(f"从哈希缓存获取数据失败 {name}:{key}: {e}")
-            return None
-
-    def hash_set(self, name: str, key: str, value: Any, expire: Optional[int] = None) -> bool:
-        """
-        设置哈希缓存数据
-        """
-        if not self.enabled:
-            return False
-            
-        try:
-            serialized_value = json.dumps(value, default=str)
-            result = self.redis_client.hset(name, key, serialized_value)
-            
-            # 如果设置了过期时间，单独设置
-            if expire and result:
-                self.redis_client.expire(name, expire)
-                
-            return result is not None
-        except Exception as e:
-            logging.error(f"设置哈希缓存数据失败 {name}:{key}: {e}")
-            return False
-
-    def hash_delete(self, name: str, *keys: str) -> int:
-        """
-        删除哈希缓存中的一个或多个字段
-        """
-        if not self.enabled:
-            return 0
-            
-        try:
-            result = self.redis_client.hdel(name, *keys)
-            return result
-        except Exception as e:
-            logging.error(f"删除哈希缓存字段失败 {name}:{keys}: {e}")
-            return 0
-
-    def flush_all(self) -> bool:
+    
+    async def flush_all(self) -> bool:
         """
         清空所有缓存
+        :return: 是否清空成功
         """
-        if not self.enabled:
-            return False
-            
         try:
-            self.redis_client.flushall()
+            await self.redis.flushall()
             return True
         except Exception as e:
-            logging.error(f"清空所有缓存失败: {e}")
+            app_logger.error(f"Failed to flush cache: {e}")
             return False
-
-
-# 缓存键前缀
-CACHE_KEYS = {
-    'statistics': 'stats:website',
-    'categories': 'categories:list',
-    'tags': 'tags:list',
-    'popular_articles': 'articles:popular',
-    'featured_articles': 'articles:featured',
-    'recent_articles': 'articles:recent',
-    'authors': 'authors:list',
-    'article_detail': 'article:{id}',
-    'category_articles': 'category:{id}:articles',
-    'tag_articles': 'tag:{id}:articles',
-    'author_articles': 'author:{id}:articles',
-    'friend_links': 'friend_links:all',
-    'featured_friend_links': 'friend_links:featured',
-    'portfolios': 'portfolios:all',
-    'featured_portfolios': 'portfolios:featured',
-    'timeline_events': 'timeline:events',
-    'active_subscriptions': 'subscriptions:active',
-    'sitemap': 'sitemap:xml',
-    'rss_feed': 'feed:rss'
-}
 
 
 # 全局缓存服务实例
 cache_service = CacheService()
+
+
+# 便捷函数
+async def cache_get_or_set(
+    key: str, 
+    fetch_func, 
+    expire: Optional[int] = 3600,
+    *args, 
+    **kwargs
+) -> Any:
+    """
+    获取缓存值，如果不存在则调用fetch_func获取并存储到缓存
+    :param key: 缓存键
+    :param fetch_func: 获取数据的函数
+    :param expire: 过期时间（秒）
+    :param args: 传递给fetch_func的位置参数
+    :param kwargs: 传递给fetch_func的关键字参数
+    :return: 数据
+    """
+    # 尝试从缓存获取
+    cached_value = await cache_service.get(key)
+    if cached_value is not None:
+        return cached_value
+    
+    # 如果缓存不存在，调用fetch_func获取数据
+    value = await fetch_func(*args, **kwargs)
+    
+    # 存储到缓存
+    await cache_service.set(key, value, expire)
+    
+    return value

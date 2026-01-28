@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import HeroSection from '@/components/home/HeroSection';
-import FeaturedSection from '@/components/home/FeaturedSection';
 import StatsPanel from '@/components/home/StatsPanel';
 import TagCloud from '@/components/home/TagCloud';
 import Timeline from '@/components/home/Timeline';
@@ -135,10 +134,6 @@ export default function Home() {
 
         <div className="container mx-auto px-4 py-16 bg-background">
           <StatsPanel />
-        </div>
-
-        <div className="container mx-auto px-4 py-16 bg-background">
-          <FeaturedSection />
         </div>
 
         <div className="container mx-auto px-4 py-16 bg-background">

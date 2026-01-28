@@ -1,9 +1,13 @@
 from typing import Any, List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from sqlalchemy.orm import Session
+import os
 from app.core.database import get_db
+from app.core.dependencies import get_current_active_user
 from app import crud
-from app.schemas.user import User, UserCreate, UserUpdate
+from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse
+from app.models.user import User as UserModel
+from app.services.image_service import ImageService
 
 router = APIRouter()
 
@@ -110,3 +114,103 @@ def delete_user(
         )
 
     return {"message": "User deleted successfully"}
+
+
+# /me endpoints for current user operations
+
+
+@router.get("/me", response_model=User)
+def read_current_user(
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """
+    Get current user's profile
+    """
+    return current_user
+
+
+@router.put("/me", response_model=User)
+def update_current_user(
+    *,
+    db: Session = Depends(get_db),
+    user_in: UserUpdate,
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """
+    Update current user's profile
+    """
+    user = crud.update_user(db, user_id=current_user.id, user_update=user_in)
+    return user
+
+
+@router.post("/me/avatar", response_model=AvatarResponse)
+def upload_current_user_avatar(
+    *,
+    db: Session = Depends(get_db),
+    file: UploadFile = File(...),
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """
+    Upload current user's avatar
+    """
+    # Check if file is an allowed image type
+    allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    if file_extension not in allowed_extensions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File type {file_extension} not allowed. Allowed types: {allowed_extensions}"
+        )
+
+    # Use ImageService to process and save avatar
+    image_service = ImageService()
+
+    # Save uploaded file temporarily
+    temp_file_path = f"temp_avatar_{file.filename}"
+    with open(temp_file_path, "wb") as buffer:
+        buffer.write(file.file.read())
+
+    try:
+        # Process image using ImageService
+        processed_image_path = image_service.save_image(
+            temp_file_path,
+            title=f"avatar_{current_user.username}"
+        )
+
+        # Update user's avatar in database
+        avatar_url = processed_image_path
+        crud.update_user(db, user_id=current_user.id, user_update=UserUpdate(avatar=avatar_url))
+
+        # Clean up temporary file
+        os.remove(temp_file_path)
+
+        return AvatarResponse(
+            avatar_url=avatar_url,
+            message="Avatar uploaded successfully"
+        )
+    except Exception as e:
+        # Clean up temporary file in case of error
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing avatar: {str(e)}"
+        )
+
+
+@router.get("/me/stats", response_model=UserStats)
+def read_current_user_stats(
+    *,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """
+    Get current user's statistics
+    """
+    stats = crud.get_user_stats(db, user_id=current_user.id)
+    if not stats:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User statistics not found"
+        )
+    return stats

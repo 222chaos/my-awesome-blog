@@ -32,14 +32,39 @@ class Settings(BaseSettings):
         extra="ignore"
     )
     
-    def validate_secret_key(self) -> None:
-        """Validate that SECRET_KEY is not the default value in production."""
-        if not self.DEBUG and self.SECRET_KEY == "your-super-secret-key-change-this-in-production":
-            raise ValueError(
-                "SECRET_KEY must be changed from the default value in production. "
-                "Set a strong, random SECRET_KEY in your environment variables."
-            )
+    def validate_required_fields(self) -> None:
+        """Validate that required fields are properly set."""
+        if not self.SECRET_KEY or self.SECRET_KEY == "your-super-secret-key-change-this-in-production":
+            if self.DEBUG:
+                print("WARNING: Using default SECRET_KEY. Change this for production!")
+            else:
+                raise ValueError(
+                    "SECRET_KEY must be set to a strong, random value in production. "
+                    "Set a strong, random SECRET_KEY in your environment variables."
+                )
+        
+        if not self.DATABASE_URL:
+            raise ValueError("DATABASE_URL must be set in environment variables.")
+        
+        if not self.REDIS_HOST:
+            raise ValueError("REDIS_HOST must be set in environment variables.")
+        
+        if not self.SMTP_HOST and self.EMAIL_ENABLED:
+            print("WARNING: SMTP_HOST is not set but EMAIL_ENABLED is True. Email functionality will be disabled.")
+        
+        if not self.SMTP_USERNAME or not self.SMTP_PASSWORD:
+            if self.EMAIL_ENABLED:
+                print("WARNING: SMTP credentials are not set. Email functionality will be disabled.")
+
+    # Add these new fields to the Settings class
+    SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    SMTP_FROM: Optional[str] = None
+    EMAIL_ENABLED: bool = False
+    FRONTEND_URL: str = "http://localhost:3000"
 
 
 settings = Settings()
-settings.validate_secret_key()
+settings.validate_required_fields()

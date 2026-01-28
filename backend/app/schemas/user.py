@@ -60,3 +60,17 @@ class User(UserInDBBase):
 
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+
+# User statistics schema
+class UserStats(BaseModel):
+    article_count: int = Field(..., description="用户发布的文章数量")
+    comment_count: int = Field(..., description="用户发表的评论数量")
+    joined_date: str = Field(..., description="用户加入日期")
+    total_views: int = Field(default=0, description="用户文章总浏览量")
+
+
+# Avatar upload response schema
+class AvatarResponse(BaseModel):
+    avatar_url: str = Field(..., description="头像URL")
+    message: str = Field(default="Avatar uploaded successfully", description="上传结果消息")
