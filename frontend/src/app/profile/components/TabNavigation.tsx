@@ -1,47 +1,45 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { User, Settings, Activity } from 'lucide-react';
 
 interface TabNavigationProps {
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  setActiveTab: (tab: string) => void;
 }
 
-const tabs = [
-  { id: 'profile', label: '个人资料', icon: '👤' },
-  { id: 'settings', label: '个性化设置', icon: '⚙️' },
-  { id: 'activity', label: '活动记录', icon: '📊' }
-];
+export default function TabNavigation({ activeTab, setActiveTab }: TabNavigationProps) {
+  const tabs = [
+    { id: 'profile', label: '个人信息', icon: User },
+    { id: 'settings', label: '设置', icon: Settings },
+    { id: 'activity', label: '活动', icon: Activity },
+  ];
 
-export default function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   return (
-    <div className="mb-8">
-      <div className="relative inline-flex p-1 bg-[var(--card)]/40 backdrop-blur-xl rounded-2xl border border-tech-cyan/20">
-        {tabs.map((tab) => (
+    <div className="flex border-b border-glass-border mb-6">
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        return (
           <button
             key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            className={`
-              relative px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl font-medium text-sm sm:text-base
-              transition-all duration-300 flex items-center gap-2
-              ${activeTab === tab.id
-                ? 'text-tech-cyan bg-tech-cyan/10 shadow-lg'
-                : 'text-muted-foreground hover:text-foreground hover:bg-tech-cyan/5'
-              }
-            `}
+            className={`flex items-center gap-2 py-3 px-4 text-sm font-medium relative transition-colors duration-200 ${
+              activeTab === tab.id
+                ? 'text-tech-cyan'
+                : 'text-foreground/70 hover:text-foreground'
+            }`}
+            onClick={() => setActiveTab(tab.id)}
           >
+            <Icon className="w-4 h-4" />
+            {tab.label}
             {activeTab === tab.id && (
               <motion.div
-                layoutId="activeTab"
-                className="absolute inset-0 bg-tech-cyan/10 rounded-xl"
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                className="absolute bottom-0 left-0 w-full h-0.5 bg-tech-cyan"
+                layoutId="tabIndicator"
               />
             )}
-            <span className="relative z-10">{tab.icon}</span>
-            <span className="relative z-10">{tab.label}</span>
           </button>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

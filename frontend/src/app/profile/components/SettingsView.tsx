@@ -1,167 +1,159 @@
-'use client';
-
 import { useState } from 'react';
-import { Bell, Moon, Sun, Globe, Lock, Palette, Mail } from 'lucide-react';
+import { Shield, Lock, Palette, Bell, Globe, Mail, KeyRound } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import { Switch } from '@/components/ui/switch';
-
-interface SettingsState {
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  weeklyDigest: boolean;
-  darkMode: boolean;
-  autoSave: boolean;
-  publicProfile: boolean;
-  showEmail: boolean;
-  language: string;
-  timezone: string;
-}
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch'; // Fixed import case
 
 export default function SettingsView() {
-  const [settings, setSettings] = useState<SettingsState>({
-    emailNotifications: true,
-    pushNotifications: false,
-    weeklyDigest: true,
-    darkMode: true,
-    autoSave: true,
-    publicProfile: true,
-    showEmail: false,
+  const [settings, setSettings] = useState({
+    notifications: true,
+    privacy: 'public',
+    twoFactorAuth: false,
+    newsletter: true,
     language: 'zh-CN',
-    timezone: 'Asia/Shanghai'
+    theme: 'auto'
   });
 
-  const [saveStatus, setSaveStatus] = useState<{ success: boolean; message: string } | null>(null);
-
-  const handleToggle = (key: keyof SettingsState) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleSettingChange = (key: string, value: any) => {
+    setSettings(prev => ({
+      ...prev,
+      [key]: value
+    }));
   };
-
-  const handleSave = async () => {
-    try {
-      // 模拟保存设置
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSaveStatus({ success: true, message: '设置已成功保存！' });
-      setTimeout(() => setSaveStatus(null), 3000);
-    } catch (error) {
-      setSaveStatus({ success: false, message: '保存失败，请稍后再试' });
-      setTimeout(() => setSaveStatus(null), 3000);
-    }
-  };
-
-  const SettingSection = ({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) => (
-    <div className="mb-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Icon className="w-5 h-5 text-tech-cyan" />
-        <h4 className="font-semibold text-foreground">{title}</h4>
-      </div>
-      <div className="space-y-3">{children}</div>
-    </div>
-  );
-
-  const SettingItem = ({ label, description, checked, onChange }: { label: string; description?: string; checked: boolean; onChange: () => void }) => (
-    <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--card)]/40 hover:bg-tech-cyan/10 transition-colors">
-      <div>
-        <div className="text-sm font-medium text-foreground">{label}</div>
-        {description && <div className="text-xs text-muted-foreground mt-1">{description}</div>}
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
-    </div>
-  );
 
   return (
-    <div className="space-y-6">
-      {saveStatus && (
-        <div
-          className={`p-4 rounded-lg transition-all duration-300 animate-fade-in-up ${
-            saveStatus.success
-              ? 'bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/30'
-              : 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/30'
-          }`}
-        >
-          {saveStatus.message}
+    <GlassCard className="overflow-hidden border-border shadow-lg transition-all duration-300">
+      <div className="p-6">
+        <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+          <Shield className="w-5 h-5 text-tech-cyan" />
+          账户设置
+        </h2>
+
+        <div className="space-y-8">
+          {/* 隐私设置 */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-tech-cyan" />
+              隐私设置
+            </h3>
+            <div className="space-y-4 pl-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-muted-foreground" />
+                  <Label className="text-foreground">个人资料可见性</Label>
+                </div>
+                <select 
+                  value={settings.privacy} 
+                  onChange={(e) => handleSettingChange('privacy', e.target.value)}
+                  className="bg-glass border border-glass-border rounded px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+                >
+                  <option value="public">公开</option>
+                  <option value="private">私密</option>
+                  <option value="friends">仅好友</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <Label className="text-foreground">允许邮件联系</Label>
+                </div>
+                <Switch
+                  checked={settings.newsletter}
+                  onCheckedChange={(checked: boolean) => handleSettingChange('newsletter', checked)} // Added type annotation
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 通知设置 */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Bell className="w-4 h-4 text-tech-cyan" />
+              通知设置
+            </h3>
+            <div className="space-y-4 pl-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <Label className="text-foreground">接收邮件通知</Label>
+                </div>
+                <Switch
+                  checked={settings.notifications}
+                  onCheckedChange={(checked: boolean) => handleSettingChange('notifications', checked)} // Added type annotation
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* 安全设置 */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <KeyRound className="w-4 h-4 text-tech-cyan" />
+              安全设置
+            </h3>
+            <div className="space-y-4 pl-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
+                  <Label className="text-foreground">两步验证</Label>
+                </div>
+                <Switch
+                  checked={settings.twoFactorAuth}
+                  onCheckedChange={(checked: boolean) => handleSettingChange('twoFactorAuth', checked)} // Added type annotation
+                />
+              </div>
+              
+              <div className="pt-4">
+                <Button variant="outline" className="w-full">
+                  修改密码
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* 显示设置 */}
+          <div>
+            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Palette className="w-4 h-4 text-tech-cyan" />
+              显示设置
+            </h3>
+            <div className="space-y-4 pl-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-foreground">界面语言</Label>
+                <select 
+                  value={settings.language} 
+                  onChange={(e) => handleSettingChange('language', e.target.value)}
+                  className="bg-glass border border-glass-border rounded px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+                >
+                  <option value="zh-CN">简体中文</option>
+                  <option value="en-US">English</option>
+                  <option value="ja-JP">日本語</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label className="text-foreground">主题模式</Label>
+                <select 
+                  value={settings.theme} 
+                  onChange={(e) => handleSettingChange('theme', e.target.value)}
+                  className="bg-glass border border-glass-border rounded px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+                >
+                  <option value="auto">自动</option>
+                  <option value="light">浅色</option>
+                  <option value="dark">深色</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      <GlassCard padding="lg" className="border-tech-cyan/20">
-        <SettingSection icon={Bell} title="通知设置">
-          <SettingItem
-            label="邮件通知"
-            description="接收关于您账户活动的重要邮件通知"
-            checked={settings.emailNotifications}
-            onChange={() => handleToggle('emailNotifications')}
-          />
-          <SettingItem
-            label="推送通知"
-            description="在浏览器中接收实时推送通知"
-            checked={settings.pushNotifications}
-            onChange={() => handleToggle('pushNotifications')}
-          />
-          <SettingItem
-            label="每周摘要"
-            description="每周接收一次活动摘要邮件"
-            checked={settings.weeklyDigest}
-            onChange={() => handleToggle('weeklyDigest')}
-          />
-        </SettingSection>
-
-        <SettingSection icon={Mail} title="邮件订阅">
-          <SettingItem
-            label="新文章通知"
-            description="当有新文章发布时通知您"
-            checked={true}
-            onChange={() => {}}
-          />
-          <SettingItem
-            label="评论回复"
-            description="有人回复您的评论时通知您"
-            checked={true}
-            onChange={() => {}}
-          />
-        </SettingSection>
-
-        <SettingSection icon={Palette} title="外观设置">
-          <SettingItem
-            label="深色模式"
-            description="使用深色主题以减少眼睛疲劳"
-            checked={settings.darkMode}
-            onChange={() => handleToggle('darkMode')}
-          />
-        </SettingSection>
-
-        <SettingSection icon={Globe} title="隐私设置">
-          <SettingItem
-            label="公开资料"
-            description="允许其他用户查看您的个人资料"
-            checked={settings.publicProfile}
-            onChange={() => handleToggle('publicProfile')}
-          />
-          <SettingItem
-            label="显示邮箱"
-            description="在公开资料中显示您的邮箱地址"
-            checked={settings.showEmail}
-            onChange={() => handleToggle('showEmail')}
-          />
-        </SettingSection>
-
-        <SettingSection icon={Lock} title="安全设置">
-          <SettingItem
-            label="自动保存"
-            description="编辑时自动保存草稿"
-            checked={settings.autoSave}
-            onChange={() => handleToggle('autoSave')}
-          />
-        </SettingSection>
-
-        <div className="flex justify-end pt-4">
-          <Button
-            onClick={handleSave}
-            className="bg-tech-cyan hover:bg-tech-sky text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-          >
-            保存设置
-          </Button>
+        <div className="mt-8 pt-6 border-t border-glass-border flex justify-end">
+          <Button>保存设置</Button>
         </div>
-      </GlassCard>
-    </div>
+      </div>
+    </GlassCard>
   );
 }

@@ -32,12 +32,9 @@ const FriendLinkCard = React.forwardRef<HTMLDivElement, FriendLinkCardProps>(
       lg: 'p-8',
     };
     
-    // 根据主题确定玻璃效果
-    // 浅色模式: 更高的不透明度以保持可读性
-    // 深色模式: 可以使用较低的透明度
-    const backgroundClass = resolvedTheme === 'dark' 
-      ? 'bg-glass/70 backdrop-blur-xl' 
-      : 'bg-glass/80 backdrop-blur-xl';
+    // 使用 CSS 变量替代条件 className，避免 hydration 不匹配
+    // 透明度由 --glass-default CSS 变量根据主题自动控制
+    const backgroundClass = 'bg-glass backdrop-blur-xl';
     
     return (
       <div

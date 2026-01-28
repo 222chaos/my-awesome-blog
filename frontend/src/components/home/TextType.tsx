@@ -64,15 +64,12 @@ const TextType = ({
     if (fetchFromApi && !text) {
       setIsLoading(true);
       getActiveTypewriterContents().then((fetchedTexts) => {
-        // Convert string array to TypewriterContent array
-        const convertedTexts: TypewriterContent[] = fetchedTexts.map((text, index) => ({
-          id: `api-${index}`,
-          text,
-          priority: index,
-          is_active: true,
-          created_at: new Date().toISOString(),
-        }));
-        setDynamicTexts(convertedTexts);
+        // API now returns TypewriterContent[] directly
+        setDynamicTexts(fetchedTexts);
+        setIsLoading(false);
+      }).catch((error) => {
+        console.error('Error fetching typewriter contents:', error);
+        setDynamicTexts([]);
         setIsLoading(false);
       });
     }

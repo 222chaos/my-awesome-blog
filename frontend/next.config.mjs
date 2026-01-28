@@ -2,14 +2,26 @@
 const nextConfig = {
   output: 'standalone',
   experimental: {
-    typedRoutes: true,
+    typedRoutes: true
   },
   images: {
-    domains: [
-      'images.unsplash.com',
-      'avatars.githubusercontent.com',
-      'localhost',
-      '127.0.0.1',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+      },
     ],
     formats: ['image/webp', 'image/avif'], // 支持现代图片格式
     dangerouslyAllowSVG: true,
@@ -39,6 +51,9 @@ const nextConfig = {
       };
     }
     return config;
+  },
+  turbopack: {
+    // 空配置，用于消除 Next.js 16 的警告
   },
 };
 

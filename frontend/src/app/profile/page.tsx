@@ -1,105 +1,82 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
-import GlassCard from '@/components/ui/GlassCard';
-import { Button } from '@/components/ui/Button';
-import EditModeForm from './components/EditModeForm';
+import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link as LinkIcon, MapPin, Calendar } from 'lucide-react';
+import { UserProfile, getMockUserProfile, getMockUserStats, UserStats } from '@/lib/api/profile';
+import { validateSocialLink } from '@/services/userService';
 import TabNavigation from './components/TabNavigation';
-import StatsGrid from './components/StatsGrid';
+import ProfileView from './components/ProfileView';
 import SettingsView from './components/SettingsView';
 import ActivityView from './components/ActivityView';
-import { UserProfile, getMockUserProfile, getMockUserStats, UserStats } from '@/lib/api/profile';
-import { FormErrors, validateForm, sanitizeFormData } from '@/lib/validation/profileValidation';
-
-type TabType = 'profile' | 'settings' | 'activity';
 
 export default function ProfilePage() {
+  const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'activity'>('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
-  const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [loading, setLoading] = useState(true);
-  const [statsLoading, setStatsLoading] = useState(true);
-  const [errors, setErrors] = useState<FormErrors>({});
   const [saveStatus, setSaveStatus] = useState<{success: boolean; message: string} | null>(null);
 
   useEffect(() => {
-    fetchUserProfile();
-    fetchUserStats();
+    loadProfileData();
   }, []);
 
-  const fetchUserProfile = async () => {
+  const loadProfileData = async () => {
     try {
       setLoading(true);
-      // 在实际项目中，使用 fetchCurrentUserProfile()
-      const mockProfile = getMockUserProfile();
-      setProfile(mockProfile);
-      setFormData(mockProfile);
+      const profileData = await getMockUserProfile();
+      const statsData = await getMockUserStats();
+      setProfile(profileData);
+      setStats(statsData);
+      setFormData(profileData);
     } catch (error) {
-      console.error('获取用户资料失败:', error);
-      setSaveStatus({ success: false, message: '获取用户资料失败' });
+      console.error('Error loading profile:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchUserStats = async () => {
-    try {
-      setStatsLoading(true);
-      // 在实际项目中，使用 fetchCurrentUserStats()
-      const mockStats = getMockUserStats();
-      setStats(mockStats);
-    } catch (error) {
-      console.error('获取用户统计数据失败:', error);
-    } finally {
-      setStatsLoading(false);
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev: Partial<UserProfile>) => ({
+          ...prev,
+          avatar: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = async (data: Partial<UserProfile>) => {
-    // 表单验证
-    const validationErrors = validateForm(data);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      // 清理表单数据
-      const sanitizedData = sanitizeFormData(data);
+      // 在实际应用中，这里会调用API更新用户信息
+      console.log('Updating profile:', formData);
       
-      // 在实际项目中，使用 updateUserProfile(sanitizedData)
-      setProfile(prev => ({ ...prev!, ...sanitizedData }) as UserProfile);
-      setIsEditing(false);
-      setErrors({});
-      setSaveStatus({ success: true, message: '个人资料已成功更新!' });
-      setTimeout(() => setSaveStatus(null), 3000);
+      // 模拟API调用
+      setTimeout(() => {
+        setProfile((prev: UserProfile | null) => ({ ...prev!, ...formData }) as UserProfile);
+        setIsEditing(false);
+        setSaveStatus({ success: true, message: '个人资料已成功更新!' });
+        setTimeout(() => setSaveStatus(null), 3000);
+      }, 500);
     } catch (error) {
-      console.error('更新用户资料失败:', error);
-      setSaveStatus({ success: false, message: '更新失败，请稍后再试' });
+      console.error('Error updating profile:', error);
+      setSaveStatus({ success: false, message: '更新个人资料时出错，请重试。' });
       setTimeout(() => setSaveStatus(null), 3000);
     }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setFormData(profile || {});
-    setErrors({});
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
         <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-tech-cyan/20 border-t-tech-cyan mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="animate-pulse rounded-full h-8 w-8 bg-tech-cyan/20" />
-            </div>
-          </div>
-          <p className="mt-6 text-foreground text-lg font-medium animate-fade-in-up">加载中...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-foreground">加载中...</p>
         </div>
       </div>
     );
@@ -108,80 +85,83 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
-        <GlassCard padding="lg" className="max-w-md w-full mx-4 border-tech-cyan/20 backdrop-blur-xl bg-card/40 hover:shadow-[0_0_30px_var(--shadow-tech-cyan)] transition-all duration-300">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-tech-cyan/10 flex items-center justify-center animate-float">
-              <svg className="w-8 h-8 text-tech-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2 text-gradient-primary">访问受限</h2>
-            <p className="text-center text-muted-foreground mb-6">
-              请先登录以查看您的个人资料
-            </p>
-            <div className="flex justify-center">
-              <Button className="bg-tech-cyan hover:bg-tech-sky text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                前往登录
-              </Button>
-            </div>
+        <div className="p-8 max-w-md w-full mx-4 border-border">
+          <h2 className="text-2xl font-bold text-center mb-4 text-foreground">访问受限</h2>
+          <p className="text-center text-muted-foreground mb-6">
+            请先登录以查看您的个人资料
+          </p>
+          <div className="flex justify-center">
+            <button className="cursor-pointer transition-all duration-200 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90">
+              前往登录
+            </button>
           </div>
-        </GlassCard>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background py-8 sm:py-12 transition-colors duration-300">
-      <div className="container mx-auto px-4 max-w-6xl animate-fade-in-up">
+      <div className="container mx-auto px-4 max-w-4xl">
         {saveStatus && (
-          <div className={`mb-6 p-4 rounded-lg transition-all duration-300 animate-fade-in-up flex items-center gap-3 ${
+          <div className={`mb-6 p-4 rounded-lg transition-all duration-300 ${
             saveStatus.success 
-              ? 'bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/30 hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]' 
-              : 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/30 hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+              ? 'bg-green-500/20 text-green-700 dark:text-green-400 border border-green-500/30' 
+              : 'bg-red-500/20 text-red-700 dark:text-red-400 border border-red-500/30'
           }`}>
-            {saveStatus.success ? (
-              <CheckCircle className="w-5 h-5 flex-shrink-0" />
-            ) : (
-              <XCircle className="w-5 h-5 flex-shrink-0" />
-            )}
-            <span className="font-medium">{saveStatus.message}</span>
+            {saveStatus.message}
           </div>
         )}
 
-        {/* 选项卡导航 */}
-        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-foreground">个人中心</h1>
+          <p className="text-muted-foreground mt-2">管理您的个人资料、设置和活动</p>
+        </div>
 
-        {/* 不同选项卡的内容 */}
-        <div className="animate-fade-in-up">
+        <TabNavigation activeTab={activeTab} setActiveTab={(tab: string) => setActiveTab(tab as 'profile' | 'settings' | 'activity')} />
+
+        <div className="mt-6">
           {activeTab === 'profile' && (
-            <div className="space-y-8">
-              {/* 统计数据 */}
-              <StatsGrid stats={stats!} loading={statsLoading} />
-
-              {/* 编辑模式表单或查看模式内容 */}
-              {isEditing ? (
-                <EditModeForm
-                  initialData={formData}
-                  onSave={handleSave}
-                  onCancel={handleCancelEdit}
-                  errors={errors}
-                />
-              ) : (
-                <GlassCard padding="lg" className="border-tech-cyan/20 backdrop-blur-xl bg-card/40 hover:shadow-[0_0_30px_var(--shadow-tech-cyan)] transition-all duration-300">
-                  <div className="text-center">
-                    <h3 className="text-xl font-bold text-foreground mb-4">个人资料</h3>
-                    <p className="text-muted-foreground">
-                      {profile.bio || '这个人很懒，还没有填写个人简介。'}
-                    </p>
-                  </div>
-                </GlassCard>
-              )}
-            </div>
+            <ProfileView
+              profile={profile}
+              isEditing={isEditing}
+              setEditing={setIsEditing}
+              formData={formData}
+              setFormData={setFormData}
+              onSave={() => handleSubmit(new Event('submit') as unknown as React.FormEvent)}
+              onCancel={() => {
+                setIsEditing(false);
+                setFormData(profile);
+              }}
+              onAvatarChange={handleAvatarUpload}
+            />
           )}
           
           {activeTab === 'settings' && <SettingsView />}
+          
           {activeTab === 'activity' && <ActivityView />}
         </div>
+
+        {stats && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-tech-cyan">{stats.posts}</p>
+              <p className="text-sm text-muted-foreground">文章数</p>
+            </div>
+            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-tech-cyan">{stats.followers}</p>
+              <p className="text-sm text-muted-foreground">关注者</p>
+            </div>
+            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-tech-cyan">{stats.following}</p>
+              <p className="text-sm text-muted-foreground">关注</p>
+            </div>
+            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-tech-cyan">{stats.likes}</p>
+              <p className="text-sm text-muted-foreground">获赞数</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
