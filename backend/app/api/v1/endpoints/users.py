@@ -171,11 +171,19 @@ def upload_current_user_avatar(
         buffer.write(file.file.read())
 
     try:
+        # Create upload directory if it doesn't exist
+        upload_dir = os.path.join("static", "avatars")
+        os.makedirs(upload_dir, exist_ok=True)
+        
         # Process image using ImageService
-        processed_image_path = image_service.save_image(
+        result = image_service.compress_and_create_variants(
             temp_file_path,
-            title=f"avatar_{current_user.username}"
+            upload_dir,
+            f"avatar_{current_user.username}"
         )
+        
+        # Use the first variant as the processed image path
+        processed_image_path = os.path.join(upload_dir, result['variants'][0]['file_path'])
 
         # Update user's avatar in database
         avatar_url = processed_image_path

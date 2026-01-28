@@ -19,7 +19,7 @@ export default function LoginLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={`${inter.className} bg-background`}>
         <ThemeWrapper>
-          <main className="bg-background min-h-screen">{children}</main>
+          <main className="min-h-screen">{children}</main>
         </ThemeWrapper>
       </body>
     </html>

@@ -63,11 +63,19 @@ def upload_image(
         buffer.write(file.file.read())
     
     try:
+        # Create upload directory if it doesn't exist
+        upload_dir = os.path.join(settings.STATIC_FILES_DIR, "uploads")
+        os.makedirs(upload_dir, exist_ok=True)
+        
         # Process image using ImageService
-        processed_image_path = image_service.save_image(
+        result = image_service.compress_and_create_variants(
             temp_file_path, 
-            title=title or file.filename
+            upload_dir,
+            title or file.filename
         )
+        
+        # Use the first variant as the processed image path
+        processed_image_path = os.path.join(upload_dir, result['variants'][0]['file_path'])
         
         # Create image record in database
         image_in = ImageCreate(
@@ -79,8 +87,8 @@ def upload_image(
             alt_text=alt_text,
             file_size=os.path.getsize(processed_image_path),
             mime_type=file.content_type,
-            width=image_service.get_image_dimensions(processed_image_path)[0],
-            height=image_service.get_image_dimensions(processed_image_path)[1],
+            width=result['original_width'],
+            height=result['original_height'],
             is_featured=is_featured,
             uploader_id=current_user.id
         )

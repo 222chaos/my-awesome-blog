@@ -268,7 +268,7 @@ export default function Timeline({ events }: TimelineProps) {
           我的历程
         </h2>
 
-        <div ref={timelineRef} className="relative max-w-3xl mx-auto">
+        <div ref={timelineRef} className="relative max-w-4xl mx-auto">
           {/* 垂直线 - 主轴 */}
           <div
             ref={verticalLineRef}

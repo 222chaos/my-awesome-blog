@@ -35,7 +35,8 @@ export default function ProfilePage() {
       setStats(statsData);
       setFormData(profileData);
     } catch (error) {
-      console.error('Error loading profile:', error);
+      // API 调用失败时，profile 保持为 null，显示"访问受限"页面
+      console.log('Profile data not available (user may not be logged in)');
     } finally {
       setLoading(false);
     }
@@ -96,6 +97,13 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
         <div className="p-8 max-w-md w-full mx-4 border-border">
+          <div className="mb-6 flex justify-center">
+            <img
+              src="/assets/lulu.gif"
+              alt="Access Restricted"
+              className="w-full max-w-xs object-contain"
+            />
+          </div>
           <h2 className="text-2xl font-bold text-center mb-4 text-foreground">访问受限</h2>
           <p className="text-center text-muted-foreground mb-6">
             请先登录以查看您的个人资料

@@ -1,4 +1,4 @@
-import aioredis
+import redis.asyncio as redis
 import json
 import pickle
 from typing import Any, Optional, Union
@@ -19,11 +19,13 @@ class CacheService:
         连接到Redis服务器
         """
         try:
-            self.redis = aioredis.from_url(
-                f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}",
+            self.redis = redis.Redis(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
                 password=settings.REDIS_PASSWORD,
+                db=settings.REDIS_DB,
+                decode_responses=False,  # We'll handle serialization manually
                 encoding="utf-8",
-                decode_responses=False  # We'll handle serialization ourselves
             )
             app_logger.info("Connected to Redis successfully")
         except Exception as e:
@@ -35,7 +37,7 @@ class CacheService:
         关闭Redis连接
         """
         if self.redis:
-            await self.redis.close()
+            await self.redis.aclose()
             
     async def set(
         self, 

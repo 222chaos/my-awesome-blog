@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
     LOG_DIR: str = "logs"
+    STATIC_FILES_DIR: str = "static"
     
     # Security
     SECRET_KEY: str = "your-super-secret-key-change-this-in-production"
