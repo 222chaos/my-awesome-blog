@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth, users, articles, comments, typewriter_contents,
     categories, tags, friend_links, portfolio, timeline_events,
-    statistics, subscriptions, images, audit_logs, analytics
+    statistics, subscriptions, images, audit_logs, analytics, oss_upload
 )
 
 api_router = APIRouter()
@@ -23,3 +23,4 @@ api_router.include_router(images.router, prefix="/images", tags=["images"])
 api_router.include_router(typewriter_contents.router, prefix="/typewriter-contents", tags=["typewriter-contents"])
 api_router.include_router(audit_logs.router, prefix="/audit-logs", tags=["audit-logs"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+api_router.include_router(oss_upload.router, prefix="/oss", tags=["oss-upload"])

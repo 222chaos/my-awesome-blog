@@ -8,6 +8,7 @@ from app import crud
 from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse
 from app.models.user import User as UserModel
 from app.services.image_service import ImageService
+from app.services.oss_service import oss_service
 
 router = APIRouter()
 
@@ -162,7 +163,7 @@ def upload_current_user_avatar(
             detail=f"File type {file_extension} not allowed. Allowed types: {allowed_extensions}"
         )
 
-    # Use ImageService to process and save avatar
+    # Use ImageService to process avatar
     image_service = ImageService()
 
     # Save uploaded file temporarily
@@ -171,22 +172,28 @@ def upload_current_user_avatar(
         buffer.write(file.file.read())
 
     try:
-        # Create upload directory if it doesn't exist
-        upload_dir = os.path.join("static", "avatars")
-        os.makedirs(upload_dir, exist_ok=True)
+        # Validate image format
+        if not image_service.validate_image_format(temp_file_path):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid image format. Supported formats: JPEG, PNG, WEBP, GIF"
+            )
         
-        # Process image using ImageService
-        result = image_service.compress_and_create_variants(
-            temp_file_path,
-            upload_dir,
-            f"avatar_{current_user.username}"
-        )
+        # Get image info
+        image_info = image_service.get_image_info(temp_file_path)
         
-        # Use the first variant as the processed image path
-        processed_image_path = os.path.join(upload_dir, result['variants'][0]['file_path'])
+        # Upload avatar to OSS
+        with open(temp_file_path, "rb") as f:
+            file_data = f.read()
+        avatar_url = oss_service.upload_file(file_data, file.filename, f"avatars/user_{current_user.id}")
+        
+        if not avatar_url:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to upload avatar to cloud storage"
+            )
 
         # Update user's avatar in database
-        avatar_url = processed_image_path
         crud.update_user(db, user_id=current_user.id, user_update=UserUpdate(avatar=avatar_url))
 
         # Clean up temporary file

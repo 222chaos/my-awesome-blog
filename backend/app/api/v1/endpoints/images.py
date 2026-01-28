@@ -8,6 +8,7 @@ from app import crud
 from app.schemas.image import Image, ImageCreate, ImageUpdate
 from app.models.user import User
 from app.services.image_service import ImageService
+from app.services.oss_service import oss_service
 from app.core.config import settings
 
 router = APIRouter()
@@ -54,7 +55,7 @@ def upload_image(
             detail=f"File type {file_extension} not allowed. Allowed types: {allowed_extensions}"
         )
     
-    # Use ImageService to process and save the image
+    # Use ImageService to process the image
     image_service = ImageService()
     
     # Save uploaded file temporarily
@@ -63,32 +64,40 @@ def upload_image(
         buffer.write(file.file.read())
     
     try:
-        # Create upload directory if it doesn't exist
-        upload_dir = os.path.join(settings.STATIC_FILES_DIR, "uploads")
-        os.makedirs(upload_dir, exist_ok=True)
+        # Validate image format
+        if not image_service.validate_image_format(temp_file_path):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid image format. Supported formats: JPEG, PNG, WEBP, GIF"
+            )
         
         # Process image using ImageService
-        result = image_service.compress_and_create_variants(
-            temp_file_path, 
-            upload_dir,
-            title or file.filename
-        )
+        # Get image info for the database record
+        image_info = image_service.get_image_info(temp_file_path)
         
-        # Use the first variant as the processed image path
-        processed_image_path = os.path.join(upload_dir, result['variants'][0]['file_path'])
+        # Upload original file to OSS
+        with open(temp_file_path, "rb") as f:
+            file_data = f.read()
+        original_file_url = oss_service.upload_file(file_data, file.filename, "images/original")
+        
+        if not original_file_url:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to upload image to cloud storage"
+            )
         
         # Create image record in database
         image_in = ImageCreate(
-            filename=os.path.basename(processed_image_path),
+            filename=file.filename,
             original_filename=file.filename,
-            filepath=processed_image_path,
+            filepath=original_file_url,  # Store the OSS URL
             title=title or file.filename,
             description=description,
             alt_text=alt_text,
-            file_size=os.path.getsize(processed_image_path),
+            file_size=len(file_data),
             mime_type=file.content_type,
-            width=result['original_width'],
-            height=result['original_height'],
+            width=image_info['width'],
+            height=image_info['height'],
             is_featured=is_featured,
             uploader_id=current_user.id
         )
@@ -198,16 +207,9 @@ def delete_image(
             detail="Image not found",
         )
     
-    # Also delete the physical file
-    if os.path.exists(image.filepath):
-        os.remove(image.filepath)
-    
-    # Delete image variants if they exist
-    base_path = os.path.splitext(image.filepath)[0]
-    for size in ['hero', 'large', 'medium', 'small', 'thumbnail']:
-        variant_path = f"{base_path}_{size}.jpg"
-        if os.path.exists(variant_path):
-            os.remove(variant_path)
+    # Delete the file from OSS
+    if image.filepath:
+        oss_service.delete_file(image.filepath)
     
     deleted = crud.delete_image(db, image_id=image_uuid)
     if not deleted:

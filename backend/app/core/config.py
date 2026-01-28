@@ -24,6 +24,14 @@ class Settings(BaseSettings):
     REDIS_DB: int = 0
     REDIS_PASSWORD: Optional[str] = None
     
+    # Aliyun OSS Configuration
+    ALIBABA_CLOUD_ACCESS_KEY_ID: str = ""
+    ALIBABA_CLOUD_ACCESS_KEY_SECRET: str = ""
+    ALIBABA_CLOUD_OSS_ENDPOINT: str = "https://oss-cn-hangzhou.aliyuncs.com"
+    ALIBABA_CLOUD_OSS_BUCKET_NAME: str = "my-awesome-blog"
+    ALIBABA_CLOUD_OSS_REGION: str = "oss-cn-hangzhou"
+    ALIBABA_CLOUD_OSS_CDN_DOMAIN: str = ""
+    
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["*","http://localhost:3000", "http://localhost:8000", "http://localhost:8989", "http://localhost:3001"]
     
@@ -56,6 +64,10 @@ class Settings(BaseSettings):
         if not self.SMTP_USERNAME or not self.SMTP_PASSWORD:
             if self.EMAIL_ENABLED:
                 print("WARNING: SMTP credentials are not set. Email functionality will be disabled.")
+        
+        if not self.ALIBABA_CLOUD_ACCESS_KEY_ID or not self.ALIBABA_CLOUD_ACCESS_KEY_SECRET:
+            if self.DEBUG:
+                print("WARNING: Alibaba Cloud credentials are not set. OSS functionality will be disabled.")
 
     # Add these new fields to the Settings class
     SMTP_HOST: Optional[str] = None

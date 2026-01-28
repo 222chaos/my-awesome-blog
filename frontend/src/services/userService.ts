@@ -1,4 +1,5 @@
 import { UserProfile } from '@/types';
+import { loginApi, logoutApi } from '@/lib/api/auth';
 
 // 模拟用户数据
 const mockUsers: Record<string, UserProfile> = {
@@ -110,42 +111,44 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
 
 /**
  * 用户登录
- * @param credentials 登录凭据（邮箱/密码）
+ * @param credentials 登录凭据（用户名/密码）
  * @returns 登录结果
  */
 export const loginUser = async (credentials: { email: string; password: string }): Promise<{ success: boolean; user?: UserProfile; error?: string }> => {
-  await delay(800); // 模拟网络延迟
-  
-  // 简单验证
-  if (!credentials.email || !credentials.password) {
-    return { success: false, error: '请输入邮箱和密码' };
+  try {
+    // 调用真实的后端 API
+    const data = await loginApi(credentials.email, credentials.password);
+
+    // 登录成功，返回用户信息
+    return {
+      success: true,
+      user: {
+        id: data.user_id || data.id,
+        username: data.username || data.email,
+        email: data.email,
+        fullName: data.full_name || data.username,
+        avatar: data.avatar_url,
+        bio: data.bio,
+        website: data.website,
+        twitter: data.twitter,
+        github: data.github,
+        linkedin: data.linkedin
+      }
+    };
+  } catch (error) {
+    // 登录失败
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : '登录失败，请重试'
+    };
   }
-  
-  // 查找匹配的用户
-  const user = Object.values(mockUsers).find(u => u.email === credentials.email);
-  
-  if (!user) {
-    return { success: false, error: '用户不存在' };
-  }
-  
-  // 模拟密码验证（这里简化处理）
-  if (credentials.password.length < 6) {
-    return { success: false, error: '密码错误' };
-  }
-  
-  // 模拟登录成功
-  localStorage.setItem('currentUserId', user.id);
-  return { success: true, user: { ...user } };
 };
 
 /**
  * 用户登出
  */
 export const logoutUser = async (): Promise<void> => {
-  await delay(300); // 模拟网络延迟
-  
-  // 清除登录信息
-  localStorage.removeItem('currentUserId');
+  await logoutApi();
 };
 
 /**

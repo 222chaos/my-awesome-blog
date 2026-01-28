@@ -33,24 +33,24 @@ export default function Navbar() {
 
   // 根据主题选择下拉框样式
   const dropdownBgClass = getThemeClass(
-    'bg-glass/90 backdrop-blur-xl border border-glass-border',
-    'bg-white/95 backdrop-blur-xl border-gray-200'
+    'bg-slate-900/95 backdrop-blur-xl border border-slate-700/50',
+    'bg-white/95 backdrop-blur-xl border-gray-300'
   );
   const dropdownItemClass = getThemeClass(
-    'focus:bg-tech-cyan/10 hover:bg-glass/30',
-    'focus:bg-gray-100 hover:bg-gray-100'
+    'focus:bg-tech-cyan/20 hover:bg-slate-700/30',
+    'focus:bg-gray-100 hover:bg-gray-50'
   );
   const textColorClass = getThemeClass(
     'text-foreground/90 group-hover:text-tech-cyan',
-    'text-gray-700 group-hover:text-tech-cyan'
+    'text-gray-800 group-hover:text-tech-cyan'
   );
   const separatorClass = getThemeClass(
-    'bg-glass-border',
+    'bg-slate-700/30',
     'bg-gray-200'
   );
   const dropdownShadowClass = getThemeClass(
-    'shadow-xl shadow-glass-glow/20',
-    'shadow-lg'
+    'shadow-xl shadow-tech-cyan/10',
+    'shadow-lg shadow-gray-300/30'
   );
 
   useEffect(() => {
@@ -148,9 +148,9 @@ export default function Navbar() {
                   <span className={`${textColorClass} transition-colors`}>设置</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className={separatorClass} />
-                <DropdownMenuItem className={`group cursor-pointer py-3 ${mounted && resolvedTheme === 'dark' ? 'focus:bg-red-500/10 hover:bg-red-500/20' : 'focus:bg-red-50 hover:bg-red-50'}`}>
+                <DropdownMenuItem className={`group cursor-pointer py-3 ${mounted && resolvedTheme === 'dark' ? 'focus:bg-red-500/20 hover:bg-red-500/30' : 'focus:bg-red-100 hover:bg-red-100'}`}>
                   <LogOut className="h-4 w-4 mr-3 text-red-500 group-hover:scale-110 transition-transform" />
-                  <span className={`text-foreground/90 group-hover:text-red-500 transition-colors ${mounted && resolvedTheme === 'dark' ? '' : 'text-gray-700'}`}>退出登录</span>
+                  <span className={`group-hover:text-red-600 transition-colors ${mounted && resolvedTheme === 'dark' ? 'text-foreground/90' : 'text-gray-800'}`}>退出登录</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
