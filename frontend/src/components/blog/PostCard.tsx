@@ -50,6 +50,24 @@ export default function PostCard({
     ? 'glass-card'
     : 'bg-gray-100 shadow-lg border border-gray-200';
 
+  // 设置默认封面图片
+  const [imgSrc, setImgSrc] = React.useState(coverImage || '/assets/avatar.jpg');
+
+  // 图片加载失败时的回调函数
+  const handleError = () => {
+    // 直接切换到默认图片
+    setImgSrc('/assets/avatar.jpg');
+  };
+
+  // 当 coverImage 发生变化时，更新 imgSrc
+  React.useEffect(() => {
+    if (coverImage) {
+      setImgSrc(coverImage);
+    } else {
+      setImgSrc('/assets/avatar.jpg');
+    }
+  }, [coverImage]);
+
   return (
     <article
       className={cn(
@@ -59,6 +77,18 @@ export default function PostCard({
       role="article"
       aria-labelledby={`post-title-${id}`}
     >
+      {/* 封面图片区域 */}
+      <div className="relative aspect-video overflow-hidden">
+        <img
+          src={imgSrc}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          onError={handleError}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-tech-darkblue/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
+
       <div className="p-4 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -120,6 +150,9 @@ export function PostCardSkeleton() {
       role="status"
       aria-label="加载中"
     >
+      {/* 封面图片骨架 */}
+      <div className="relative aspect-video bg-gray-300 dark:bg-gray-700 animate-pulse"></div>
+      
       <div className="p-4 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">

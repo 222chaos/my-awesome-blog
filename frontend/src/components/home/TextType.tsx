@@ -3,7 +3,7 @@
 import { ElementType, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getActiveTypewriterContents, TypewriterContent } from '@/lib/api';
+import { getActiveTypewriterTexts, getActiveTypewriterContents, TypewriterContent } from '@/lib/api';
 
 interface TextTypeProps {
   className?: string;
@@ -63,9 +63,9 @@ const TextType = ({
   useEffect(() => {
     if (fetchFromApi && !text) {
       setIsLoading(true);
-      getActiveTypewriterContents().then((fetchedTexts) => {
-        // API now returns TypewriterContent[] directly
-        setDynamicTexts(fetchedTexts);
+      getActiveTypewriterContents().then((fetchedContents) => {
+        // API returns TypewriterContent[] directly
+        setDynamicTexts(fetchedContents);
         setIsLoading(false);
       }).catch((error) => {
         console.error('Error fetching typewriter contents:', error);

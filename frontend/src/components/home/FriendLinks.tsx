@@ -35,14 +35,13 @@ export default function FriendLinks({ links }: FriendLinksProps) {
   }
 
   return (
-    <section className="py-12 lg:py-16">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
-          友情链接
-        </h2>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {links.map((link, index) => (
+    <section className="py-6 lg:py-8">
+      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6 animate-fade-in-up">
+        友情链接
+      </h2>
+
+      <div className="grid grid-cols-2 gap-3">
+        {links.map((link, index) => (
             <a
               key={link.id}
               href={link.url}
@@ -51,33 +50,34 @@ export default function FriendLinks({ links }: FriendLinksProps) {
               className="group"
             >
               <FriendLinkCard
-                className="h-full flex flex-col items-center justify-center"
+                className="flex flex-row items-center justify-start px-4"
                 hoverEffect={true}
                 glowEffect={true}
-                padding="md"
+                padding="sm"
                 cornerAnimation={true}
               >
                 {/* Favicon */}
                 <img
                   src={link.favicon}
                   alt={link.name}
-                  className="w-12 h-12 mb-3 group-hover:scale-110 transition-transform duration-300"
+                  className="w-10 h-10 mr-3 group-hover:scale-110 transition-transform duration-300"
                 />
-                
+
                 {/* 名称 */}
-                <h4 className="text-foreground font-medium mb-1 group-hover:text-tech-cyan transition-colors">
-                  {link.name}
-                </h4>
-                
-                {/* 描述 */}
-                {link.description && (
-                  <p className="text-muted-foreground text-sm">{link.description}</p>
-                )}
+                <div className="flex-1">
+                  <h4 className="text-foreground font-medium mb-1 group-hover:text-tech-cyan transition-colors">
+                    {link.name}
+                  </h4>
+
+                  {/* 描述 */}
+                  {link.description && (
+                    <p className="text-muted-foreground text-xs">{link.description}</p>
+                  )}
+                </div>
               </FriendLinkCard>
             </a>
           ))}
         </div>
-      </div>
     </section>
   );
 }

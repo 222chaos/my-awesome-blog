@@ -6,19 +6,17 @@ import FeaturedSection from '@/components/home/FeaturedSection';
 import StatsPanel from '@/components/home/StatsPanel';
 import TagCloud from '@/components/home/TagCloud';
 import Timeline from '@/components/home/Timeline';
-import FriendLinks from '@/components/home/FriendLinks';
 import Portfolio from '@/components/home/Portfolio';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
-import type { Post, Category, PopularPost, TimelineItem, FriendLink } from '@/types';
+import type { Post, Category, PopularPost, TimelineItem } from '@/types';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineItem[]>([]);
-  const [friendLinks, setFriendLinks] = useState<FriendLink[]>([]);
 
   useEffect(() => {
     setPosts([
@@ -128,37 +126,6 @@ export default function Home() {
         description: '为几个开源项目和GitHub仓库做出贡献。',
       },
     ]);
-
-    setFriendLinks([
-      {
-        id: '1',
-        name: 'Next.js',
-        url: 'https://nextjs.org',
-        favicon: '/assets/nextjs-logo.svg',
-        description: '生产就绪的React框架',
-      },
-      {
-        id: '2',
-        name: 'Vercel',
-        url: 'https://vercel.com',
-        favicon: '/assets/vercel-logo.svg',
-        description: '开发. 预览. 部署.',
-      },
-      {
-        id: '3',
-        name: 'Tailwind CSS',
-        url: 'https://tailwindcss.com',
-        favicon: '/assets/tailwind-logo.svg',
-        description: '快速构建现代网站',
-      },
-      {
-        id: '4',
-        name: 'Radix UI',
-        url: 'https://www.radix-ui.com',
-        favicon: '/assets/radix-logo.svg',
-        description: '无样式、可访问的UI组件',
-      },
-    ]);
   }, []);
 
   return (
@@ -183,26 +150,23 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 py-16 bg-background">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <FriendLinks links={friendLinks} />
-            <Portfolio
-              projects={[{
-                id: '1',
-                title: '电商网站',
-                description: '使用React和Node.js构建的全功能电商平台',
-                image: '/assets/placeholder-portfolio.jpg',
-                tags: ['React', 'Node.js', 'MongoDB'],
-                link: '/projects/ecommerce',
-              }, {
-                id: '2',
-                title: '任务管理应用',
-                description: '具有实时协作功能的任务管理工具',
-                image: '/assets/placeholder-portfolio.jpg',
-                tags: ['Vue.js', 'Firebase', 'Tailwind'],
-                link: '/projects/task-manager',
-              }]}
-            />
-          </div>
+          <Portfolio
+            projects={[{
+              id: '1',
+              title: '电商网站',
+              description: '使用React和Node.js构建的全功能电商平台',
+              image: '/assets/placeholder-portfolio.jpg',
+              tags: ['React', 'Node.js', 'MongoDB'],
+              link: '/projects/ecommerce',
+            }, {
+              id: '2',
+              title: '任务管理应用',
+              description: '具有实时协作功能的任务管理工具',
+              image: '/assets/placeholder-portfolio.jpg',
+              tags: ['Vue.js', 'Firebase', 'Tailwind'],
+              link: '/projects/task-manager',
+            }]}
+          />
         </div>
 
         <Card className="container mx-auto px-4 py-8 mt-12 glass-card glow-border">

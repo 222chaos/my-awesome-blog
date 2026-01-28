@@ -5,6 +5,15 @@ import { FileText, Eye, Users, ArrowRight, Heart, MessageCircle, Calendar, Alert
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import { ArticleCardSkeleton } from './ArticleCardSkeleton';
+import FriendLinks from './FriendLinks';
+
+interface FriendLink {
+  id: string;
+  name: string;
+  url: string;
+  favicon: string;
+  description?: string;
+}
 
 interface Stat {
   label: string;
@@ -21,35 +30,66 @@ interface FriendLink {
 }
 
 // 模拟友链数据
-const mockFriendLinks: FriendLink[] = [
+const mockFriendLinksForFlip: FriendLink[] = [
   {
-    id: 1,
+    id: '1',
     name: '技术博客',
     description: '分享前端开发经验',
     url: 'https://example1.com',
-    avatar: 'https://placehold.co/40x40/2563eb/ffffff?text=T'
+    favicon: 'https://placehold.co/40x40/2563eb/ffffff?text=T'
   },
   {
-    id: 2,
+    id: '2',
     name: '设计灵感',
     description: 'UI/UX设计资源',
     url: 'https://example2.com',
-    avatar: 'https://placehold.co/40x40/10b981/ffffff?text=D'
+    favicon: 'https://placehold.co/40x40/10b981/ffffff?text=D'
   },
   {
-    id: 3,
+    id: '3',
     name: '开源社区',
     description: '开源项目分享',
     url: 'https://example3.com',
-    avatar: 'https://placehold.co/40x40/f59e0b/ffffff?text=O'
+    favicon: 'https://placehold.co/40x40/f59e0b/ffffff?text=O'
   },
   {
-    id: 4,
+    id: '4',
     name: '程序员笔记',
     description: '算法与数据结构',
     url: 'https://example4.com',
-    avatar: 'https://placehold.co/40x40/ef4444/ffffff?text=C'
+    favicon: 'https://placehold.co/40x40/ef4444/ffffff?text=C'
   }
+];
+
+const mockFriendLinks: FriendLink[] = [
+  {
+    id: '1',
+    name: 'Next.js',
+    url: 'https://nextjs.org',
+    favicon: '/assets/nextjs-logo.svg',
+    description: '生产就绪的React框架',
+  },
+  {
+    id: '2',
+    name: 'Vercel',
+    url: 'https://vercel.com',
+    favicon: '/assets/vercel-logo.svg',
+    description: '开发. 预览. 部署.',
+  },
+  {
+    id: '3',
+    name: 'Tailwind CSS',
+    url: 'https://tailwindcss.com',
+    favicon: '/assets/tailwind-logo.svg',
+    description: '快速构建现代网站',
+  },
+  {
+    id: '4',
+    name: 'Radix UI',
+    url: 'https://www.radix-ui.com',
+    favicon: '/assets/radix-logo.svg',
+    description: '无样式、可访问的UI组件',
+  },
 ];
 
 interface Article {
@@ -159,40 +199,18 @@ function ProfileCard() {
 
 // 友站链接翻转卡片组件
 function FriendLinkFlipCard() {
-  const friendCount = mockFriendLinks.length;
-  const totalVisits = 12580; // 模拟友站总访问量
-
   return (
     <section className="flip-card" style={{ width: '100%', minHeight: '200px' }} aria-label="友站链接卡片">
       <div className="flip-card-inner" style={{ minHeight: '200px' }}>
-        {/* 正面 - 友站统计 */}
-        <div className="flip-card-front rounded-2xl p-6 transition-all duration-300 glass-card flex flex-col items-center justify-center">
-          <div className="text-center">
-            {/* 大数字显示 */}
-            <div className="flex items-center justify-center mb-3">
-              <Globe className="w-8 h-8 text-tech-cyan mr-3" />
-              <span className="text-5xl font-bold text-tech-cyan">{friendCount}</span>
-            </div>
-            <p className="text-lg font-semibold text-foreground mb-1">友情链接</p>
-            <p className="text-sm text-muted-foreground mb-4">累计访问 {totalVisits.toLocaleString()} 次</p>
-            
-            {/* 提示文字 */}
-            <div className="flex items-center justify-center text-tech-cyan/80 text-sm">
-              <span>悬停查看友链</span>
-              <ArrowRight className="w-4 h-4 ml-1 animate-pulse" />
-            </div>
-          </div>
-        </div>
-
         {/* 背面 - 友链列表 */}
         <div className="flip-card-back rounded-2xl transition-all duration-300 glass-card overflow-hidden">
           {/* 背面内容 */}
           <div className="h-full flex flex-col p-4">
             <h4 className="text-sm font-bold text-foreground mb-3 text-center">友情链接</h4>
-            
+
             {/* 友链列表 - 2x2 网格 */}
             <div className="grid grid-cols-2 gap-2 flex-1">
-              {mockFriendLinks.map((link) => (
+              {mockFriendLinksForFlip.map((link) => (
                 <a
                   key={link.id}
                   href={link.url}
@@ -201,7 +219,7 @@ function FriendLinkFlipCard() {
                   className="group flex flex-col items-center justify-center p-2 rounded-lg bg-[var(--card)]/80 hover:bg-tech-cyan/20 transition-colors"
                 >
                   <img
-                    src={link.avatar}
+                    src={link.favicon}
                     alt={link.name}
                     className="w-8 h-8 rounded-full mb-1 group-hover:scale-110 transition-transform"
                   />
@@ -230,6 +248,8 @@ function FriendLinkFlipCard() {
 
 // 文章卡片组件
 function ArticleCard({ article, delayClass }: { article: Article; delayClass: string }) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <article
       role="article"
@@ -246,9 +266,10 @@ function ArticleCard({ article, delayClass }: { article: Article; delayClass: st
             {/* 左侧图片 */}
             <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
               <img
-                src={article.image || 'https://placehold.co/400x400/1e293b/ffffff?text=Article'}
+                src={imageError ? '/assets/avatar.jpg' : (article.image || '/assets/avatar.jpg')}
                 alt={article.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125"
+                onError={() => setImageError(true)}
               />
             </div>
 
@@ -398,12 +419,12 @@ export default function StatsPanel() {
     <section className="py-8 sm:py-10 md:py-12 lg:py-16">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {/* 左侧列 - 垂直堆叠两个卡片 */}
+          {/* 左侧列 - 垂直堆叠 */}
           <div className="md:col-span-1 flex flex-col gap-6">
             {/* 个人资料卡片 */}
             <ProfileCard />
-            {/* 友站链接翻转卡片 */}
-            <FriendLinkFlipCard />
+            {/* 友情链接 */}
+            <FriendLinks links={mockFriendLinks} />
           </div>
 
           {/* 右侧文章列表 */}
