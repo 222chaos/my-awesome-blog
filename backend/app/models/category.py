@@ -20,5 +20,5 @@ class Category(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
-    articles = relationship("Article", secondary="article_categories", back_populates="categories")
-    article_categories = relationship("ArticleCategory", back_populates="category", cascade="all, delete-orphan")
+    articles = relationship("Article", secondary="article_categories", back_populates="categories", overlaps="article_categories")
+    article_categories = relationship("ArticleCategory", back_populates="category", cascade="all, delete-orphan", overlaps="articles,categories")

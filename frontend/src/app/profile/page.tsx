@@ -8,6 +8,7 @@ import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link a
 import { UserProfile, UserStats, fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
 import { validateSocialLink, getCurrentUser } from '@/services/userService';
 import { useLoading } from '@/context/loading-context';
+import { useThemeUtils } from '@/hooks/useThemeUtils';
 import TabNavigation from './components/TabNavigation';
 import ProfileView from './components/ProfileView';
 import SettingsView from './components/SettingsView';
@@ -16,6 +17,7 @@ import ActivityView from './components/ActivityView';
 export default function ProfilePage() {
   const router = useRouter();
   const { showLoading, hideLoading } = useLoading();
+  const { getThemeClass } = useThemeUtils();
   const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'activity'>('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -138,8 +140,29 @@ export default function ProfilePage() {
     );
   }
 
+  // 主题相关样式
+  const containerBgClass = getThemeClass(
+    'bg-gradient-to-br from-tech-darkblue/20 via-tech-deepblue/10 to-tech-cyan/5',
+    'bg-gradient-to-br from-gray-100 to-gray-50'
+  );
+
+  const cardBgClass = getThemeClass(
+    'bg-glass/30 backdrop-blur-xl border border-glass-border',
+    'bg-white/80 backdrop-blur-xl border border-gray-200'
+  );
+
+  const textClass = getThemeClass(
+    'text-foreground',
+    'text-gray-800'
+  );
+
+  const accentClass = getThemeClass(
+    'text-tech-cyan',
+    'text-blue-600'
+  );
+
   return (
-    <div className="min-h-screen bg-background py-8 sm:py-12 transition-colors duration-300">
+    <div className={`min-h-screen py-8 sm:py-12 transition-colors duration-300 ${containerBgClass}`}>
       <div className="container mx-auto px-4 max-w-4xl">
         {saveStatus && (
           <div className={`mb-6 p-4 rounded-lg transition-all duration-300 ${
@@ -152,8 +175,8 @@ export default function ProfilePage() {
         )}
 
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-foreground">个人中心</h1>
-          <p className="text-muted-foreground mt-2">管理您的个人资料、设置和活动</p>
+          <h1 className={`text-4xl font-bold ${accentClass}`}>个人中心</h1>
+          <p className={`text-lg mt-2 ${getThemeClass('text-foreground/70', 'text-gray-600')}`}>管理您的个人资料、设置和活动</p>
         </div>
 
         <TabNavigation activeTab={activeTab} setActiveTab={(tab: string) => setActiveTab(tab as 'profile' | 'settings' | 'activity')} />
@@ -181,22 +204,34 @@ export default function ProfilePage() {
         </div>
 
         {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
-            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.article_count || stats.posts || 0}</p>
-              <p className="text-sm text-muted-foreground">文章数</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div className={`${cardBgClass} rounded-xl p-4 text-center transition-transform duration-300 hover:scale-105`}>
+              <div className="flex flex-col items-center justify-center">
+                <UserRound className="w-8 h-8 text-tech-cyan mb-2" />
+                <p className="text-2xl font-bold text-tech-cyan">{stats.article_count || stats.posts || 0}</p>
+                <p className="text-sm text-muted-foreground">文章数</p>
+              </div>
             </div>
-            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.comment_count || 0}</p>
-              <p className="text-sm text-muted-foreground">评论数</p>
+            <div className={`${cardBgClass} rounded-xl p-4 text-center transition-transform duration-300 hover:scale-105`}>
+              <div className="flex flex-col items-center justify-center">
+                <Mail className="w-8 h-8 text-tech-cyan mb-2" />
+                <p className="text-2xl font-bold text-tech-cyan">{stats.comment_count || 0}</p>
+                <p className="text-sm text-muted-foreground">评论数</p>
+              </div>
             </div>
-            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.total_views || 0}</p>
-              <p className="text-sm text-muted-foreground">总浏览量</p>
+            <div className={`${cardBgClass} rounded-xl p-4 text-center transition-transform duration-300 hover:scale-105`}>
+              <div className="flex flex-col items-center justify-center">
+                <Globe className="w-8 h-8 text-tech-cyan mb-2" />
+                <p className="text-2xl font-bold text-tech-cyan">{stats.total_views || 0}</p>
+                <p className="text-sm text-muted-foreground">总浏览量</p>
+              </div>
             </div>
-            <div className="bg-glass/70 backdrop-blur-xl border border-glass-border rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold text-tech-cyan">{stats.joined_date || '-'}</p>
-              <p className="text-sm text-muted-foreground">加入日期</p>
+            <div className={`${cardBgClass} rounded-xl p-4 text-center transition-transform duration-300 hover:scale-105`}>
+              <div className="flex flex-col items-center justify-center">
+                <Calendar className="w-8 h-8 text-tech-cyan mb-2" />
+                <p className="text-2xl font-bold text-tech-cyan">{stats.joined_date || '-'}</p>
+                <p className="text-sm text-muted-foreground">加入日期</p>
+              </div>
             </div>
           </div>
         )}

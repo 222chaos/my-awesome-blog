@@ -10,5 +10,5 @@ class ArticleTag(Base):
     tag_id = Column(UUID(as_uuid=True), ForeignKey("tags.id"), primary_key=True)
 
     # Relationships
-    article = relationship("Article", back_populates="article_tags")
-    tag = relationship("Tag", back_populates="article_tags")
+    article = relationship("Article", back_populates="article_tags", overlaps="articles,tags")
+    tag = relationship("Tag", back_populates="article_tags", overlaps="articles,tags")

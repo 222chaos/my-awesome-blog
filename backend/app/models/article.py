@@ -34,7 +34,7 @@ class Article(Base):
     # Relationships
     author = relationship("User", back_populates="articles")
     comments = relationship("Comment", back_populates="article", cascade="all, delete-orphan")
-    categories = relationship("Category", secondary="article_categories", back_populates="articles")
-    tags = relationship("Tag", secondary="article_tags", back_populates="articles")
-    article_categories = relationship("ArticleCategory", back_populates="article", cascade="all, delete-orphan")
-    article_tags = relationship("ArticleTag", back_populates="article", cascade="all, delete-orphan")
+    categories = relationship("Category", secondary="article_categories", back_populates="articles", overlaps="article_categories")
+    tags = relationship("Tag", secondary="article_tags", back_populates="articles", overlaps="article_tags")
+    article_categories = relationship("ArticleCategory", back_populates="article", cascade="all, delete-orphan", overlaps="categories")
+    article_tags = relationship("ArticleTag", back_populates="article", cascade="all, delete-orphan", overlaps="tags")

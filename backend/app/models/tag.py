@@ -16,5 +16,5 @@ class Tag(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    articles = relationship("Article", secondary="article_tags", back_populates="tags")
-    article_tags = relationship("ArticleTag", back_populates="tag", cascade="all, delete-orphan")
+    articles = relationship("Article", secondary="article_tags", back_populates="tags", overlaps="article_tags")
+    article_tags = relationship("ArticleTag", back_populates="tag", cascade="all, delete-orphan", overlaps="articles,tags")

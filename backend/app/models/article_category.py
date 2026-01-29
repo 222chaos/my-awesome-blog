@@ -11,5 +11,5 @@ class ArticleCategory(Base):
     is_primary = Column(Boolean, default=False)
 
     # Relationships
-    article = relationship("Article", back_populates="article_categories")
-    category = relationship("Category", back_populates="article_categories")
+    article = relationship("Article", back_populates="article_categories", overlaps="articles,categories")
+    category = relationship("Category", back_populates="article_categories", overlaps="articles,categories")

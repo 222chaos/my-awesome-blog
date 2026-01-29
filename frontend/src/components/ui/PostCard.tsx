@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Calendar, Tag, User, Eye, MessageCircle, Heart, Bookmark, Clock, ThumbsUp } from 'lucide-react';
+import { Calendar, Tag, User, Eye, MessageCircle, Heart, Bookmark, Clock, ThumbsUp, Image as ImageIcon } from 'lucide-react';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
 
 interface Article {
@@ -52,6 +52,8 @@ interface PostCardProps {
 export default function PostCard({ article, className = '' }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [imgSrc, setImgSrc] = useState(article.featured_image || '/assets/avatar.jpg');
+
   const { getThemeClass } = useThemeUtils();
 
   // 格式化日期
@@ -62,6 +64,11 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  // 图片加载失败时的回调函数
+  const handleError = () => {
+    setImgSrc('/assets/avatar.jpg');
   };
 
   // 主题相关样式
@@ -82,70 +89,91 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
 
   return (
     <Link href={`/articles/${article.id}`}>
-      <div className={`group overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${cardBgClass} ${className}`}>
-        {/* 卡片头部 */}
-        <div className="p-5">
-          <div className="flex justify-between items-start mb-3">
-            <Badge variant="secondary" className={getThemeClass(
-              'bg-tech-cyan/20 text-tech-cyan',
-              'bg-blue-100 text-blue-800'
-            )}>
-              {article.category.name}
-            </Badge>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 mr-1" />
-              <span>{formatDate(article.published_at)}</span>
-            </div>
+      <div className={`group overflow-hidden rounded-xl transition-all duration-300 hover:shadow-2xl ${cardBgClass} ${className}`}>
+        <div className="flex flex-col sm:flex-row">
+          {/* 左侧封面图 */}
+          <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
+            {imgSrc ? (
+              <img
+                src={imgSrc}
+                alt={article.title}
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                loading="lazy"
+                onError={handleError}
+              />
+            ) : (
+              <div className={`w-full h-full flex items-center justify-center ${getThemeClass('bg-glass/20', 'bg-gray-200')}`}>
+                <ImageIcon className="h-12 w-12 text-foreground/30" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-tech-darkblue/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
           </div>
 
-          {/* 标题 */}
-          <h2 className={`text-lg font-bold mb-2 line-clamp-2 group-hover:${accentClass} transition-colors ${textClass}`}>
-            {article.title}
-          </h2>
-
-          {/* 摘要 */}
-          <p className={`mb-4 line-clamp-3 text-sm ${getThemeClass('text-foreground/70', 'text-gray-600')}`}>
-            {article.excerpt}
-          </p>
-
-          {/* 标签 */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {article.tags.slice(0, 3).map((tag) => (
-              <Badge
-                key={tag.id}
-                variant="outline"
-                className={`text-xs ${getThemeClass(
-                  'border-glass-border text-foreground/80',
-                  'border-gray-300 text-gray-700'
-                )}`}
-              >
-                <Tag className="h-3 w-3 mr-1" />
-                {tag.name}
+          {/* 右侧内容 */}
+          <div className="flex-1 flex flex-col p-5 min-w-0 transition-transform duration-300 group-hover:translate-x-2">
+            {/* 卡片头部 */}
+            <div className="flex justify-between items-start mb-3 flex-shrink-0">
+              <Badge variant="secondary" className={getThemeClass(
+                'bg-tech-cyan/20 text-tech-cyan',
+                'bg-blue-100 text-blue-800'
+              )}>
+                {article.category.name}
               </Badge>
-            ))}
-          </div>
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4 mr-1" />
+                <span>{formatDate(article.published_at)}</span>
+              </div>
+            </div>
 
-          {/* 底部信息 */}
-          <div className="flex items-center justify-between pt-3 border-t border-dashed border-opacity-30">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center">
-                  <Eye className="h-4 w-4 mr-1" />
-                  <span className="text-sm">{article.view_count}</span>
+            {/* 标题 */}
+            <h2 className={`text-lg font-bold mb-2 line-clamp-2 group-hover:${accentClass} transition-colors ${textClass}`}>
+              {article.title}
+            </h2>
+
+            {/* 摘要 */}
+            <p className={`mb-3 line-clamp-2 text-sm flex-1 ${getThemeClass('text-foreground/70', 'text-gray-600')}`}>
+              {article.excerpt}
+            </p>
+
+            {/* 标签 */}
+            <div className="flex flex-wrap gap-1.5 mb-3 flex-shrink-0">
+              {article.tags.slice(0, 3).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="outline"
+                  className={`text-xs ${getThemeClass(
+                    'border-glass-border text-foreground/80',
+                    'border-gray-300 text-gray-700'
+                  )}`}
+                >
+                  <Tag className="h-3 w-3 mr-1" />
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
+
+            {/* 底部信息 */}
+            <div className="flex items-center justify-between pt-3 border-t border-dashed border-opacity-30 flex-shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    <Eye className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{article.view_count}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <ThumbsUp className="h-4 w-4 mr-1" />
+                    <span className="text-sm">{article.likes_count}</span>
+                  </div>
                 </div>
                 <div className="flex items-center">
-                  <ThumbsUp className="h-4 w-4 mr-1" />
-                  <span className="text-sm">{article.likes_count}</span>
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span className="text-sm">{article.read_time} 分钟</span>
                 </div>
               </div>
               <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                <span className="text-sm">{article.read_time} 分钟</span>
+                <User className="h-4 w-4 mr-1" />
+                <span className="text-sm">{article.author.username}</span>
               </div>
-            </div>
-            <div className="flex items-center">
-              <User className="h-4 w-4 mr-1" />
-              <span className="text-sm">{article.author.username}</span>
             </div>
           </div>
         </div>
