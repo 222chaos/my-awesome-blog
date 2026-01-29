@@ -7,6 +7,7 @@ import type { Post } from '@/types';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import PostCard, { PostCardSkeleton } from '@/components/blog/PostCard';
 import { useTheme } from '@/context/theme-context';
+import { useLoading } from '@/context/loading-context';
 
 interface PostCardItemProps {
   post: Post;
@@ -47,6 +48,7 @@ interface PostGridProps {
 export default function PostGrid({ posts, loading = false, hasMore = true, onLoadMore }: PostGridProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
 
   // 防止 hydration 错误
   useEffect(() => {
@@ -60,20 +62,23 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
   const [page, setPage] = useState(1);
   const [hasMoreLocal, setHasMoreLocal] = useState(hasMore);
   const [loadingLocal, setLoadingLocal] = useState(loading);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const observerRef = useRef<IntersectionObserver>();
 
   const loadMore = useCallback(async () => {
     if (loadingLocal || !hasMoreLocal || !onLoadMore) return;
 
+    showLoading();
     setLoadingLocal(true);
     onLoadMore();
 
     // 模拟加载数据
     setTimeout(() => {
+      hideLoading();
       setLoadingLocal(false);
       setPage(prev => prev + 1);
     }, 1000);
-  }, [loadingLocal, hasMoreLocal, onLoadMore]);
+  }, [loadingLocal, hasMoreLocal, onLoadMore, showLoading, hideLoading]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

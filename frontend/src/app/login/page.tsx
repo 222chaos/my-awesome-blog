@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { loginUser } from '@/services/userService';
+import { useLoading } from '@/context/loading-context';
 import './form-styles.css';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     setMounted(true);
@@ -23,7 +24,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    showLoading();
 
     try {
       const result = await loginUser({ email, password });
@@ -37,7 +38,7 @@ export default function LoginPage() {
       setError('登录失败，请重试');
       console.error('Login error:', err);
     } finally {
-      setLoading(false);
+      hideLoading();
     }
   };
 
@@ -142,19 +143,11 @@ export default function LoginPage() {
               type="submit"
               variant="default"
               className="w-full hover:scale-105 transition-all duration-200 bg-tech-cyan hover:bg-tech-lightcyan text-black font-semibold py-3 shadow-lg shadow-tech-cyan/30"
-              disabled={loading}
             >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
-                  <span>登录中...</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <Lock className="w-4 h-4" />
-                  <span>登录</span>
-                </div>
-              )}
+              <div className="flex items-center justify-center gap-2">
+                <Lock className="w-4 h-4" />
+                <span>登录</span>
+              </div>
             </Button>
           </form>
 

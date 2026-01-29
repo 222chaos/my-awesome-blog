@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { FileText, Eye, Users, ArrowRight, Heart, MessageCircle, Calendar, AlertCircle, RefreshCw, ExternalLink, Globe } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
+import { useLoading } from '@/context/loading-context';
 import { ArticleCardSkeleton } from './ArticleCardSkeleton';
 import FriendLinks from './FriendLinks';
 
@@ -397,10 +398,13 @@ function ArticleList({ articles, loading, error, onRetry }: { articles: Article[
 export default function StatsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     // 模拟数据加载
+    showLoading();
     const timer = setTimeout(() => {
+      hideLoading();
       setLoading(false);
     }, 1500);
 
@@ -409,8 +413,10 @@ export default function StatsPanel() {
 
   const handleRetry = () => {
     setError(null);
+    showLoading();
     setLoading(true);
     setTimeout(() => {
+      hideLoading();
       setLoading(false);
     }, 1500);
   };

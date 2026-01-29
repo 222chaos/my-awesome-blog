@@ -1,5 +1,5 @@
 import { UserProfile } from '@/types';
-import { loginApi, logoutApi, getCurrentUserApi } from '@/lib/api/auth';
+import { loginApi, logoutApi, getCurrentUserApi, isAuthenticated } from '@/lib/api/auth';
 
 // 模拟用户数据
 const mockUsers: Record<string, UserProfile> = {
@@ -98,15 +98,20 @@ export const uploadAvatar = async (userId: string, file: File): Promise<string> 
  */
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
   await delay(300); // 模拟网络延迟
-  
-  // 模拟获取当前登录用户（这里假设是用户1）
-  const currentUserId = localStorage.getItem('currentUserId') || '1';
-  
-  if (mockUsers[currentUserId]) {
-    return { ...mockUsers[currentUserId] };
+
+  // 使用 auth API 检查登录状态
+  if (!isAuthenticated()) {
+    return null;
   }
-  
-  return null;
+
+  try {
+    return await getCurrentUserApi();
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    // 如果获取用户信息失败，清除认证状态
+    await logoutUser();
+    return null;
+  }
 };
 
 /**

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Calendar, Tag, User, Eye, MessageCircle, Heart, Bookmark } from 'lucide-react';
+import { Calendar, Tag, User, Eye, MessageCircle, Heart, Bookmark, Clock, ThumbsUp } from 'lucide-react';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
 
 interface Article {
@@ -20,11 +20,17 @@ interface Article {
   author_id: string;
   category_id: string;
   featured_image?: string;
+  read_time: number; // 阅读时间（分钟）
+  likes_count: number; // 点赞数
+  comments_count: number; // 评论数
+  shares_count: number; // 分享数
   author: {
     id: string;
     username: string;
     email: string;
     avatar?: string;
+    reputation: number; // 声誉分数
+    followers_count: number; // 关注者数量
   };
   category: {
     id: string;
@@ -121,14 +127,20 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
 
           {/* 底部信息 */}
           <div className="flex items-center justify-between pt-3 border-t border-dashed border-opacity-30">
-            <div className="flex items-center">
-              <div className="flex items-center mr-3">
-                <Eye className="h-4 w-4 mr-1" />
-                <span className="text-sm">{article.view_count}</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  <Eye className="h-4 w-4 mr-1" />
+                  <span className="text-sm">{article.view_count}</span>
+                </div>
+                <div className="flex items-center">
+                  <ThumbsUp className="h-4 w-4 mr-1" />
+                  <span className="text-sm">{article.likes_count}</span>
+                </div>
               </div>
               <div className="flex items-center">
-                <MessageCircle className="h-4 w-4 mr-1" />
-                <span className="text-sm">评论数</span>
+                <Clock className="h-4 w-4 mr-1" />
+                <span className="text-sm">{article.read_time} 分钟</span>
               </div>
             </div>
             <div className="flex items-center">

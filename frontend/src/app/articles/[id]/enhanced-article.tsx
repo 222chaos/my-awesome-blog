@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, ArrowLeft, Clock, ThumbsUp, MessageSquare, TrendingUp, Award, Users } from 'lucide-react';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
 import { getArticleById, getRelatedArticles } from '@/services/articleService';
-import { useLoading } from '@/context/loading-context';
 import PostCard from '@/components/ui/PostCard';
 import { Progress } from '@/components/ui/progress';
 
@@ -105,7 +104,7 @@ const convertToArticle = (related: RelatedArticle): Article => {
   };
 };
 
-export default function ArticleDetailPage() {
+export default function EnhancedArticleDetailPage() {
   const params = useParams<{ id: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]);
@@ -118,12 +117,10 @@ export default function ArticleDetailPage() {
   const [activeHeading, setActiveHeading] = useState('');
   const tocRef = useRef<HTMLDivElement>(null);
   const { getThemeClass } = useThemeUtils();
-  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     const fetchArticleData = async () => {
       try {
-        showLoading();
         setLoading(true);
         const articleData = await getArticleById(params.id);
         if (!articleData) {
@@ -134,14 +131,13 @@ export default function ArticleDetailPage() {
         // 获取相关文章
         const relatedData = await getRelatedArticles(params.id, articleData.category.id);
         setRelatedArticles(relatedData);
-
+        
         // 生成目录
         generateTableOfContents(articleData.content);
       } catch (err) {
         console.error('获取文章数据失败:', err);
         setError('获取文章数据失败');
       } finally {
-        hideLoading();
         setLoading(false);
       }
     };
@@ -156,7 +152,7 @@ export default function ArticleDetailPage() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
     const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
+    
     const tocItems = Array.from(headings).map(heading => {
       return {
         id: heading.id,
@@ -164,7 +160,7 @@ export default function ArticleDetailPage() {
         level: parseInt(heading.tagName.charAt(1))
       };
     });
-
+    
     setToc(tocItems);
   };
 
@@ -172,7 +168,7 @@ export default function ArticleDetailPage() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200;
-
+      
       for (const item of toc) {
         const element = document.getElementById(item.id);
         if (element && element.offsetTop <= scrollPosition) {
@@ -311,9 +307,9 @@ export default function ArticleDetailPage() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
                         onClick={handleLike}
                         className={`flex items-center ${isLiked ? 'text-red-500' : ''} ${getThemeClass(
                           'border-glass-border hover:bg-glass/40 text-foreground',
@@ -324,9 +320,9 @@ export default function ArticleDetailPage() {
                         {isLiked ? '已点赞' : '点赞'}
                         <span className="ml-1">({article.likes_count})</span>
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
                         onClick={handleBookmark}
                         className={`flex items-center ${isBookmarked ? 'text-yellow-500' : ''} ${getThemeClass(
                           'border-glass-border hover:bg-glass/40 text-foreground',
@@ -383,7 +379,7 @@ export default function ArticleDetailPage() {
                     </div>
                     <p className={`text-sm ${mutedTextClass}`}>点赞数</p>
                   </GlassCard>
-
+                  
                   <GlassCard className={`p-4 text-center ${cardBgClass}`}>
                     <div className="flex items-center justify-center">
                       <MessageSquare className="h-6 w-6 mr-2 text-tech-cyan" />
@@ -391,7 +387,7 @@ export default function ArticleDetailPage() {
                     </div>
                     <p className={`text-sm ${mutedTextClass}`}>评论数</p>
                   </GlassCard>
-
+                  
                   <GlassCard className={`p-4 text-center ${cardBgClass}`}>
                     <div className="flex items-center justify-center">
                       <Share2 className="h-6 w-6 mr-2 text-tech-cyan" />
@@ -399,7 +395,7 @@ export default function ArticleDetailPage() {
                     </div>
                     <p className={`text-sm ${mutedTextClass}`}>分享数</p>
                   </GlassCard>
-
+                  
                   <GlassCard className={`p-4 text-center ${cardBgClass}`}>
                     <div className="flex items-center justify-center">
                       <Eye className="h-6 w-6 mr-2 text-tech-cyan" />
@@ -418,11 +414,11 @@ export default function ArticleDetailPage() {
                     <div className="flex-1">
                       <div className="flex flex-wrap items-center justify-between">
                         <h3 className={`text-lg font-semibold ${textClass}`}>{article.author.username}</h3>
-                        <Button
-                          variant={isFollowingAuthor ? "default" : "outline"}
+                        <Button 
+                          variant={isFollowingAuthor ? "default" : "outline"} 
                           size="sm"
                           onClick={handleFollowAuthor}
-                          className={isFollowingAuthor
+                          className={isFollowingAuthor 
                             ? getThemeClass('bg-tech-cyan hover:bg-tech-lightcyan text-black', 'bg-blue-600 hover:bg-blue-700 text-white')
                             : getThemeClass(
                                 'border-glass-border hover:bg-glass/40 text-foreground',
@@ -435,7 +431,7 @@ export default function ArticleDetailPage() {
                       <p className={mutedTextClass}>
                         {article.author.bio || '暂无个人简介'}
                       </p>
-
+                      
                       <div className="flex flex-wrap gap-4 mt-4">
                         <div className="flex items-center">
                           <Award className="h-4 w-4 mr-2 text-tech-cyan" />
@@ -466,7 +462,7 @@ export default function ArticleDetailPage() {
                       写评论
                     </Button>
                   </div>
-
+                  
                   <div className="space-y-6">
                     <div className="flex">
                       <div className="mr-4 flex-shrink-0">
@@ -571,7 +567,7 @@ export default function ArticleDetailPage() {
                   </div>
                   <Progress value={45} className="w-full" />
                 </div>
-
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div className={`p-3 rounded-lg ${getThemeClass('bg-glass/20', 'bg-gray-100')}`}>
                     <div className="flex items-center">
@@ -580,7 +576,7 @@ export default function ArticleDetailPage() {
                     </div>
                     <p className={`text-xs mt-1 ${mutedTextClass}`}>阅读量</p>
                   </div>
-
+                  
                   <div className={`p-3 rounded-lg ${getThemeClass('bg-glass/20', 'bg-gray-100')}`}>
                     <div className="flex items-center">
                       <ThumbsUp className="h-4 w-4 mr-2 text-tech-cyan" />
@@ -588,7 +584,7 @@ export default function ArticleDetailPage() {
                     </div>
                     <p className={`text-xs mt-1 ${mutedTextClass}`}>点赞数</p>
                   </div>
-
+                  
                   <div className={`p-3 rounded-lg ${getThemeClass('bg-glass/20', 'bg-gray-100')}`}>
                     <div className="flex items-center">
                       <MessageSquare className="h-4 w-4 mr-2 text-tech-cyan" />
@@ -596,7 +592,7 @@ export default function ArticleDetailPage() {
                     </div>
                     <p className={`text-xs mt-1 ${mutedTextClass}`}>评论数</p>
                   </div>
-
+                  
                   <div className={`p-3 rounded-lg ${getThemeClass('bg-glass/20', 'bg-gray-100')}`}>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2 text-tech-cyan" />

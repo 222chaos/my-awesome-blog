@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, Clock, MessageCircle, Heart, Eye, ExternalLink } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
+import { useLoading } from '@/context/loading-context';
 
 interface ActivityItem {
   id: string;
@@ -16,10 +17,12 @@ interface ActivityItem {
 
 export default function ActivityView() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     // 模拟加载活动数据
+    showLoading();
     setTimeout(() => {
       setActivities([
         {
@@ -62,7 +65,8 @@ export default function ActivityView() {
           postId: 'post-4'
         }
       ]);
-      setLoading(false);
+      hideLoading();
+      setIsLoading(false);
     }, 800);
   }, []);
 
@@ -95,9 +99,9 @@ export default function ActivityView() {
           活动历史
         </h2>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tech-cyan"></div>
+            <p className="text-muted-foreground">加载中...</p>
           </div>
         ) : (
           <div className="space-y-4">

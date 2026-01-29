@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link as LinkIcon, MapPin, Calendar } from 'lucide-react';
 import { UserProfile, UserStats, fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
-import { validateSocialLink } from '@/services/userService';
+import { validateSocialLink, getCurrentUser } from '@/services/userService';
+import { useLoading } from '@/context/loading-context';
 import TabNavigation from './components/TabNavigation';
 import ProfileView from './components/ProfileView';
 import SettingsView from './components/SettingsView';
@@ -14,12 +15,13 @@ import ActivityView from './components/ActivityView';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { showLoading, hideLoading } = useLoading();
   const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'activity'>('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
-  const [loading, setLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<{success: boolean; message: string} | null>(null);
 
   useEffect(() => {
@@ -28,17 +30,30 @@ export default function ProfilePage() {
 
   const loadProfileData = async () => {
     try {
-      setLoading(true);
+      showLoading();
+      setIsPageLoading(true);
+
+      // 检查登录状态
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        // 未登录，自动重定向到登录页
+        router.push('/login');
+        return;
+      }
+
+      // 已登录，加载资料和统计数据
       const profileData = await fetchCurrentUserProfile();
       const statsData = await fetchCurrentUserStats();
       setProfile(profileData);
       setStats(statsData);
       setFormData(profileData);
     } catch (error) {
-      // API 调用失败时，profile 保持为 null，显示"访问受限"页面
-      console.log('Profile data not available (user may not be logged in)');
+      console.error('Error loading profile data:', error);
+      // 如果是认证错误或其他错误，重定向到登录页
+      router.push('/login');
     } finally {
-      setLoading(false);
+      hideLoading();
+      setIsPageLoading(false);
     }
   };
 
@@ -82,12 +97,11 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
+  if (isPageLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-foreground">加载中...</p>
+          <p className="text-foreground">加载中...</p>
         </div>
       </div>
     );

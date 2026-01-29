@@ -15,12 +15,18 @@ export interface Article {
   author_id: string;
   category_id: string;
   featured_image?: string;
+  read_time: number; // 阅读时间（分钟）
+  likes_count: number; // 点赞数
+  comments_count: number; // 评论数
+  shares_count: number; // 分享数
   author: {
     id: string;
     username: string;
     email: string;
     avatar?: string;
     bio?: string;
+    reputation: number; // 声誉分数
+    followers_count: number; // 关注者数量
   };
   category: {
     id: string;
@@ -40,12 +46,14 @@ export interface Category {
   name: string;
   slug: string;
   description: string;
+  article_count: number; // 分类文章数量
 }
 
 export interface Tag {
   id: string;
   name: string;
   slug: string;
+  article_count: number; // 标签文章数量
 }
 
 export interface RelatedArticle {
@@ -89,11 +97,17 @@ export const getArticles = async (filters?: {
         published_at: '2023-01-15T10:30:00Z',
         author_id: '1',
         category_id: '1',
+        read_time: 8,
+        likes_count: 42,
+        comments_count: 15,
+        shares_count: 8,
         author: {
           id: '1',
           username: '开发者小王',
           email: 'xiaowang@example.com',
-          bio: '热爱前端技术，专注React生态'
+          bio: '热爱前端技术，专注React生态',
+          reputation: 1250,
+          followers_count: 320
         },
         category: {
           id: '1',
@@ -119,11 +133,17 @@ export const getArticles = async (filters?: {
         published_at: '2023-02-20T14:45:00Z',
         author_id: '2',
         category_id: '1',
+        read_time: 12,
+        likes_count: 36,
+        comments_count: 9,
+        shares_count: 5,
         author: {
           id: '2',
           username: 'TypeScript专家',
           email: 'ts-expert@example.com',
-          bio: 'TypeScript深度使用者，喜欢探索类型系统'
+          bio: 'TypeScript深度使用者，喜欢探索类型系统',
+          reputation: 2100,
+          followers_count: 540
         },
         category: {
           id: '1',
@@ -149,11 +169,17 @@ export const getArticles = async (filters?: {
         published_at: '2023-03-10T09:20:00Z',
         author_id: '3',
         category_id: '2',
+        read_time: 15,
+        likes_count: 28,
+        comments_count: 7,
+        shares_count: 3,
         author: {
           id: '3',
           username: '后端架构师',
           email: 'architect@example.com',
-          bio: '专注于后端架构和性能优化'
+          bio: '专注于后端架构和性能优化',
+          reputation: 3400,
+          followers_count: 890
         },
         category: {
           id: '2',
@@ -246,31 +272,36 @@ export const getCategories = async (): Promise<Category[]> => {
         id: '1',
         name: '前端开发',
         slug: 'frontend',
-        description: '关于前端开发的技术文章'
+        description: '关于前端开发的技术文章',
+        article_count: 42
       },
       {
         id: '2',
         name: '后端开发',
         slug: 'backend',
-        description: '关于后端开发的技术文章'
+        description: '关于后端开发的技术文章',
+        article_count: 28
       },
       {
         id: '3',
         name: '数据库',
         slug: 'database',
-        description: '关于数据库设计和优化的文章'
+        description: '关于数据库设计和优化的文章',
+        article_count: 15
       },
       {
         id: '4',
         name: 'DevOps',
         slug: 'devops',
-        description: '关于运维和部署的文章'
+        description: '关于运维和部署的文章',
+        article_count: 12
       },
       {
         id: '5',
         name: '人工智能',
         slug: 'ai',
-        description: '关于AI和机器学习的文章'
+        description: '关于AI和机器学习的文章',
+        article_count: 8
       }
     ];
   } catch (error) {
@@ -290,42 +321,50 @@ export const getTags = async (): Promise<Tag[]> => {
       {
         id: '1',
         name: 'React',
-        slug: 'react'
+        slug: 'react',
+        article_count: 15
       },
       {
         id: '2',
         name: 'JavaScript',
-        slug: 'javascript'
+        slug: 'javascript',
+        article_count: 28
       },
       {
         id: '3',
         name: 'Hooks',
-        slug: 'hooks'
+        slug: 'hooks',
+        article_count: 12
       },
       {
         id: '4',
         name: 'TypeScript',
-        slug: 'typescript'
+        slug: 'typescript',
+        article_count: 10
       },
       {
         id: '5',
         name: '编程技巧',
-        slug: 'programming-tips'
+        slug: 'programming-tips',
+        article_count: 8
       },
       {
         id: '6',
         name: 'Node.js',
-        slug: 'nodejs'
+        slug: 'nodejs',
+        article_count: 9
       },
       {
         id: '7',
         name: '性能优化',
-        slug: 'performance'
+        slug: 'performance',
+        article_count: 7
       },
       {
         id: '8',
         name: '服务器',
-        slug: 'server'
+        slug: 'server',
+        article_count: 5
       }
     ];
   } catch (error) {
