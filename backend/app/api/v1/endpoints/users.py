@@ -5,6 +5,7 @@ import os
 from app.core.database import get_db
 from app.core.dependencies import get_current_active_user
 from app import crud
+from app.crud.user import get_user_stats
 from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse
 from app.models.user import User as UserModel
 from app.services.image_service import ImageService
@@ -52,69 +53,6 @@ def create_user(
 
     user = crud.create_user(db, user=user_in)
     return user
-
-
-@router.get("/{user_id}", response_model=User)
-def read_user_by_id(
-    user_id: str,
-    db: Session = Depends(get_db)
-) -> Any:
-    """
-    Get a specific user by id
-    """
-    from uuid import UUID
-    user_uuid = UUID(user_id)
-    user = crud.get_user(db, user_id=user_uuid)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-    return user
-
-
-@router.put("/{user_id}", response_model=User)
-def update_user(
-    *,
-    db: Session = Depends(get_db),
-    user_id: str,
-    user_in: UserUpdate
-) -> Any:
-    """
-    Update a user
-    """
-    from uuid import UUID
-    user_uuid = UUID(user_id)
-    user = crud.get_user(db, user_id=user_uuid)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-
-    user = crud.update_user(db, user_id=user_uuid, user_update=user_in)
-    return user
-
-
-@router.delete("/{user_id}", response_model=dict)
-def delete_user(
-    *,
-    db: Session = Depends(get_db),
-    user_id: str
-) -> Any:
-    """
-    Delete a user
-    """
-    from uuid import UUID
-    user_uuid = UUID(user_id)
-    deleted = crud.delete_user(db, user_id=user_uuid)
-    if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-
-    return {"message": "User deleted successfully"}
 
 
 # /me endpoints for current user operations
@@ -222,10 +160,73 @@ def read_current_user_stats(
     """
     Get current user's statistics
     """
-    stats = crud.get_user_stats(db, user_id=current_user.id)
+    stats = get_user_stats(db, user_id=current_user.id)
     if not stats:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User statistics not found"
         )
     return stats
+
+
+@router.get("/{user_id}", response_model=User)
+def read_user_by_id(
+    user_id: str,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get a specific user by id
+    """
+    from uuid import UUID
+    user_uuid = UUID(user_id)
+    user = crud.get_user(db, user_id=user_uuid)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user
+
+
+@router.put("/{user_id}", response_model=User)
+def update_user(
+    *,
+    db: Session = Depends(get_db),
+    user_id: str,
+    user_in: UserUpdate
+) -> Any:
+    """
+    Update a user
+    """
+    from uuid import UUID
+    user_uuid = UUID(user_id)
+    user = crud.get_user(db, user_id=user_uuid)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    user = crud.update_user(db, user_id=user_uuid, user_update=user_in)
+    return user
+
+
+@router.delete("/{user_id}", response_model=dict)
+def delete_user(
+    *,
+    db: Session = Depends(get_db),
+    user_id: str
+) -> Any:
+    """
+    Delete a user
+    """
+    from uuid import UUID
+    user_uuid = UUID(user_id)
+    deleted = crud.delete_user(db, user_id=user_uuid)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    return {"message": "User deleted successfully"}

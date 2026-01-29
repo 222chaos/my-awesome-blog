@@ -1,7 +1,8 @@
 from app.crud.user import (
     get_user, get_user_by_username, get_user_by_email, get_users,
     create_user, update_user, delete_user, authenticate_user,
-    get_password_hash, verify_password, get_authors_with_article_count
+    get_password_hash, verify_password, get_authors_with_article_count,
+    get_user_stats
 )
 
 from app.crud.article import (

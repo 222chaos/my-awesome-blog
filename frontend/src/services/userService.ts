@@ -1,5 +1,5 @@
 import { UserProfile } from '@/types';
-import { loginApi, logoutApi } from '@/lib/api/auth';
+import { loginApi, logoutApi, getCurrentUserApi } from '@/lib/api/auth';
 
 // 模拟用户数据
 const mockUsers: Record<string, UserProfile> = {
@@ -116,23 +116,26 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
  */
 export const loginUser = async (credentials: { email: string; password: string }): Promise<{ success: boolean; user?: UserProfile; error?: string }> => {
   try {
-    // 调用真实的后端 API
-    const data = await loginApi(credentials.email, credentials.password);
+    // 步骤1：调用登录API获取token
+    await loginApi(credentials.email, credentials.password);
+
+    // 步骤2：获取用户信息
+    const userData = await getCurrentUserApi();
 
     // 登录成功，返回用户信息
     return {
       success: true,
       user: {
-        id: data.user_id || data.id,
-        username: data.username || data.email,
-        email: data.email,
-        fullName: data.full_name || data.username,
-        avatar: data.avatar_url,
-        bio: data.bio,
-        website: data.website,
-        twitter: data.twitter,
-        github: data.github,
-        linkedin: data.linkedin
+        id: userData.id,
+        username: userData.username,
+        email: userData.email,
+        fullName: userData.full_name || userData.username,
+        avatar: userData.avatar,
+        bio: userData.bio,
+        website: userData.website,
+        twitter: userData.twitter,
+        github: userData.github,
+        linkedin: userData.linkedin
       }
     };
   } catch (error) {

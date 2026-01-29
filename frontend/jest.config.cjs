@@ -1,9 +1,4 @@
-const nextJest = require('@next/env');
-
-const createJestConfig = nextJest({
-  dir: './',
-});
-
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   preset: 'ts-jest',
@@ -28,4 +23,4 @@ const customJestConfig = {
   },
 };
 
-module.exports = createJestConfig(customJestConfig);
+module.exports = customJestConfig;

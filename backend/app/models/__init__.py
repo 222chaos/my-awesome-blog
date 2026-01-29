@@ -1,4 +1,5 @@
 from app.core.database import Base
+from app.models.logs.audit_log import AuditLog
 from app.models.user import User
 from app.models.article import Article
 from app.models.comment import Comment
@@ -13,4 +14,3 @@ from app.models.timeline_event import TimelineEvent
 from app.models.subscription import Subscription
 from app.models.image import Image, ImageVariant
 from app.models.typewriter_content import TypewriterContent
-from app.models.logs.audit_log import AuditLog

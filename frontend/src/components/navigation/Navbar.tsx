@@ -65,7 +65,7 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: '首页', icon: Home },
     { href: '/home', label: '家', icon: Home },
-    { href: '/records', label: '记录', icon: BookOpen },
+    { href: '/articles', label: '文章', icon: BookOpen },
     { href: '/gallery', label: '相册', icon: Camera },
     { href: '/tools', label: '百宝箱', icon: Wrench },
     { href: '/messages', label: '留言', icon: Mail },

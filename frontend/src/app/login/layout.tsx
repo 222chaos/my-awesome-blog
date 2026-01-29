@@ -1,9 +1,6 @@
 import '../../styles/globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import ThemeWrapper from '@/components/theme-wrapper';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: '登录 - 我的优秀博客',
@@ -16,13 +13,9 @@ export default function LoginLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <body className={`${inter.className} bg-background`}>
-        <ThemeWrapper>
-          <main className="min-h-screen">{children}</main>
-        </ThemeWrapper>
-      </body>
-    </html>
+    <ThemeWrapper>
+      <main className="min-h-screen">{children}</main>
+    </ThemeWrapper>
   );
 }
 
