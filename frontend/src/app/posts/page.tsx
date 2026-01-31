@@ -1,4 +1,4 @@
-import PostCard from '@/components/blog/PostCard';
+import SimplePostCard from '@/components/blog/SimplePostCard';
 import GlassCard from '@/components/ui/GlassCard';
 import Breadcrumb from '@/components/Breadcrumb';
 
@@ -67,7 +67,7 @@ export default function PostsPage() {
               className="animate-fade-in-up"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <PostCard {...post} />
+              <SimplePostCard {...post} />
             </div>
           ))}
         </div>

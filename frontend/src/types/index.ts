@@ -93,3 +93,21 @@ export interface UserProfile {
   github?: string;
   linkedin?: string;
 }
+
+// 打字机内容类型
+export interface TypewriterContent {
+  id: string;
+  text: string;
+  priority: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+// 用户统计类型
+export interface UserStats {
+  article_count: number;
+  comment_count: number;
+  joined_date: string;
+  total_views: number;
+}

@@ -10,9 +10,9 @@ import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, ArrowLeft, Clock, ThumbsUp, MessageSquare, TrendingUp, Award, Users } from 'lucide-react';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
-import { getArticleById, getRelatedArticles } from '@/services/articleService';
+import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService';
 import PostCard from '@/components/ui/PostCard';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/Progress';
 
 interface Article {
   id: string;
@@ -53,19 +53,6 @@ interface Article {
   }>;
 }
 
-interface RelatedArticle {
-  id: string;
-  title: string;
-  excerpt: string;
-  published_at: string;
-  category: {
-    name: string;
-  };
-  view_count: number;
-  read_time: number;
-  likes_count: number;
-}
-
 // 将 RelatedArticle 转换为 Article 类型的辅助函数
 const convertToArticle = (related: RelatedArticle): Article => {
   return {
@@ -81,8 +68,8 @@ const convertToArticle = (related: RelatedArticle): Article => {
     author_id: '1',
     category_id: '1',
     featured_image: undefined,
-    read_time: related.read_time,
-    likes_count: related.likes_count,
+    read_time: 0,
+    likes_count: 0,
     comments_count: 0,
     shares_count: 0,
     author: {
@@ -617,7 +604,7 @@ export default function EnhancedArticleDetailPage() {
                           <h4 className={`font-medium line-clamp-2 ${textClass}`}>{relatedArticle.title}</h4>
                           <div className="flex items-center text-xs mt-2 text-muted-foreground">
                             <Clock className="h-3 w-3 mr-1" />
-                            <span>{relatedArticle.read_time} 分钟阅读</span>
+                            <span>{relatedArticle.view_count} 次浏览</span>
                           </div>
                         </div>
                       </Link>

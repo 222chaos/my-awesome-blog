@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { User, Mail, Globe, Twitter, Github, Linkedin, FileText, Save, X, Check } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Label } from '@/components/ui/Label';
 import { validateSocialLink } from '@/services/userService';
 
 interface EditModeFormProps {
@@ -175,7 +175,7 @@ export default function EditModeForm({ initialData, onSave, onCancel }: EditMode
                         value={formData[field.name as keyof typeof formData] || ''}
                         onChange={handleChange}
                         onBlur={() => handleBlur(field.name)}
-                        placeholder={field.placeholder}
+                        placeholder={(field as any).placeholder || ''}
                         className={`bg-muted/50 border-tech-cyan/20 focus:border-tech-cyan/50 focus:ring-2 focus:ring-tech-cyan/20 transition-all duration-300 ${
                           hasError ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
                         }`}

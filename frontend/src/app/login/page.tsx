@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { showLoading, hideLoading } = useLoading();
+  const { isLoading, showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     setMounted(true);
@@ -87,7 +87,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
+                disabled={isLoading}
                 className="bg-transparent"
               />
               <label htmlFor="username" className="absolute pointer-events-none text-white/80">
@@ -110,7 +110,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
+                disabled={isLoading}
                 className="bg-transparent"
               />
               <label htmlFor="password" className="absolute pointer-events-none text-white/80">
@@ -127,7 +127,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-tech-cyan hover:text-white transition-colors disabled:opacity-50"
-                disabled={loading}
+                disabled={isLoading}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -156,9 +156,9 @@ export default function LoginPage() {
               还没有账号？
               <button
                 type="button"
-                onClick={() => router.push('/contact')}
+                onClick={() => router.push('/contact' as any)}
                 className="ml-2 text-tech-cyan hover:text-white transition-colors font-medium cursor-pointer hover:underline disabled:opacity-50"
-                disabled={loading}
+                disabled={isLoading}
               >
                 联系我们
               </button>

@@ -10,10 +10,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, ArrowLeft, Clock, ThumbsUp, MessageSquare, TrendingUp, Award, Users } from 'lucide-react';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
-import { getArticleById, getRelatedArticles } from '@/services/articleService';
+import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService'; // 导入 RelatedArticle 类型
 import { useLoading } from '@/context/loading-context';
 import PostCard from '@/components/ui/PostCard';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/Progress';
 
 interface Article {
   id: string;
@@ -54,19 +54,6 @@ interface Article {
   }>;
 }
 
-interface RelatedArticle {
-  id: string;
-  title: string;
-  excerpt: string;
-  published_at: string;
-  category: {
-    name: string;
-  };
-  view_count: number;
-  read_time: number;
-  likes_count: number;
-}
-
 // 将 RelatedArticle 转换为 Article 类型的辅助函数
 const convertToArticle = (related: RelatedArticle): Article => {
   return {
@@ -82,8 +69,8 @@ const convertToArticle = (related: RelatedArticle): Article => {
     author_id: '1',
     category_id: '1',
     featured_image: undefined,
-    read_time: related.read_time,
-    likes_count: related.likes_count,
+    read_time: 0, // 使用默认值
+    likes_count: 0, // 使用默认值
     comments_count: 0,
     shares_count: 0,
     author: {
@@ -108,7 +95,7 @@ const convertToArticle = (related: RelatedArticle): Article => {
 export default function ArticleDetailPage() {
   const params = useParams<{ id: string }>();
   const [article, setArticle] = useState<Article | null>(null);
-  const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]);
+  const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]); // 使用从服务导入的类型
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -365,8 +352,7 @@ export default function ArticleDetailPage() {
                         className={getThemeClass(
                           'border-glass-border text-foreground/80',
                           'border-gray-300 text-gray-700'
-                        )}
-                      >
+                        )}>
                         <Tag className="h-3 w-3 mr-1" />
                         {tag.name}
                       </Badge>
@@ -402,7 +388,7 @@ export default function ArticleDetailPage() {
 
                   <GlassCard className={`p-4 text-center ${cardBgClass}`}>
                     <div className="flex items-center justify-center">
-                      <Eye className="h-6 w-6 mr-2 text-tech-cyan" />
+                      <Eye className="h-4 w-4 mr-2 text-tech-cyan" />
                       <span className="text-2xl font-bold">{article.view_count}</span>
                     </div>
                     <p className={`text-sm ${mutedTextClass}`}>阅读量</p>
@@ -621,7 +607,7 @@ export default function ArticleDetailPage() {
                           <h4 className={`font-medium line-clamp-2 ${textClass}`}>{relatedArticle.title}</h4>
                           <div className="flex items-center text-xs mt-2 text-muted-foreground">
                             <Clock className="h-3 w-3 mr-1" />
-                            <span>{relatedArticle.read_time} 分钟阅读</span>
+                            <span>{articleForCard.read_time} 分钟阅读</span>
                           </div>
                         </div>
                       </Link>

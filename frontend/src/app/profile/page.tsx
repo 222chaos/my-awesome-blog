@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link as LinkIcon, MapPin, Calendar } from 'lucide-react';
-import { UserProfile, UserStats, fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
+import { UserProfile, UserStats } from '@/types';
+import { fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
 import { validateSocialLink, getCurrentUser } from '@/services/userService';
 import { useLoading } from '@/context/loading-context';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
@@ -208,7 +209,7 @@ export default function ProfilePage() {
             <div className={`${cardBgClass} rounded-xl p-4 text-center transition-transform duration-300 hover:scale-105`}>
               <div className="flex flex-col items-center justify-center">
                 <UserRound className="w-8 h-8 text-tech-cyan mb-2" />
-                <p className="text-2xl font-bold text-tech-cyan">{stats.article_count || stats.posts || 0}</p>
+                <p className="text-2xl font-bold text-tech-cyan">{stats.article_count || 0}</p>
                 <p className="text-sm text-muted-foreground">文章数</p>
               </div>
             </div>

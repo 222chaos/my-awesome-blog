@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
 import type { Post } from '@/types';
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import PostCard, { PostCardSkeleton } from '@/components/blog/PostCard';
+import SimplePostCard, { SimplePostCardSkeleton } from '@/components/blog/SimplePostCard';
 import { useTheme } from '@/context/theme-context';
 import { useLoading } from '@/context/loading-context';
 
@@ -19,7 +19,7 @@ interface PostCardItemWithThemeProps extends PostCardItemProps {
 }
 
 const PostCardItemWithTheme = React.memo(({ post, index, glassCardClass }: PostCardItemWithThemeProps) => (
-  <PostCard
+  <SimplePostCard
     key={post.id}
     id={post.id}
     title={post.title}
@@ -112,7 +112,7 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
           {shouldShowSkeleton ? (
             // 显示骨架屏
             Array.from({ length: 6 }).map((_, index) => (
-              <PostCardSkeleton key={`skeleton-${index}`} />
+              <SimplePostCardSkeleton key={`skeleton-${index}`} />
             ))
           ) : (
             posts.map((post, index) => (

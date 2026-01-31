@@ -2,7 +2,7 @@
 
 import { FileText, MessageCircle, Eye, Calendar, TrendingUp } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import { UserStats } from '@/lib/api/profile';
+import { UserStats } from '@/types';
 
 interface StatsGridProps {
   stats: UserStats;

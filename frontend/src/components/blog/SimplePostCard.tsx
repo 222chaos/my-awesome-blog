@@ -7,7 +7,7 @@ import { CalendarIcon, ArrowRightIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/theme-context';
 
-interface PostCardProps {
+interface SimplePostCardProps {
   id: string;
   title: string;
   excerpt: string;
@@ -21,9 +21,10 @@ interface PostCardProps {
   coverImage?: string;
   likes?: number;
   comments?: number;
+  style?: React.CSSProperties;
 }
 
-export default function PostCard({
+export default function SimplePostCard({
   id,
   title,
   excerpt,
@@ -36,8 +37,9 @@ export default function PostCard({
   showMeta = true,
   coverImage,
   likes = 0,
-  comments = 0
-}: PostCardProps) {
+  comments = 0,
+  style
+}: SimplePostCardProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -142,8 +144,8 @@ export default function PostCard({
   );
 }
 
-// PostCard Skeleton Component for Loading State
-export function PostCardSkeleton() {
+// SimplePostCard Skeleton Component for Loading State
+export function SimplePostCardSkeleton() {
   return (
     <article
       className="glass-card-secondary overflow-hidden h-full flex flex-col animate-pulse"

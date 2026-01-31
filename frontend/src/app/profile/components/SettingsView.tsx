@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Shield, Lock, Palette, Bell, Globe, Mail, KeyRound } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch'; // Fixed import case
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 
 export default function SettingsView() {
   const [settings, setSettings] = useState({
@@ -60,9 +59,11 @@ export default function SettingsView() {
                   <Mail className="w-4 h-4 text-muted-foreground" />
                   <Label className="text-foreground">允许邮件联系</Label>
                 </div>
-                <Switch
+                <input
+                  type="checkbox"
                   checked={settings.newsletter}
-                  onCheckedChange={(checked: boolean) => handleSettingChange('newsletter', checked)} // Added type annotation
+                  onChange={(e) => handleSettingChange('newsletter', e.target.checked)}
+                  className="w-4 h-4 rounded border-glass-border text-tech-cyan focus:ring-tech-cyan"
                 />
               </div>
             </div>
@@ -80,9 +81,11 @@ export default function SettingsView() {
                   <Mail className="w-4 h-4 text-muted-foreground" />
                   <Label className="text-foreground">接收邮件通知</Label>
                 </div>
-                <Switch
+                <input
+                  type="checkbox"
                   checked={settings.notifications}
-                  onCheckedChange={(checked: boolean) => handleSettingChange('notifications', checked)} // Added type annotation
+                  onChange={(e) => handleSettingChange('notifications', e.target.checked)}
+                  className="w-4 h-4 rounded border-glass-border text-tech-cyan focus:ring-tech-cyan"
                 />
               </div>
             </div>
@@ -100,9 +103,11 @@ export default function SettingsView() {
                   <Shield className="w-4 h-4 text-muted-foreground" />
                   <Label className="text-foreground">两步验证</Label>
                 </div>
-                <Switch
+                <input
+                  type="checkbox"
                   checked={settings.twoFactorAuth}
-                  onCheckedChange={(checked: boolean) => handleSettingChange('twoFactorAuth', checked)} // Added type annotation
+                  onChange={(e) => handleSettingChange('twoFactorAuth', e.target.checked)}
+                  className="w-4 h-4 rounded border-glass-border text-tech-cyan focus:ring-tech-cyan"
                 />
               </div>
               

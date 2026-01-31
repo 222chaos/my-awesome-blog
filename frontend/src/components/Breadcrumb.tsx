@@ -25,7 +25,7 @@ export default function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
             )}
             {item.href && !item.active ? (
               <Link
-                href={item.href}
+                href={item.href as any}
                 className="text-sm font-medium text-tech-cyan hover:text-tech-lightcyan transition-colors truncate max-w-[200px]"
                 aria-current={index === items.length - 1 ? 'page' : undefined}
               >

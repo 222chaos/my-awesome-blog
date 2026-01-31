@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Camera, Mail, Globe, Twitter, Github, Linkedin, MapPin, Calendar, ExternalLink, Edit3, Save, X, UserRound } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Label } from '@/components/ui/Label';
 import { useThemeUtils } from '@/hooks/useThemeUtils';
-import { UserProfile } from '@/lib/api/profile';
+import { UserProfile } from '@/types';
 
 // 类型定义
 interface ProfileViewProps {
