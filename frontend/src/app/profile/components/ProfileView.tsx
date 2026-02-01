@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Label } from '@/components/ui/Label';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { UserProfile } from '@/types';
 
 // 类型定义
@@ -32,7 +32,7 @@ export default function ProfileView({
   onCancel,
   onAvatarChange
 }: ProfileViewProps) {
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,25 +43,14 @@ export default function ProfileView({
   };
 
   // 主题相关样式
-  const cardBgClass = getThemeClass(
-    'bg-glass/30 backdrop-blur-xl border border-glass-border',
-    'bg-white/80 backdrop-blur-xl border border-gray-200'
-  );
-
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
+  const cardBgClass = themedClasses.cardBgClass;
+  const textClass = themedClasses.textClass;
   const accentClass = getThemeClass(
     'text-tech-cyan',
     'text-blue-600'
   );
 
-  const mutedClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const mutedClass = themedClasses.mutedTextClass;
 
   return (
     <GlassCard className={`overflow-hidden border-border shadow-lg transition-all duration-300 hover:shadow-xl ${cardBgClass}`}>

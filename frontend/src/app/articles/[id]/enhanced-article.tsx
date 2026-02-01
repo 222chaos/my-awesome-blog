@@ -9,7 +9,7 @@ import GlassCard from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, ArrowLeft, Clock, ThumbsUp, MessageSquare, TrendingUp, Award, Users } from 'lucide-react';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService';
 import PostCard from '@/components/ui/PostCard';
 import { Progress } from '@/components/ui/Progress';
@@ -103,7 +103,7 @@ export default function EnhancedArticleDetailPage() {
   const [toc, setToc] = useState<{ id: string; text: string; level: number }[]>([]);
   const [activeHeading, setActiveHeading] = useState('');
   const tocRef = useRef<HTMLDivElement>(null);
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
 
   useEffect(() => {
     const fetchArticleData = async () => {
@@ -194,25 +194,14 @@ export default function EnhancedArticleDetailPage() {
   };
 
   // 主题相关样式
-  const cardBgClass = getThemeClass(
-    'bg-glass/30 backdrop-blur-xl border border-glass-border',
-    'bg-white/80 backdrop-blur-xl border border-gray-200'
-  );
-
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
+  const cardBgClass = themedClasses.cardBgClass;
+  const textClass = themedClasses.textClass;
   const accentClass = getThemeClass(
     'text-tech-cyan',
     'text-blue-600'
   );
 
-  const mutedTextClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const mutedTextClass = themedClasses.mutedTextClass;
 
   if (error) {
     return (

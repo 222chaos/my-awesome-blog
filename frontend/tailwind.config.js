@@ -170,6 +170,14 @@ export default {
           from: { opacity: 0, transform: 'translateX(30px)', 'will-change': 'opacity, transform' },
           to: { opacity: 1, transform: 'translateX(0)', 'will-change': 'opacity, transform' },
         },
+        'slide-from-top': {
+          '0%': { transform: 'translateY(-100%)', 'will-change': 'transform' },
+          '100%': { transform: 'translateY(0)', 'will-change': 'transform' },
+        },
+        'vertical-scroll': {
+          '0%': { transform: 'translateY(-25%)', 'will-change': 'transform' },
+          '100%': { transform: 'translateY(25%)', 'will-change': 'transform' },
+        },
       },
       // 统一定义animation（只保留一次）
       animation: {
@@ -187,6 +195,8 @@ export default {
         'float-improved': 'float-improved 8s ease-in-out infinite',
         'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
         'slide-in-right': 'slide-in-right 0.6s ease-out forwards',
+        'slide-from-top': 'slide-from-top 1.5s ease-out forwards',
+        'vertical-scroll': 'vertical-scroll 20s linear infinite',
         'spin-slow': 'spin 8s linear infinite',
       },
       transitionProperty: {

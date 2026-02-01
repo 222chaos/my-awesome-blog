@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Calendar, Tag, User, Eye, MessageCircle, Heart, Bookmark, Clock, ThumbsUp, Image as ImageIcon } from 'lucide-react';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 
 interface Article {
   id: string;
@@ -54,7 +54,7 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [imgSrc, setImgSrc] = useState(article.featured_image || '/assets/avatar.jpg');
 
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
 
   // 格式化日期
   const formatDate = (dateString: string) => {
@@ -72,16 +72,8 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
   };
 
   // 主题相关样式
-  const cardBgClass = getThemeClass(
-    'bg-glass/30 backdrop-blur-xl border border-glass-border',
-    'bg-white/80 backdrop-blur-xl border border-gray-200'
-  );
-
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
+  const cardBgClass = themedClasses.cardBgClass;
+  const textClass = themedClasses.textClass;
   const accentClass = getThemeClass(
     'text-tech-cyan',
     'text-blue-600'
@@ -131,7 +123,7 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
             </h2>
 
             {/* 摘要 */}
-            <p className={`mb-3 line-clamp-2 text-sm flex-1 ${getThemeClass('text-foreground/70', 'text-gray-600')}`}>
+            <p className={`mb-3 line-clamp-2 text-sm flex-1 ${themedClasses.mutedTextClass}`}>
               {article.excerpt}
             </p>
 
@@ -178,8 +170,8 @@ export default function PostCard({ article, className = '' }: PostCardProps) {
           </div>
         </div>
 
-        {/* 底部操作栏 */}
-        <div className={`px-5 py-3 flex justify-between items-center border-t ${getThemeClass('border-glass-border', 'border-gray-200')}`}>
+            {/* 底部操作栏 */}
+          <div className={`px-5 py-3 flex justify-between items-center border-t ${themedClasses.borderClass}`}>
           <div className="flex space-x-2">
             <Button
               variant="ghost"

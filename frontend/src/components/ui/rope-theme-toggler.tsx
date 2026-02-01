@@ -5,6 +5,16 @@ import { Moon, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/theme-context';
 
+// 绳子主题常量
+const ROPE_THEME_CONSTANTS = {
+  DEFAULT_ROPE_COLOR: 'from-[#D4A574] to-[#8B4513]',
+  FIXED_POINT_GRADIENT: 'linear-gradient(to bottom, #C4956A, #8B4513)',
+  KNOT_GRADIENT: 'linear-gradient(to bottom, #C4956A, #8B4513)',
+  DEFAULT_ROPE_LENGTH: 120,
+  DEFAULT_ROPE_WIDTH: 4,
+  DEFAULT_ANIMATION_DURATION: 400,
+} as const;
+
 interface RopeThemeTogglerProps extends React.ComponentPropsWithoutRef<'div'> {
   ropeLength?: number;
   ropeColor?: string;
@@ -17,10 +27,10 @@ const hasViewTransitionSupport = typeof document !== 'undefined' &&
   'startViewTransition' in document;
 
 export const RopeThemeToggler = ({
-  ropeLength = 120,
-  ropeColor = 'from-[#D4A574] to-[#8B4513]', // 渐变棕色
-  ropeWidth = 4,
-  animationDuration = 400,
+  ropeLength = ROPE_THEME_CONSTANTS.DEFAULT_ROPE_LENGTH,
+  ropeColor = ROPE_THEME_CONSTANTS.DEFAULT_ROPE_COLOR,
+  ropeWidth = ROPE_THEME_CONSTANTS.DEFAULT_ROPE_WIDTH,
+  animationDuration = ROPE_THEME_CONSTANTS.DEFAULT_ANIMATION_DURATION,
   className,
   ...props
 }: RopeThemeTogglerProps) => {
@@ -139,7 +149,7 @@ export const RopeThemeToggler = ({
         <div
           className="w-2 h-2 rounded-full mb-1 z-10"
           style={{
-            background: 'linear-gradient(to bottom, #C4956A, #8B4513)'
+            background: ROPE_THEME_CONSTANTS.FIXED_POINT_GRADIENT
           }}
         ></div>
 
@@ -170,7 +180,7 @@ export const RopeThemeToggler = ({
         <div
           className="w-3 h-1.5 rounded-full -mt-0.5 z-10"
           style={{
-            background: 'linear-gradient(to bottom, #C4956A, #8B4513)'
+            background: ROPE_THEME_CONSTANTS.KNOT_GRADIENT
           }}
         ></div>
         

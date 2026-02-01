@@ -2,7 +2,7 @@
 
 import { FileText, Eye, Heart, MessageCircle, TrendingUp } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { memo } from 'react';
 
 interface MiniStatsProps {
@@ -18,12 +18,9 @@ function MiniStats({
   totalLikes,
   totalComments,
 }: MiniStatsProps) {
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses } = useThemedClasses();
 
-  const mutedTextClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const mutedTextClass = themedClasses.mutedTextClass;
 
   const stats = [
     {

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Tag } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { memo } from 'react';
 
 interface Tag {
@@ -41,7 +41,7 @@ function SidebarTagCloud({
   selectedTag,
   onTagSelect,
 }: SidebarTagCloudProps) {
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
 
   if (!tags || tags.length === 0) {
     return null;
@@ -93,7 +93,7 @@ function SidebarTagCloud({
 
       {tags.length > 12 && (
         <div className="mt-3 text-center">
-          <span className={`text-xs ${getThemeClass('text-foreground/50', 'text-gray-500')}`}>
+          <span className={`text-xs ${themedClasses.mutedTextClass}/60`}>
             还有 {tags.length - 12} 个标签...
           </span>
         </div>

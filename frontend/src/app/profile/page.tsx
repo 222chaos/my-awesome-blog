@@ -9,7 +9,7 @@ import { UserProfile, UserStats } from '@/types';
 import { fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
 import { validateSocialLink, getCurrentUser } from '@/services/userService';
 import { useLoading } from '@/context/loading-context';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import TabNavigation from './components/TabNavigation';
 import ProfileView from './components/ProfileView';
 import SettingsView from './components/SettingsView';
@@ -18,7 +18,7 @@ import ActivityView from './components/ActivityView';
 export default function ProfilePage() {
   const router = useRouter();
   const { showLoading, hideLoading } = useLoading();
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
   const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'activity'>('profile');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -147,16 +147,8 @@ export default function ProfilePage() {
     'bg-gradient-to-br from-gray-100 to-gray-50'
   );
 
-  const cardBgClass = getThemeClass(
-    'bg-glass/30 backdrop-blur-xl border border-glass-border',
-    'bg-white/80 backdrop-blur-xl border border-gray-200'
-  );
-
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
+  const cardBgClass = themedClasses.cardBgClass;
+  const textClass = themedClasses.textClass;
   const accentClass = getThemeClass(
     'text-tech-cyan',
     'text-blue-600'

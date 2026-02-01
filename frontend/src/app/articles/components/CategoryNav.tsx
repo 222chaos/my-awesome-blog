@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Folder, FolderOpen } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { memo } from 'react';
 
 interface Category {
@@ -23,17 +23,10 @@ interface CategoryNavProps {
 
 function CategoryNav({ categories, selectedCategory, onCategorySelect }: CategoryNavProps) {
   const searchParams = useSearchParams();
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
 
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
-  const mutedTextClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const textClass = themedClasses.textClass;
+  const mutedTextClass = themedClasses.mutedTextClass;
 
   if (!categories || categories.length === 0) {
     return null;

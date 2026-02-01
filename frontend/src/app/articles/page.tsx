@@ -8,11 +8,12 @@ import GlassCard from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Search, Filter, TrendingUp, Menu, X } from 'lucide-react';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { getArticles, getCategories, getTags } from '@/services/articleService';
 import { useLoading } from '@/context/loading-context';
 import PostCard from '@/components/ui/PostCard';
 import ArticleSidebar from './components/ArticleSidebar';
+import MediaPlayer from '@/components/ui/MediaPlayer';
 
 interface Article {
   id: string;
@@ -79,7 +80,7 @@ export default function ArticlesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const articlesPerPage = 6;
   const searchParams = useSearchParams();
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
   const { showLoading, hideLoading } = useLoading();
 
   // 获取搜索参数
@@ -171,31 +172,33 @@ export default function ArticlesPage() {
 
   const totalPages = Math.ceil(articles.length / articlesPerPage);
 
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
+  const textClass = themedClasses.textClass;
   const accentClass = getThemeClass(
     'text-tech-cyan',
     'text-blue-600'
   );
 
-  const mutedTextClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const mutedTextClass = themedClasses.mutedTextClass;
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-7xl mx-auto">
-        {/* 页面标题 */}
-        <div className="text-center mb-8">
-          <h1 className={`text-3xl md:text-4xl font-bold mb-3 ${accentClass}`}>文章中心</h1>
-          <p className={`text-base md:text-lg ${mutedTextClass}`}>
-            探索技术前沿，分享开发心得，发现创新灵感
-          </p>
-        </div>
+    <div className="min-h-screen bg-background relative">
+      {/* 媒体播放组件 - 使用绝对定位紧贴浏览器顶部 */}
+      <div className="h-[25vh] overflow-hidden absolute top-0 left-0 right-0 z-10 -mt-16 sm:-mt-14 lg:-mt-16">
+        <MediaPlayer
+          mediaItems={[
+            {
+              type: 'video',
+              src: '/video/falling-star-sky-lake-silhouette-live-wallpaper.mp4',
+              alt: '星空湖景动态壁纸',
+              caption: '星空湖景动态壁纸'
+            }
+          ]}
+          autoPlay={true}
+          aspectRatio="aspect-[4/1]"
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto pt-40"> {/* 增加顶部填充以避免内容被媒体组件遮挡 */}
 
         {/* 搜索和排序栏 */}
         <GlassCard className="mb-6 p-4">

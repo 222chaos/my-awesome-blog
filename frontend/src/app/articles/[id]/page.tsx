@@ -9,11 +9,12 @@ import GlassCard from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, ArrowLeft, Clock, ThumbsUp, MessageSquare, TrendingUp, Award, Users } from 'lucide-react';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService'; // 导入 RelatedArticle 类型
 import { useLoading } from '@/context/loading-context';
 import PostCard from '@/components/ui/PostCard';
 import { Progress } from '@/components/ui/Progress';
+import MediaPlayer from '@/components/ui/MediaPlayer';
 
 interface Article {
   id: string;
@@ -104,7 +105,7 @@ export default function ArticleDetailPage() {
   const [toc, setToc] = useState<{ id: string; text: string; level: number }[]>([]);
   const [activeHeading, setActiveHeading] = useState('');
   const tocRef = useRef<HTMLDivElement>(null);
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
   const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
@@ -198,25 +199,14 @@ export default function ArticleDetailPage() {
   };
 
   // 主题相关样式
-  const cardBgClass = getThemeClass(
-    'bg-glass/30 backdrop-blur-xl border border-glass-border',
-    'bg-white/80 backdrop-blur-xl border border-gray-200'
-  );
-
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
+  const cardBgClass = themedClasses.cardBgClass;
+  const textClass = themedClasses.textClass;
   const accentClass = getThemeClass(
     'text-tech-cyan',
     'text-blue-600'
   );
 
-  const mutedTextClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const mutedTextClass = themedClasses.mutedTextClass;
 
   if (error) {
     return (
@@ -233,15 +223,35 @@ export default function ArticleDetailPage() {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-background">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background relative">
+      {/* 媒体播放组件 - 使用绝对定位紧贴浏览器顶部 */}
+      <div className="h-[25vh] overflow-hidden absolute top-0 left-0 right-0 z-10 -mt-16 sm:-mt-14 lg:-mt-16">
+        {article && (
+          <MediaPlayer
+            mediaItems={[
+              {
+                type: 'video',
+                src: '/video/falling-star-sky-lake-silhouette-live-wallpaper.mp4',
+                alt: '星空湖景动态壁纸',
+                caption: '星空湖景动态壁纸'
+              }
+            ]}
+            autoPlay={true}
+            aspectRatio="aspect-[4/1]"
+          />
+        )}
+      </div>
+
+      <div className="max-w-7xl mx-auto pt-40"> {/* 增加顶部填充以避免内容被媒体组件遮挡 */}
         {/* 返回按钮 */}
-        <Link href="/articles" prefetch={false}>
-          <Button variant="ghost" className={`mb-6 ${getThemeClass('text-foreground hover:text-tech-cyan', 'text-gray-800 hover:text-blue-600')}`}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            返回文章列表
-          </Button>
-        </Link>
+        <div className="inline-block mt-6 ml-4">
+          <Link href="/articles" prefetch={false}>
+            <Button variant="ghost" className={getThemeClass('text-foreground hover:text-tech-cyan', 'text-gray-800 hover:text-blue-600')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              返回文章列表
+            </Button>
+          </Link>
+        </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* 主内容区 */}

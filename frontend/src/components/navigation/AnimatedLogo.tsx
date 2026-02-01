@@ -15,11 +15,17 @@ export default function AnimatedLogo() {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo 图标 */}
-      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-tech-cyan to-tech-lightcyan">
+      <div className={cn(
+        "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-tech-cyan to-tech-lightcyan transition-all duration-300",
+        isHovered && "scale-110 rotate-3 shadow-lg shadow-tech-cyan/30"
+      )}>
         <svg
           viewBox="0 0 29.667 31.69"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-6 h-6 text-white"
+          className={cn(
+            "w-6 h-6 text-white transition-all duration-300",
+            isHovered && "scale-110"
+          )}
         >
           <path
             transform="translate(0 0)"
@@ -42,8 +48,8 @@ export default function AnimatedLogo() {
       {/* Logo 文字 */}
       <div className="flex flex-col">
         <span className={cn(
-          "font-bold text-foreground whitespace-nowrap transition-all duration-1500 ease-in-out",
-          isHovered ? "text-2xl" : "text-lg"
+          "font-bold text-foreground whitespace-nowrap transition-all duration-300 ease-out",
+          isHovered ? "text-xl scale-105" : "text-lg"
         )}>
           {isHovered ? 'Awesome Blog' : 'Blog'}
         </span>

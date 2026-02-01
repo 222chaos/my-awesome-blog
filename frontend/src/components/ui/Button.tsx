@@ -46,7 +46,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, children, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
 
-    // 涟漪效果处理
+    // 优化的涟漪效果处理 - 使用 CSS 变量和固定的 span 元素
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (onClick) {
         onClick(e);
@@ -57,25 +57,41 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      const ripple = document.createElement('span');
+      // 检查是否已有涟漪元素
+      let ripple = button.querySelector('.button-ripple') as HTMLSpanElement | null;
+      
+      if (!ripple) {
+        ripple = document.createElement('span');
+        ripple.className = 'button-ripple';
+        button.appendChild(ripple);
+      }
+
+      // 使用 CSS 变量设置位置
       ripple.style.cssText = `
+        --ripple-x: ${x}px;
+        --ripple-y: ${y}px;
         position: absolute;
         border-radius: 50%;
-        background: var(--ripple-color);
-        transform: scale(0);
-        animation: ripple 0.6s ease-out;
+        background: currentColor;
+        transform: translate(var(--ripple-x), var(--ripple-y)) scale(0);
+        opacity: 0.3;
         pointer-events: none;
-        left: ${x}px;
-        top: ${y}px;
+        left: 0;
+        top: 0;
         width: 100px;
         height: 100px;
         margin-left: -50px;
         margin-top: -50px;
+        animation: button-ripple 0.6s ease-out forwards;
       `;
 
-      button.appendChild(ripple);
-
-      setTimeout(() => ripple.remove(), 600);
+      // 清理动画完成后的样式
+      setTimeout(() => {
+        if (ripple) {
+          ripple.style.animation = 'none';
+          ripple.style.transform = 'translate(var(--ripple-x), var(--ripple-y)) scale(2)';
+        }
+      }, 600);
     };
 
     return (

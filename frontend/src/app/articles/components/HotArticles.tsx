@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { TrendingUp, Eye, ThumbsUp, MessageCircle } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { memo } from 'react';
 
 interface Article {
@@ -20,17 +20,10 @@ interface HotArticlesProps {
 }
 
 function HotArticles({ articles }: HotArticlesProps) {
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
 
-  const textClass = getThemeClass(
-    'text-foreground',
-    'text-gray-800'
-  );
-
-  const mutedTextClass = getThemeClass(
-    'text-foreground/70',
-    'text-gray-600'
-  );
+  const textClass = themedClasses.textClass;
+  const mutedTextClass = themedClasses.mutedTextClass;
 
   // 取前6篇热门文章（按浏览量排序）
   const hotArticles = articles

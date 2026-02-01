@@ -5,7 +5,7 @@ import HotArticles from './HotArticles';
 import MiniStats from './MiniStats';
 import SidebarTagCloud from './SidebarTagCloud';
 import FriendLinks from '@/components/home/FriendLinks';
-import { useThemeUtils } from '@/hooks/useThemeUtils';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { memo, useMemo } from 'react';
 
 interface Category {
@@ -61,7 +61,7 @@ function ArticleSidebar({
   onCategorySelect,
   onTagSelect,
 }: ArticleSidebarProps) {
-  const { getThemeClass } = useThemeUtils();
+  const { themedClasses, getThemeClass } = useThemedClasses();
 
   // 使用 useMemo 缓存统计数据
   const stats = useMemo(() => {
