@@ -1143,3 +1143,31 @@ html {
   color: var(--foreground);
 }
 
+/* ===== 弹幕动画 ===== */
+@keyframes danmaku-move {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-danmaku {
+  animation-name: danmaku-move;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* 弹幕暂停状态 */
+.animate-danmaku.paused {
+  animation-play-state: paused;
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-danmaku {
+    animation: none;
+  }
+}
+

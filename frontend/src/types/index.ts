@@ -111,3 +111,24 @@ export interface UserStats {
   joined_date: string;
   total_views: number;
 }
+
+// 留言/弹幕消息类型
+export interface Message {
+  id: string;
+  content: string;
+  author: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
+  created_at: string;
+  color?: string; // 弹幕颜色
+  isDanmaku?: boolean; // 是否以弹幕形式显示
+}
+
+// 创建留言请求类型
+export interface CreateMessageRequest {
+  content: string;
+  color?: string;
+  isDanmaku?: boolean;
+}
