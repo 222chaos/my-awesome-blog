@@ -11,7 +11,8 @@ interface StatsGridProps {
 
 export default function StatsGrid({ stats, loading }: StatsGridProps) {
   // 格式化日期
-  const formatDate = (dateString: string): string => {
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
@@ -60,7 +61,7 @@ export default function StatsGrid({ stats, loading }: StatsGridProps) {
     },
     {
       label: '加入时间',
-      value: formatDate(stats.joined_date).split('年')[0],
+      value: formatDate(stats.joined_date).includes('N/A') ? 'N/A' : formatDate(stats.joined_date).split('年')[0],
       icon: Calendar,
       color: 'tech-cyan',
       bgColor: 'bg-tech-cyan/20',
@@ -95,7 +96,7 @@ export default function StatsGrid({ stats, loading }: StatsGridProps) {
             {/* 数值 */}
             <div className="text-center">
               <div className={`text-2xl font-bold text-${stat.color} mb-1 group-hover:text-tech-cyan transition-colors`}>
-                {stat.isDate ? stat.value : stat.value.toLocaleString()}
+                {stat.isDate ? stat.value : stat.value?.toLocaleString() || '0'}
               </div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
             </div>

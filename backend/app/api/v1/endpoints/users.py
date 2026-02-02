@@ -92,10 +92,15 @@ def upload_current_user_avatar(
     """
     Upload current user's avatar
     """
+    from app.utils.logger import app_logger
+    
+    app_logger.info(f"Starting avatar upload for user: {current_user.id}, file: {file.filename}")
+    
     # Check if file is an allowed image type
     allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
     file_extension = os.path.splitext(file.filename)[1].lower()
     if file_extension not in allowed_extensions:
+        app_logger.error(f"File type {file_extension} not allowed for user {current_user.id}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"File type {file_extension} not allowed. Allowed types: {allowed_extensions}"
@@ -106,12 +111,22 @@ def upload_current_user_avatar(
 
     # Save uploaded file temporarily
     temp_file_path = f"temp_avatar_{file.filename}"
-    with open(temp_file_path, "wb") as buffer:
-        buffer.write(file.file.read())
+    try:
+        with open(temp_file_path, "wb") as buffer:
+            # Read file content in chunks to handle large files
+            while content := file.file.read(1024 * 1024):  # 1MB chunks
+                buffer.write(content)
+    except Exception as e:
+        app_logger.error(f"Error saving temporary file: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error saving uploaded file"
+        )
 
     try:
         # Validate image format
         if not image_service.validate_image_format(temp_file_path):
+            app_logger.error(f"Invalid image format for user {current_user.id}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid image format. Supported formats: JPEG, PNG, WEBP, GIF"
@@ -119,6 +134,7 @@ def upload_current_user_avatar(
         
         # Get image info
         image_info = image_service.get_image_info(temp_file_path)
+        app_logger.info(f"Image info: {image_info}")
         
         # Upload avatar to OSS
         with open(temp_file_path, "rb") as f:
@@ -126,22 +142,36 @@ def upload_current_user_avatar(
         avatar_url = oss_service.upload_file(file_data, file.filename, f"avatars/user_{current_user.id}")
         
         if not avatar_url:
+            app_logger.error(f"Failed to upload avatar to OSS for user {current_user.id}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to upload avatar to cloud storage"
             )
 
         # Update user's avatar in database
-        crud.update_user(db, user_id=current_user.id, user_update=UserUpdate(avatar=avatar_url))
+        updated_user = crud.update_user(db, user_id=current_user.id, user_update=UserUpdate(avatar=avatar_url))
+        
+        if not updated_user:
+            app_logger.error(f"Failed to update user avatar in database for user {current_user.id}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update user avatar in database"
+            )
 
         # Clean up temporary file
         os.remove(temp_file_path)
+        
+        app_logger.info(f"Avatar uploaded successfully for user {current_user.id}, URL: {avatar_url}")
 
         return AvatarResponse(
             avatar_url=avatar_url,
             message="Avatar uploaded successfully"
         )
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
     except Exception as e:
+        app_logger.error(f"Unexpected error processing avatar for user {current_user.id}: {str(e)}")
         # Clean up temporary file in case of error
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)

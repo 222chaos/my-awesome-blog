@@ -122,7 +122,7 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
 export const loginUser = async (credentials: { email: string; password: string }): Promise<{ success: boolean; user?: UserProfile; error?: string }> => {
   try {
     // 步骤1：调用登录API获取token
-    await loginApi(credentials.email, credentials.password);
+    const loginResult = await loginApi(credentials.email, credentials.password);
 
     // 步骤2：获取用户信息
     const userData = await getCurrentUserApi();
@@ -134,7 +134,7 @@ export const loginUser = async (credentials: { email: string; password: string }
         id: userData.id,
         username: userData.username,
         email: userData.email,
-        fullName: userData.full_name || userData.username,
+        fullName: userData.fullName || userData.username,
         avatar: userData.avatar,
         bio: userData.bio,
         website: userData.website,

@@ -106,10 +106,23 @@ export interface TypewriterContent {
 
 // 用户统计类型
 export interface UserStats {
-  article_count: number;
-  comment_count: number;
-  joined_date: string;
-  total_views: number;
+  article_count?: number;
+  comment_count?: number;
+  joined_date?: string;
+  total_views?: number;
+}
+
+// 回复类型
+export interface Reply {
+  id: string;
+  content: string;
+  author: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
+  created_at: string;
+  likes?: number;
 }
 
 // 留言/弹幕消息类型
@@ -124,6 +137,9 @@ export interface Message {
   created_at: string;
   color?: string; // 弹幕颜色
   isDanmaku?: boolean; // 是否以弹幕形式显示
+  likes?: number; // 点赞数
+  replies?: Reply[]; // 回复列表
+  level?: number; // 用户等级
 }
 
 // 创建留言请求类型

@@ -1,31 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-import { Message } from '@/types';
+import { Message, Reply } from '@/types';
 import { formatDistanceToNow } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { Trash2, MessageSquare } from 'lucide-react';
+import { Trash2, MessageSquare, Heart, Reply as ReplyIcon, ThumbsUp, ThumbsDown, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { deleteMessage } from '@/services/messageService';
+import { deleteMessage, likeMessage, replyToMessage } from '@/services/messageService';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 
 interface MessageListProps {
   messages: Message[];
   currentUserId?: string;
   onMessageDeleted?: (id: string) => void;
+  onMessageUpdated?: (updatedMessage: Message) => void;
 }
 
-export default function MessageList({ 
-  messages, 
-  currentUserId, 
-  onMessageDeleted 
+export default function MessageList({
+  messages,
+  currentUserId,
+  onMessageDeleted,
+  onMessageUpdated
 }: MessageListProps) {
   const { themedClasses } = useThemedClasses();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
+  const [replies, setReplies] = useState<Record<string, boolean>>({});
+  const [replyTexts, setReplyTexts] = useState<Record<string, string>>({});
+  const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
 
   const handleDelete = async (id: string) => {
     if (!confirm('确定要删除这条留言吗？')) return;
-    
+
     setDeletingId(id);
     try {
       await deleteMessage(id);
@@ -35,6 +41,59 @@ export default function MessageList({
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const handleLike = async (id: string) => {
+    try {
+      const updatedMessage = await likeMessage(id);
+      setLikedMessages(prev => ({
+        ...prev,
+        [id]: !prev[id]
+      }));
+      onMessageUpdated?.(updatedMessage);
+    } catch (error) {
+      console.error('点赞失败:', error);
+      alert('点赞失败，请重试');
+    }
+  };
+
+  const toggleReply = (id: string) => {
+    setReplies(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const handleReplySubmit = async (id: string) => {
+    const text = replyTexts[id];
+    if (!text || text.trim().length === 0) return;
+
+    try {
+      const updatedMessage = await replyToMessage(id, text);
+      onMessageUpdated?.(updatedMessage);
+
+      // 清空输入框
+      setReplyTexts(prev => ({
+        ...prev,
+        [id]: ''
+      }));
+
+      // 关闭回复框
+      setReplies(prev => ({
+        ...prev,
+        [id]: false
+      }));
+    } catch (error) {
+      console.error('回复失败:', error);
+      alert('回复失败，请重试');
+    }
+  };
+
+  const toggleReplies = (id: string) => {
+    setExpandedReplies(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
   if (messages.length === 0) {
@@ -59,7 +118,7 @@ export default function MessageList({
         <MessageSquare className="w-5 h-5 text-tech-cyan" />
         全部留言 ({messages.length})
       </h3>
-      
+
       <div className="space-y-3">
         {messages.map((message) => (
           <div
@@ -97,24 +156,129 @@ export default function MessageList({
                       {message.author.username}
                     </span>
                     {message.isDanmaku && (
-                      <span 
+                      <span
                         className="text-xs px-2 py-0.5 rounded-full bg-tech-cyan/20 text-tech-cyan border border-tech-cyan/30"
                       >
                         弹幕
                       </span>
                     )}
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-500 border border-purple-500/30">
+                      Lv.{message.level || 1}
+                    </span>
                   </div>
                   <span className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(message.created_at))}
                   </span>
                 </div>
-                
+
                 <p className={cn(
                   "mt-1 text-sm leading-relaxed",
                   themedClasses.textClass
                 )}>
                   {message.content}
                 </p>
+
+                {/* 操作按钮 */}
+                <div className="flex items-center gap-4 mt-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLike(message.id)}
+                    className={cn(
+                      "flex items-center gap-1.5 text-xs",
+                      likedMessages[message.id]
+                        ? "text-red-500 hover:text-red-600"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Heart className={cn("w-3.5 h-3.5", likedMessages[message.id] && "fill-current")} />
+                    {likedMessages[message.id] ? '已赞' : '点赞'} ({message.likes || 0})
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleReply(message.id)}
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <ReplyIcon className="w-3.5 h-3.5" />
+                    回复
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleReplies(message.id)}
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    {expandedReplies[message.id] ? (
+                      <>
+                        <ChevronUp className="w-3.5 h-3.5" />
+                        收起回复
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                        查看回复 ({message.replies?.length || 0})
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <Star className="w-3.5 h-3.5" />
+                    收藏
+                  </Button>
+                </div>
+
+                {/* 回复列表 */}
+                {expandedReplies[message.id] && message.replies && message.replies.length > 0 && (
+                  <div className="mt-3 space-y-2 pl-4 border-l-2 border-muted">
+                    {message.replies.map((reply: Reply) => (
+                      <div key={reply.id} className="py-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">{reply.author.username}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {formatDistanceToNow(new Date(reply.created_at))}
+                          </span>
+                        </div>
+                        <p className="text-sm mt-1">{reply.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 回复框 */}
+                {replies[message.id] && (
+                  <div className="mt-3 pt-3 border-t border-muted">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={replyTexts[message.id] || ''}
+                        onChange={(e) => setReplyTexts(prev => ({
+                          ...prev,
+                          [message.id]: e.target.value
+                        }))}
+                        placeholder="输入回复内容..."
+                        className={cn(
+                          "flex-1 px-3 py-1.5 text-sm rounded-lg",
+                          "bg-background/50 border border-input",
+                          "focus:outline-none focus:ring-1 focus:ring-tech-cyan"
+                        )}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleReplySubmit(message.id)}
+                        className="bg-tech-cyan hover:bg-tech-lightcyan text-white"
+                      >
+                        发送
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 删除按钮 */}

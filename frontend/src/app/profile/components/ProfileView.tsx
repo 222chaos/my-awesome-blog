@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Camera, Mail, Globe, Twitter, Github, Linkedin, MapPin, Calendar, ExternalLink, Edit3, Save, X, UserRound } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Label } from '@/components/ui/Label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { UserProfile } from '@/types';
 
@@ -167,10 +167,7 @@ export default function ProfileView({
                   value={formData.username || ''}
                   onChange={handleInputChange}
                   readOnly
-                  className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200 ${getThemeClass(
-                    'bg-glass/20 border-glass-border',
-                    'bg-white/80 border-gray-300'
-                  )}`}
+                  className="border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200"
                 />
               </div>
               <div className="space-y-2">
@@ -184,10 +181,7 @@ export default function ProfileView({
                   type="email"
                   value={formData.email || ''}
                   onChange={handleInputChange}
-                  className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200 ${getThemeClass(
-                    'bg-glass/20 border-glass-border',
-                    'bg-white/80 border-gray-300'
-                  )}`}
+                  className="border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200"
                 />
               </div>
               <div className="space-y-2">
@@ -201,10 +195,7 @@ export default function ProfileView({
                   value={formData.website || ''}
                   onChange={handleInputChange}
                   placeholder="https://example.com"
-                  className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200 ${getThemeClass(
-                    'bg-glass/20 border-glass-border',
-                    'bg-white/80 border-gray-300'
-                  )}`}
+                  className="border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200"
                 />
               </div>
               <div className="space-y-2">
@@ -218,10 +209,7 @@ export default function ProfileView({
                   value={formData.twitter || ''}
                   onChange={handleInputChange}
                   placeholder="@username"
-                  className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200 ${getThemeClass(
-                    'bg-glass/20 border-glass-border',
-                    'bg-white/80 border-gray-300'
-                  )}`}
+                  className="border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200"
                 />
               </div>
               <div className="space-y-2">
@@ -235,10 +223,7 @@ export default function ProfileView({
                   value={formData.github || ''}
                   onChange={handleInputChange}
                   placeholder="username"
-                  className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200 ${getThemeClass(
-                    'bg-glass/20 border-glass-border',
-                    'bg-white/80 border-gray-300'
-                  )}`}
+                  className="border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200"
                 />
               </div>
               <div className="space-y-2">
@@ -252,10 +237,7 @@ export default function ProfileView({
                   value={formData.linkedin || ''}
                   onChange={handleInputChange}
                   placeholder="username"
-                  className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200 ${getThemeClass(
-                    'bg-glass/20 border-glass-border',
-                    'bg-white/80 border-gray-300'
-                  )}`}
+                  className="border-glass-border text-foreground placeholder:text-foreground/50 transition-colors duration-200"
                 />
               </div>
             </div>
@@ -270,10 +252,7 @@ export default function ProfileView({
                 value={formData.bio || ''}
                 onChange={handleInputChange}
                 rows={4}
-                className={`bg-glass/50 border-glass-border text-foreground placeholder:text-foreground/50 resize-none transition-colors duration-200 ${getThemeClass(
-                  'bg-glass/20 border-glass-border',
-                  'bg-white/80 border-gray-300'
-                )}`}
+                className="border-glass-border text-foreground placeholder:text-foreground/50 resize-none transition-colors duration-200"
                 placeholder="介绍一下自己..."
               />
             </div>

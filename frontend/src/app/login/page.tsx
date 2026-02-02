@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { loginUser } from '@/services/userService';
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams(); // 获取URL参数
   const { isLoading, showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
@@ -30,12 +31,34 @@ export default function LoginPage() {
       const result = await loginUser({ email, password });
 
       if (result.success && result.user) {
-        router.push('/profile');
+        console.log('Login successful, attempting to navigate to profile');
+        // 登录成功后，检查是否有重定向参数
+        const redirectParam = searchParams.get('redirect');
+        const redirectPath = redirectParam ? decodeURIComponent(redirectParam) : '/profile';
+        console.log('Redirect path:', redirectPath);
+
+        // 确保重定向路径是安全的，只允许内部路径
+        if (redirectPath.startsWith('/') && !redirectPath.startsWith('//')) {
+          // 使用 Next.js 路由进行导航以保持 SPA 特性
+          console.log('Navigating to:', redirectPath);
+          // 使用 setTimeout 确保状态更新后再跳转
+          setTimeout(() => {
+            router.push(redirectPath as any);
+          }, 800); // 延迟800毫秒，确保认证状态同步，比ProtectedRoute的延迟时间长
+        } else {
+          // 如果重定向路径不安全，则默认导航到主页
+          console.log('Navigating to default profile page');
+          // 使用 setTimeout 确保状态更新后再跳转
+          setTimeout(() => {
+            router.push('/profile' as any);
+          }, 800); // 延迟800毫秒，确保认证状态同步，比ProtectedRoute的延迟时间长
+        }
       } else {
+        console.log('Login failed:', result.error);
         setError(result.error || '登录失败，请重试');
       }
     } catch (err) {
-      setError('登录失败，请重试');
+      setError(err instanceof Error ? err.message : '登录失败，请重试');
       console.error('Login error:', err);
     } finally {
       hideLoading();
@@ -46,21 +69,24 @@ export default function LoginPage() {
     return null;
   }
 
+  // 从URL参数获取消息
+  const message = searchParams.get('message');
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* 背景图片层 */}
-      <div className="login-page absolute inset-0 z-0" />
-      {/* 渐变遮罩层 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-tech-cyan/10 via-purple-500/15 to-pink-500/10 animate-gradient-shift z-0" />
-      {/* 漂浮的粒子效果 */}
-      <div className="absolute inset-0 overflow-hidden z-0">
+    <div className="relative min-h-screen flex items-center justify-center">
+      {/* 背景图片层 - 最底层 (由CSS控制z-index) */}
+      <div className="login-page" />
+      {/* 渐变遮罩层 - 中间层 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-tech-cyan/10 via-purple-500/15 to-pink-500/10 animate-gradient-shift pointer-events-none" />
+      {/* 漂浮的粒子效果 - 上层 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-tech-cyan/10 rounded-full blur-3xl animate-float-1" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-float-2" />
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-float-3" />
       </div>
 
-      {/* 登录卡片 */}
-      <div className="relative z-10 p-4">
+      {/* 登录卡片 - 最顶层 */}
+      <div className="relative z-50 p-4">
         <div
           className="bg-glass/90 backdrop-blur-2xl border border-glass-border rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 animate-card-appear"
           style={{
@@ -77,12 +103,17 @@ export default function LoginPage() {
             <p className="text-gray-300">
               登录以访问您的个人资料
             </p>
+            {message && (
+              <p className="text-yellow-300 mt-2 text-sm">
+                {message}
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <input
-                id="username"
+                id="email"
                 type="text"
                 required
                 value={email}
@@ -90,8 +121,8 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="bg-transparent"
               />
-              <label htmlFor="username" className="absolute pointer-events-none text-white/80">
-                {Array.from('Username').map((char, index) => (
+              <label htmlFor="email" className="absolute pointer-events-none text-white/80">
+                {Array.from('Email').map((char, index) => (
                   <span
                     key={index}
                     style={{ transitionDelay: `${index * 50}ms` }}

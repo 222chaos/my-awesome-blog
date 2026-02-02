@@ -8,15 +8,18 @@ interface DanmakuProps {
   messages: Message[];
   isPlaying?: boolean;
   className?: string;
+  density?: number; // 弹幕密度百分比 (0-100)
 }
 
 interface DanmakuItem extends Message {
   top: number;
   duration: number;
   delay: number;
+  fontSize: number; // 字体大小
+  opacity: number;  // 透明度
 }
 
-export default function Danmaku({ messages, isPlaying = true, className }: DanmakuProps) {
+export default function Danmaku({ messages, isPlaying = true, className, density = 50 }: DanmakuProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [danmakuItems, setDanmakuItems] = useState<DanmakuItem[]>([]);
   const [containerHeight, setContainerHeight] = useState(0);
@@ -25,10 +28,10 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
   // 计算弹幕位置
   const calculateDanmakuPosition = useCallback((existingItems: DanmakuItem[]): number => {
     if (!containerRef.current) return 0;
-    
+
     const trackHeight = 40; // 每条轨道高度
     const tracks = Math.floor(containerHeight / trackHeight);
-    
+
     // 随机选择一个轨道
     const track = Math.floor(Math.random() * tracks);
     return track * trackHeight + 10;
@@ -37,19 +40,24 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
   // 初始化弹幕
   useEffect(() => {
     if (!containerRef.current || messages.length === 0) return;
-    
+
     const height = containerRef.current.clientHeight;
     setContainerHeight(height);
-    
-    const items: DanmakuItem[] = messages.map((msg, index) => ({
+
+    // 根据密度过滤消息
+    const filteredMessages = messages.filter(() => Math.random() * 100 < density);
+
+    const items: DanmakuItem[] = filteredMessages.map((msg, index) => ({
       ...msg,
       top: (index % Math.floor(height / 40)) * 40 + 10,
       duration: 15 + Math.random() * 10, // 15-25秒
       delay: index * 2 + Math.random() * 5, // 错开时间
+      fontSize: 14 + Math.random() * 4, // 随机字体大小 (14-18px)
+      opacity: 0.7 + Math.random() * 0.3, // 随机透明度 (0.7-1.0)
     }));
-    
+
     setDanmakuItems(items);
-  }, [messages]);
+  }, [messages, density]);
 
   // 处理窗口大小变化
   useEffect(() => {
@@ -65,7 +73,7 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
 
   if (messages.length === 0) {
     return (
-      <div 
+      <div
         ref={containerRef}
         className={cn(
           "relative overflow-hidden bg-gradient-to-b from-background/50 to-background/30",
@@ -79,7 +87,7 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={cn(
         "relative overflow-hidden",
@@ -89,7 +97,7 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
       )}
     >
       {/* 背景网格效果 */}
-      <div 
+      <div
         className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: `
@@ -99,7 +107,7 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
           backgroundSize: '50px 50px',
         }}
       />
-      
+
       {/* 弹幕轨道 */}
       {danmakuItems.map((item) => (
         <div
@@ -119,20 +127,22 @@ export default function Danmaku({ messages, isPlaying = true, className }: Danma
             animationDuration: `${item.duration}s`,
             animationDelay: `${item.delay}s`,
             willChange: 'transform',
+            fontSize: `${item.fontSize}px`,
+            opacity: item.opacity,
           }}
         >
           <span className="flex items-center gap-2">
             {item.author.avatar && (
-              <img 
-                src={item.author.avatar} 
+              <img
+                src={item.author.avatar}
                 alt={item.author.username}
                 className="w-5 h-5 rounded-full border border-white/30"
               />
             )}
-            <span className="text-sm font-medium opacity-80">
+            <span className="font-medium opacity-80">
               {item.author.username}:
             </span>
-            <span className="text-sm">{item.content}</span>
+            <span>{item.content}</span>
           </span>
         </div>
       ))}

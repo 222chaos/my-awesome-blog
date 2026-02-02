@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { createMessage, DANMAKU_COLORS, validateMessage } from '@/services/messageService';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { Send, Palette, MessageSquare, Sparkles } from 'lucide-react';
+import { Send, Palette, MessageSquare, Sparkles, Smile, Bold, Italic, Link, AtSign } from 'lucide-react';
 import { Message } from '@/types';
 
 interface MessageInputProps {
@@ -14,17 +14,19 @@ interface MessageInputProps {
   onMessageSent: (message: Message) => void;
 }
 
-export default function MessageInput({ 
-  isLoggedIn, 
-  currentUser, 
-  onMessageSent 
+export default function MessageInput({
+  isLoggedIn,
+  currentUser,
+  onMessageSent
 }: MessageInputProps) {
   const { themedClasses } = useThemedClasses();
   const [content, setContent] = useState('');
-  const [selectedColor, setSelectedColor] = useState(DANMAKU_COLORS[0].value);
+  const [selectedColor, setSelectedColor] = useState<string>(DANMAKU_COLORS[0].value);
   const [isDanmaku, setIsDanmaku] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ export default function MessageInput({
     // 验证内容
     const validation = validateMessage(content);
     if (!validation.isValid) {
-      setError(validation.error);
+      setError(validation.error || null);
       return;
     }
 
@@ -44,13 +46,38 @@ export default function MessageInput({
         color: selectedColor,
         isDanmaku,
       });
-      
+
       onMessageSent(newMessage);
       setContent('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '发送失败，请重试');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // 自动调整文本框高度
+  const adjustTextareaHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  };
+
+  // 插入表情符号
+  const insertEmoji = (emoji: string) => {
+    if (textareaRef.current) {
+      const startPos = textareaRef.current.selectionStart;
+      const endPos = textareaRef.current.selectionEnd;
+      const newText = content.substring(0, startPos) + emoji + content.substring(endPos);
+      setContent(newText);
+      setShowEmojiPicker(false);
+
+      // 延迟调整高度
+      setTimeout(adjustTextareaHeight, 0);
     }
   };
 
@@ -64,7 +91,7 @@ export default function MessageInput({
         <p className={cn("mb-2", themedClasses.textClass)}>
           登录后即可发表留言
         </p>
-        <a 
+        <a
           href="/login"
           className="text-sm text-tech-cyan hover:text-tech-lightcyan hover:underline"
         >
@@ -95,17 +122,30 @@ export default function MessageInput({
         <span className={cn("text-sm font-medium", themedClasses.textClass)}>
           {currentUser?.username}
         </span>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-500 border border-purple-500/30">
+          Lv.5
+        </span>
       </div>
 
       {/* 输入框 */}
       <div className="relative">
         <textarea
+          ref={textareaRef}
           value={content}
           onChange={(e) => {
             setContent(e.target.value);
             setError(null);
+            adjustTextareaHeight();
           }}
-          placeholder="写下你的留言..."
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              if (!isSubmitting && content.trim().length > 0) {
+                handleSubmit(e as unknown as React.FormEvent);
+              }
+            }
+          }}
+          placeholder="写下你的留言... (按 Enter 发送，Shift+Enter 换行)"
           maxLength={200}
           rows={3}
           className={cn(
@@ -121,6 +161,68 @@ export default function MessageInput({
           {content.length}/200
         </div>
       </div>
+
+      {/* 快捷工具栏 */}
+      <div className="flex flex-wrap items-center gap-2 mt-2">
+        <button
+          type="button"
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
+          aria-label="插入表情"
+        >
+          <Smile className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          type="button"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
+          aria-label="加粗"
+        >
+          <Bold className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          type="button"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
+          aria-label="斜体"
+        >
+          <Italic className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          type="button"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
+          aria-label="插入链接"
+        >
+          <Link className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <button
+          type="button"
+          className="p-1.5 rounded-md hover:bg-accent transition-colors"
+          aria-label="提及用户"
+        >
+          <AtSign className="w-4 h-4 text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* 表情选择器 */}
+      {showEmojiPicker && (
+        <div className="mt-2 p-3 bg-accent rounded-lg border border-input">
+          <div className="grid grid-cols-8 gap-2">
+            {['😀', '😂', '😍', '🥰', '😎', '🤩', '🥳', '😭', '😡', '🤯', '🥶', '😱', '🤠', '🥴', '😈', '👻'].map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => insertEmoji(emoji)}
+                className="text-xl hover:scale-125 transition-transform"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 错误提示 */}
       {error && (
@@ -156,7 +258,7 @@ export default function MessageInput({
           onClick={() => setIsDanmaku(!isDanmaku)}
           className={cn(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all duration-200",
-            isDanmaku 
+            isDanmaku
               ? "bg-tech-cyan/20 text-tech-cyan border border-tech-cyan/30"
               : "bg-muted text-muted-foreground border border-transparent hover:bg-muted/80"
           )}

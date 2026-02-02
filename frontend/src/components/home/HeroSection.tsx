@@ -124,7 +124,7 @@ export default function HeroSection() {
             >
               <TextType
                 fetchFromApi={true}
-                typingSpeed={75}
+                typingSpeed={150}
                 pauseDuration={1500}
                 showCursor
                 cursorCharacter="_"

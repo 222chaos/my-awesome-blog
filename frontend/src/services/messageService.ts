@@ -14,6 +14,9 @@ let mockMessages: Message[] = [
     created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
     color: '#00D9FF',
     isDanmaku: true,
+    likes: 12,
+    replies: [],
+    level: 5,
   },
   {
     id: '2',
@@ -25,6 +28,9 @@ let mockMessages: Message[] = [
     created_at: new Date(Date.now() - 86400000).toISOString(),
     color: '#FF6B6B',
     isDanmaku: true,
+    likes: 8,
+    replies: [],
+    level: 3,
   },
   {
     id: '3',
@@ -36,6 +42,21 @@ let mockMessages: Message[] = [
     created_at: new Date(Date.now() - 43200000).toISOString(),
     color: '#4ECDC4',
     isDanmaku: true,
+    likes: 15,
+    replies: [
+      {
+        id: 'r1',
+        content: '谢谢支持！我会持续更新的',
+        author: {
+          id: '1',
+          username: '博主',
+          avatar: '/assets/avatar1.jpg',
+        },
+        created_at: new Date(Date.now() - 40000000).toISOString(),
+        likes: 5,
+      }
+    ],
+    level: 4,
   },
   {
     id: '4',
@@ -47,6 +68,9 @@ let mockMessages: Message[] = [
     created_at: new Date(Date.now() - 3600000).toISOString(),
     color: '#FFE66D',
     isDanmaku: true,
+    likes: 6,
+    replies: [],
+    level: 2,
   },
   {
     id: '5',
@@ -57,6 +81,9 @@ let mockMessages: Message[] = [
     },
     created_at: new Date(Date.now() - 1800000).toISOString(),
     isDanmaku: false,
+    likes: 3,
+    replies: [],
+    level: 1,
   },
 ];
 
@@ -81,7 +108,7 @@ export const DANMAKU_COLORS = [
  */
 export const getMessages = async (): Promise<Message[]> => {
   await delay(300);
-  return [...mockMessages].sort((a, b) => 
+  return [...mockMessages].sort((a, b) =>
     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 };
@@ -104,14 +131,14 @@ export const getDanmakuMessages = async (): Promise<Message[]> => {
  */
 export const createMessage = async (data: CreateMessageRequest): Promise<Message> => {
   await delay(500);
-  
+
   // 获取当前登录用户
   const currentUser = await getCurrentUser();
-  
+
   if (!currentUser) {
     throw new Error('请先登录后再留言');
   }
-  
+
   const newMessage: Message = {
     id: Date.now().toString(),
     content: data.content.trim(),
@@ -123,10 +150,13 @@ export const createMessage = async (data: CreateMessageRequest): Promise<Message
     created_at: new Date().toISOString(),
     color: data.color || DANMAKU_COLORS[0].value,
     isDanmaku: data.isDanmaku ?? true,
+    likes: 0,
+    replies: [],
+    level: 1, // 默认等级
   };
-  
+
   mockMessages.unshift(newMessage);
-  
+
   return newMessage;
 };
 
@@ -137,24 +167,76 @@ export const createMessage = async (data: CreateMessageRequest): Promise<Message
  */
 export const deleteMessage = async (messageId: string): Promise<boolean> => {
   await delay(300);
-  
+
   const currentUser = await getCurrentUser();
   if (!currentUser) {
     throw new Error('请先登录');
   }
-  
+
   const message = mockMessages.find(m => m.id === messageId);
   if (!message) {
     throw new Error('留言不存在');
   }
-  
+
   // 只能删除自己的留言
   if (message.author.id !== currentUser.id) {
     throw new Error('只能删除自己的留言');
   }
-  
+
   mockMessages = mockMessages.filter(m => m.id !== messageId);
   return true;
+};
+
+/**
+ * 点赞留言
+ * @param messageId 留言ID
+ * @returns 更新后的留言
+ */
+export const likeMessage = async (messageId: string): Promise<Message> => {
+  await delay(200);
+
+  const message = mockMessages.find(m => m.id === messageId);
+  if (!message) {
+    throw new Error('留言不存在');
+  }
+
+  message.likes = (message.likes || 0) + 1;
+  return { ...message };
+};
+
+/**
+ * 回复留言
+ * @param messageId 留言ID
+ * @param content 回复内容
+ * @returns 更新后的留言
+ */
+export const replyToMessage = async (messageId: string, content: string): Promise<Message> => {
+  await delay(300);
+
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    throw new Error('请先登录');
+  }
+
+  const message = mockMessages.find(m => m.id === messageId);
+  if (!message) {
+    throw new Error('留言不存在');
+  }
+
+  const newReply = {
+    id: `r${Date.now()}`,
+    content: content.trim(),
+    author: {
+      id: currentUser.id,
+      username: currentUser.username,
+      avatar: currentUser.avatar,
+    },
+    created_at: new Date().toISOString(),
+    likes: 0,
+  };
+
+  message.replies = message.replies ? [...message.replies, newReply] : [newReply];
+  return { ...message };
 };
 
 /**
@@ -166,10 +248,10 @@ export const validateMessage = (content: string): { isValid: boolean; error?: st
   if (!content || content.trim().length === 0) {
     return { isValid: false, error: '留言内容不能为空' };
   }
-  
+
   if (content.trim().length > 200) {
     return { isValid: false, error: '留言内容不能超过200字' };
   }
-  
+
   return { isValid: true };
 };

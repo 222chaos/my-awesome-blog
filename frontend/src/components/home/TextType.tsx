@@ -3,7 +3,7 @@
 import { ElementType, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getActiveTypewriterTexts, getActiveTypewriterContents, TypewriterContent } from '@/lib/api';
+import { getActiveTypewriterContents, TypewriterContent } from '@/lib/api';
 
 interface TextTypeProps {
   className?: string;
@@ -136,22 +136,21 @@ const TextType = ({
     const executeTypingAnimation = () => {
       if (isDeleting) {
         if (displayedText === '') {
-          setIsDeleting(false);
-          if (currentTextIndex === textArray.length - 1 && !loop) return;
-
+          // 完成删除后，切换到下一个文本
           if (onSentenceComplete) onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
 
-          // 立即切换到下一个文字，不等待pauseDuration
-          setCurrentTextIndex(prev => (prev + 1) % textArray.length);
+          // 设置下一个文本的索引
+          const nextTextIndex = (currentTextIndex + 1) % textArray.length;
+
+          // 如果是最后一个文本且不循环，则停止
+          if (currentTextIndex === textArray.length - 1 && !loop) {
+            return;
+          }
+
+          // 更新到下一个文本
+          setCurrentTextIndex(nextTextIndex);
           setCurrentCharIndex(0);
-          // 直接开始输入下一个文字
-          setDisplayedText(''); // 清空当前显示的文字
-          // 立即开始输入下一个文字，无需等待
-          setTimeout(() => {
-            setCurrentTextIndex(prev => (prev + 1) % textArray.length);
-            setCurrentCharIndex(0);
-            setIsDeleting(false);
-          }, 50); // 小延迟以确保状态更新
+          setIsDeleting(false);
         } else {
           timeout = setTimeout(() => {
             setDisplayedText(prev => prev.slice(0, -1));
@@ -161,12 +160,13 @@ const TextType = ({
         if (currentText && currentCharIndex < processedText.length) {
           timeout = setTimeout(
             () => {
-            setDisplayedText(prev => prev + processedText[currentCharIndex]);
-            setCurrentCharIndex(prev => prev + 1);
-          },
-          variableSpeed ? getRandomSpeed() : typingSpeed
-        );
-        } else if (textArray.length >= 1) {
+              setDisplayedText(prev => prev + processedText[currentCharIndex]);
+              setCurrentCharIndex(prev => prev + 1);
+            },
+            variableSpeed ? getRandomSpeed() : typingSpeed
+          );
+        } else if (textArray.length > 0) {
+          // 文本已完成输入，准备删除
           if (!loop && currentTextIndex === textArray.length - 1) {
             return;
           }
