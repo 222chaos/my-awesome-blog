@@ -1,19 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, X, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Camera, Filter, Search, Grid3X3, Film, Star, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import GlitchText from '@/components/ui/GlitchText';
-import { ParallaxScroll } from '@/components/ui/ParallaxScroll';
-import { FocusCards } from '@/components/ui/FocusCards';
-import MasonryGrid from '@/components/ui/MasonryGrid';
+import GlassCard from '@/components/ui/GlassCard';
+import ImageGallery from '@/components/ui/ImageGallery';
+import ImageCarousel from '@/components/ui/ImageCarousel';
+
 import { Album } from '@/types';
-import Loader from '@/components/loading/Loader';
+
+
 
 const AlbumsPage = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'carousel'>('grid');
   const [loading, setLoading] = useState(true);
 
   // 获取相册数据
@@ -26,14 +28,69 @@ const AlbumsPage = () => {
         if (result.success) {
           setAlbums(result.data);
         } else {
-          // Fallback data if API fails or returns empty
-          console.warn('Using fallback data');
-          setAlbums(getFallbackAlbums());
+          console.error('获取相册数据失败:', result.message);
         }
+        
+        setLoading(false);
       } catch (error) {
         console.error('获取相册数据失败:', error);
-        setAlbums(getFallbackAlbums());
-      } finally {
+        // 如果API调用失败，使用默认数据
+        setAlbums([
+          {
+            id: '1',
+            title: '城市夜景',
+            description: '现代都市的夜晚美景摄影集',
+            coverImage: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            date: '2023-10-15',
+            featured: true,
+            images: 24
+          },
+          {
+            id: '2',
+            title: '自然风光',
+            description: '壮丽的自然景观摄影',
+            coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            date: '2023-09-22',
+            featured: false,
+            images: 32
+          },
+          {
+            id: '3',
+            title: '人物肖像',
+            description: '专业人像摄影作品',
+            coverImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            date: '2023-08-30',
+            featured: true,
+            images: 18
+          },
+          {
+            id: '4',
+            title: '旅行记忆',
+            description: '世界旅行中的美好瞬间',
+            coverImage: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            date: '2023-07-18',
+            featured: false,
+            images: 42
+          },
+          {
+            id: '5',
+            title: '动物世界',
+            description: '野生动物的精彩瞬间',
+            coverImage: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            date: '2023-06-05',
+            featured: true,
+            images: 28
+          },
+          {
+            id: '6',
+            title: '美食摄影',
+            description: '精致美食的视觉盛宴',
+            coverImage: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            date: '2023-05-12',
+            featured: false,
+            images: 15
+          }
+        ]);
         setLoading(false);
       }
     };
@@ -41,213 +98,245 @@ const AlbumsPage = () => {
     fetchAlbums();
   }, []);
 
-  const getFallbackAlbums = (): Album[] => [
-    {
-      id: '1',
-      title: 'Neon City',
-      description: 'Cyberpunk vibes and night lights.',
-      coverImage: 'https://images.unsplash.com/photo-1555685812-4b943f3db990?q=80&w=2070&auto=format&fit=crop',
-      date: '2023-11-01',
-      featured: true,
-      images: 12
-    },
-    {
-      id: '2',
-      title: 'Digital Nature',
-      description: 'Where technology meets the wild.',
-      coverImage: 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?q=80&w=1974&auto=format&fit=crop',
-      date: '2023-10-15',
-      featured: true,
-      images: 8
-    },
-    {
-      id: '3',
-      title: 'Abstract Minds',
-      description: 'Deep dive into abstract geometry.',
-      coverImage: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop',
-      date: '2023-09-20',
-      featured: false,
-      images: 15
-    },
-    {
-      id: '4',
-      title: 'Urban Exploration',
-      description: 'Lost in the concrete jungle.',
-      coverImage: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?q=80&w=2070&auto=format&fit=crop',
-      date: '2023-08-10',
-      featured: false,
-      images: 20
-    },
-    {
-      id: '5',
-      title: 'Minimalist',
-      description: 'Less is more.',
-      coverImage: 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=2067&auto=format&fit=crop',
-      date: '2023-07-05',
-      featured: true,
-      images: 10
-    },
-    {
-      id: '6',
-      title: 'Portraits',
-      description: 'Faces of the future.',
-      coverImage: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1964&auto=format&fit=crop',
-      date: '2023-06-12',
-      featured: false,
-      images: 18
+  // 获取特定相册的详细信息
+  const loadAlbumImages = async (albumId: string) => {
+    try {
+      // 这里可以调用API获取相册的详细信息
+      const albumDetail = albums.find(album => album.id === albumId);
+      setSelectedAlbum(albumDetail || null);
+    } catch (error) {
+      console.error('获取相册详情失败:', error);
     }
-  ];
-
-  // Collect all images for the ParallaxScroll (simulated from covers for now)
-  const allImages = albums.map(a => a.coverImage).concat(albums.map(a => a.coverImage)).concat(albums.map(a => a.coverImage)); // Duplicate to fill scroll
-
-  // Generate mock images for selected album
-  const getAlbumImages = (album: Album) => {
-    return Array.from({ length: album.images }).map((_, i) => ({
-      id: `${album.id}-${i}`,
-      src: album.coverImage, // In real app, this would be different images
-      alt: `${album.title} ${i}`,
-      title: `${album.title} #${i + 1}`
-    }));
   };
 
-  if (loading) return <Loader />;
+  // 加载所有相册图片用于轮播模式
+  const allImages = albums.flatMap(album => 
+    Array.from({ length: 5 }, (_, i) => ({
+      id: `${album.id}-${i}`,
+      src: album.coverImage,
+      alt: `${album.title} - 图片 ${i + 1}`,
+      title: `${album.title} - 图片 ${i + 1}`,
+      description: `这是${album.title}相册中的第${i + 1}张图片`,
+      date: album.date
+    }))
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-tech-darkblue via-tech-deepblue to-tech-cyan flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-tech-cyan mb-4"></div>
+          <p className="text-white">正在加载相册...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-tech-cyan selection:text-black">
-      {/* 1. Hero Section with Glitch Text */}
-      <section className="relative h-[80vh] flex flex-col items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tech-deepblue/20 via-black to-black z-0" />
-        <div className="z-10 text-center space-y-6">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <GlitchText text="CYBER" size="xl" className="block" />
-            <GlitchText text="GALLERY" size="xl" className="block" />
-          </motion.div>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="text-tech-cyan/80 text-lg md:text-xl tracking-widest uppercase font-light"
-          >
-            Visual Archives // v2.0
-          </motion.p>
-        </div>
-        
-        {/* Scroll Indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+    <div className="min-h-screen bg-gradient-to-br from-tech-darkblue via-tech-deepblue to-tech-cyan pb-16 pt-24">
+      <div className="container mx-auto px-4">
+        {/* 页面标题 */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Scroll to Explore</span>
-          <div className="w-[1px] h-12 bg-gradient-to-b from-tech-cyan to-transparent" />
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 flex items-center justify-center">
+            <Camera className="mr-3" /> 我的相册
+          </h1>
+          <p className="text-xl text-tech-lightcyan max-w-2xl mx-auto">
+            探索生活中的美好瞬间，用镜头记录难忘时刻
+          </p>
         </motion.div>
-      </section>
 
-      {/* 2. Featured Albums (Focus Cards) */}
-      <section className="py-24 px-4 relative z-10">
-        <div className="container mx-auto">
-          <div className="flex items-end justify-between mb-16 px-4 md:px-8">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-bold mb-2 text-white">
-                ALBUM <span className="text-tech-cyan">COLLECTIONS</span>
-              </h2>
-              <p className="text-white/60 max-w-md">
-                Curated moments from the digital frontier. Hover to focus.
-              </p>
+        {/* 视图模式切换 */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex rounded-lg border border-glass-border bg-glass/30 backdrop-blur-xl p-1">
+            <button
+              className={cn(
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                viewMode === 'grid'
+                  ? 'bg-tech-cyan text-white shadow-md'
+                  : 'text-white/80 hover:text-white'
+              )}
+              onClick={() => setViewMode('grid')}
+            >
+              <Grid3X3 className="inline mr-2 h-4 w-4" /> 网格视图
+            </button>
+            <button
+              className={cn(
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                viewMode === 'carousel'
+                  ? 'bg-tech-cyan text-white shadow-md'
+                  : 'text-white/80 hover:text-white'
+              )}
+              onClick={() => setViewMode('carousel')}
+            >
+              <Film className="inline mr-2 h-4 w-4" /> 幻灯片
+            </button>
+          </div>
+        </div>
+
+        {/* 相册筛选器 */}
+        <div className="mb-8 p-4 rounded-xl bg-glass/30 backdrop-blur-xl border border-glass-border">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="搜索相册..."
+                className="w-full pl-10 pr-4 py-2 bg-black/20 rounded-lg border border-glass-border text-white focus:outline-none focus:ring-2 focus:ring-tech-cyan"
+              />
             </div>
-            <div className="hidden md:block text-right">
-              <p className="text-4xl font-mono text-white/20">01</p>
+            <div className="flex space-x-2">
+              <button className="px-4 py-2 bg-tech-cyan/20 hover:bg-tech-cyan/30 rounded-lg border border-glass-border transition-all duration-300 flex items-center">
+                <Star className="mr-2 h-4 w-4" /> 精选
+              </button>
+              <button className="px-4 py-2 bg-tech-cyan/20 hover:bg-tech-cyan/30 rounded-lg border border-glass-border transition-all duration-300 flex items-center">
+                <Calendar className="mr-2 h-4 w-4" /> 最新
+              </button>
+              <button className="px-4 py-2 bg-tech-cyan/20 hover:bg-tech-cyan/30 rounded-lg border border-glass-border transition-all duration-300 flex items-center">
+                <Filter className="mr-2 h-4 w-4" /> 更多
+              </button>
             </div>
           </div>
-          
-          <FocusCards 
-            cards={albums} 
-            onCardClick={(id) => {
-              const album = albums.find(a => a.id === id);
-              if (album) setSelectedAlbum(album);
-            }} 
-          />
         </div>
-      </section>
 
-      {/* 3. Visual Stream (Parallax Scroll) */}
-      <section className="py-24 relative bg-neutral-950">
-        <div className="container mx-auto px-4">
-           <div className="flex items-end justify-between mb-8 px-4 md:px-8">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-bold mb-2 text-white">
-                VISUAL <span className="text-tech-cyan">STREAM</span>
-              </h2>
-              <p className="text-white/60 max-w-md">
-                A continuous flow of captured memories.
-              </p>
-            </div>
-            <div className="hidden md:block text-right">
-              <p className="text-4xl font-mono text-white/20">02</p>
-            </div>
+        {/* 相册列表 */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {albums.map((album, index) => (
+              <motion.div
+                key={album.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <GlassCard 
+                  className="h-full cursor-pointer overflow-hidden group"
+                  onClick={() => loadAlbumImages(album.id)}
+                >
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={album.coverImage}
+                      alt={album.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    {album.featured && (
+                      <div className="absolute top-3 right-3 bg-tech-cyan text-black text-xs font-bold px-2 py-1 rounded-full">
+                        精选
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                      <div>
+                        <h3 className="text-white font-bold text-lg">{album.title}</h3>
+                        <p className="text-white/80 text-sm">{album.images} 张照片</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-white font-bold text-lg mb-1">{album.title}</h3>
+                    <p className="text-white/80 mb-2">{album.description}</p>
+                    <div className="flex justify-between items-center text-white/60 text-sm">
+                      <span>{album.date}</span>
+                      <span>{album.images} 张照片</span>
+                    </div>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            ))}
           </div>
-          <ParallaxScroll images={allImages} />
-        </div>
-      </section>
+        ) : (
+          <div className="mb-12">
+            <ImageCarousel 
+              images={allImages} 
+              autoPlay={true} 
+              interval={4000}
+              className="mb-12"
+            />
+          </div>
+        )}
 
-      {/* 4. Selected Album Overlay (Modal style) */}
-      <AnimatePresence>
+        {/* 选择的相册详情 */}
         {selectedAlbum && (
           <motion.div
-            initial={{ opacity: 0, y: '100%' }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-50 bg-black overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-12"
           >
-            <div className="min-h-screen p-4 md:p-8">
-              {/* Header */}
-              <div className="sticky top-0 z-20 flex justify-between items-center mb-12 bg-black/80 backdrop-blur-md p-4 rounded-xl border border-white/10">
-                <button 
-                  onClick={() => setSelectedAlbum(null)}
-                  className="flex items-center gap-2 text-white/80 hover:text-tech-cyan transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                  <span className="uppercase tracking-wider text-sm">Back to Collections</span>
-                </button>
-                <div className="text-center">
-                  <h2 className="text-xl font-bold text-white">{selectedAlbum.title}</h2>
-                  <p className="text-xs text-white/50 uppercase tracking-widest">{selectedAlbum.date}</p>
-                </div>
-                <button 
-                  onClick={() => setSelectedAlbum(null)}
-                  className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Album Content */}
-              <div className="container mx-auto max-w-7xl">
-                <div className="mb-16 text-center">
-                  <h1 className="text-5xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 mb-6">
-                    {selectedAlbum.title.toUpperCase()}
-                  </h1>
-                  <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
-                    {selectedAlbum.description}
-                  </p>
-                </div>
-
-                <MasonryGrid 
-                  images={getAlbumImages(selectedAlbum)} 
-                  onImageClick={(img) => console.log('View image', img)} 
-                />
-              </div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">{selectedAlbum.title}</h2>
+              <button 
+                className="text-tech-cyan hover:text-tech-lightcyan"
+                onClick={() => setSelectedAlbum(null)}
+              >
+                关闭
+              </button>
             </div>
+            <ImageGallery 
+              images={Array.from({ length: 12 }, (_, i) => ({
+                id: `${selectedAlbum.id}-${i}`,
+                src: selectedAlbum.coverImage,
+                alt: `${selectedAlbum.title} - 图片 ${i + 1}`,
+                title: `${selectedAlbum.title} - 图片 ${i + 1}`,
+                description: `这是${selectedAlbum.title}相册中的第${i + 1}张图片`,
+                date: selectedAlbum.date
+              }))}
+              columns={3}
+              showLightbox={true}
+              enableFilter={false}
+              enableSearch={false}
+            />
           </motion.div>
         )}
-      </AnimatePresence>
+
+        {/* 特色相册部分 */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">精选相册</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {albums
+              .filter(album => album.featured)
+              .map((album, index) => (
+                <motion.div
+                  key={album.id}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <GlassCard className="group overflow-hidden">
+                    <div className="flex flex-col md:flex-row">
+                      <div className="md:w-2/5 relative">
+                        <img
+                          src={album.coverImage}
+                          alt={album.title}
+                          className="w-full h-64 md:h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute top-3 right-3 bg-tech-cyan text-black text-xs font-bold px-2 py-1 rounded-full">
+                          精选
+                        </div>
+                      </div>
+                      <div className="md:w-3/5 p-6 flex flex-col justify-center">
+                        <h3 className="text-xl font-bold text-white mb-2">{album.title}</h3>
+                        <p className="text-white/80 mb-4">{album.description}</p>
+                        <div className="flex justify-between items-center text-white/60 text-sm mt-auto">
+                          <span>{album.date}</span>
+                          <span>{album.images} 张照片</span>
+                        </div>
+                        <button 
+                          className="mt-4 self-start px-4 py-2 bg-tech-cyan/20 hover:bg-tech-cyan/30 rounded-lg border border-glass-border transition-all duration-300"
+                          onClick={() => loadAlbumImages(album.id)}
+                        >
+                          查看相册
+                        </button>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </motion.div>
+              ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
