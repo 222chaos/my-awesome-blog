@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link as LinkIcon, MapPin, Calendar } from 'lucide-react';
 import { UserProfile, UserStats } from '@/types';
-import { fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats, uploadMockAvatar } from '@/lib/api/profile';
+import { fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
 import { validateSocialLink, getCurrentUser } from '@/services/userService';
 import { useLoading } from '@/context/loading-context';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
@@ -29,46 +29,41 @@ export default function ProfilePage() {
   const [saveStatus, setSaveStatus] = useState<{success: boolean; message: string} | null>(null);
 
   useEffect(() => {
-    // 延迟加载数据，确保认证状态有时间同步
-    const timer = setTimeout(() => {
-      loadProfileData();
-    }, 300); // 减少延迟时间，因为ProtectedRoute现在更快响应
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const loadProfileData = async () => {
-    try {
-      showLoading();
-      setIsPageLoading(true);
-
-      // 检查登录状态
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        // 未登录，自动重定向到登录页
-        router.push('/login');
+    const checkAuthAndLoadData = async () => {
+      // 检查本地存储的认证状态
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // 没有 token，立即重定向到登录页
+        router.push('/login?message=请先登录以查看您的个人资料');
         return;
       }
 
-      // 已登录，加载资料和统计数据
-      const profileData = await fetchCurrentUserProfile();
-      const statsData = await fetchCurrentUserStats();
-      setProfile(profileData);
-      setStats(statsData);
-      setFormData(profileData);
-    } catch (error) {
-      console.error('Error loading profile data:', error);
-      // 如果是认证错误或其他错误，重定向到登录页
-      if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
-        router.push('/login?message=请先登录以查看您的个人资料');
-      } else {
-        router.push('/login');
+      try {
+        // 有 token，加载数据
+        showLoading();
+        setIsPageLoading(true);
+
+        const profileData = await fetchCurrentUserProfile();
+        const statsData = await fetchCurrentUserStats();
+        setProfile(profileData);
+        setStats(statsData);
+        setFormData(profileData);
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+        // 如果是认证错误，重定向到登录页
+        if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+          router.push('/login?message=认证已过期，请重新登录');
+        } else {
+          router.push('/login');
+        }
+      } finally {
+        hideLoading();
+        setIsPageLoading(false);
       }
-    } finally {
-      hideLoading();
-      setIsPageLoading(false);
-    }
-  };
+    };
+
+    checkAuthAndLoadData();
+  }, [router]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -88,19 +83,8 @@ export default function ProfilePage() {
           router.push('/login');
           return;
         }
-        // 如果真实API失败，尝试使用模拟API
-        try {
-          const file = e.target.files[0];
-          const result = await uploadMockAvatar(file);
-          setFormData((prev: Partial<UserProfile>) => ({
-            ...prev,
-            avatar: result.avatar_url
-          }));
-        } catch (mockError) {
-          console.error('Error uploading avatar with mock:', mockError);
-          setSaveStatus({ success: false, message: '上传头像失败，请重试。' });
-          setTimeout(() => setSaveStatus(null), 3000);
-        }
+        setSaveStatus({ success: false, message: '上传头像失败，请重试。' });
+        setTimeout(() => setSaveStatus(null), 3000);
       }
     }
   };
@@ -190,7 +174,7 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <div className={`min-h-screen py-8 sm:py-12 transition-colors duration-300 ${containerBgClass}`}>
+      <div className={`min-h-screen pt-24 pb-8 sm:pb-12 transition-colors duration-300 ${containerBgClass}`}>
         <div className="container mx-auto px-4 max-w-4xl">
           {saveStatus && (
             <div className={`mb-6 p-4 rounded-lg transition-all duration-300 ${

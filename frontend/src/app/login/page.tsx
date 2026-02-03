@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -8,7 +8,8 @@ import { loginUser } from '@/services/userService';
 import { useLoading } from '@/context/loading-context';
 import './form-styles.css';
 
-export default function LoginPage() {
+// 提取使用 searchParams 的逻辑到单独的组件中
+function LoginFormContent() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,32 +26,32 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     // 客户端验证
     if (!username || !password) {
       setError('请填写所有必填字段');
       return;
     }
-    
+
     // 验证用户名长度
     if (username.length < 3) {
       setError('用户名长度至少为3位');
       return;
     }
-    
+
     // 验证密码长度
     if (password.length < 6) {
       setError('密码长度至少为6位');
       return;
     }
-    
+
     showLoading();
 
     try {
       const result = await loginUser({ username, password });
 
       if (result.success && result.user) {
-        console.log('Login successful, attempting to navigate to profile');
+        console.log('Login successful, attempting to navigate');
         // 登录成功后，检查是否有重定向参数
         const redirectParam = searchParams.get('redirect');
         const redirectPath = redirectParam ? decodeURIComponent(redirectParam) : '/profile';
@@ -58,19 +59,13 @@ export default function LoginPage() {
 
         // 确保重定向路径是安全的，只允许内部路径
         if (redirectPath.startsWith('/') && !redirectPath.startsWith('//')) {
-          // 使用 Next.js 路由进行导航以保持 SPA 特性
+          // 使用 window.location.href 强制页面刷新，确保中间件能读取到新设置的 cookie
           console.log('Navigating to:', redirectPath);
-          // 使用 setTimeout 确保状态更新后再跳转
-          setTimeout(() => {
-            router.push(redirectPath as any);
-          }, 300); // 延迟300毫秒，确保认证状态同步
+          window.location.href = redirectPath;
         } else {
           // 如果重定向路径不安全，则默认导航到主页
           console.log('Navigating to default profile page');
-          // 使用 setTimeout 确保状态更新后再跳转
-          setTimeout(() => {
-            router.push('/profile' as any);
-          }, 300); // 延迟300毫秒，确保认证状态同步
+          window.location.href = '/profile';
         }
       } else {
         console.log('Login failed:', result.error);
@@ -217,5 +212,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 默认导出组件，用 Suspense 包裹
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">加载中...</div>}>
+      <LoginFormContent />
+    </Suspense>
   );
 }

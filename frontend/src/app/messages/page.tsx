@@ -11,13 +11,15 @@ import Danmaku from '@/components/messages/Danmaku';
 import MessageList from '@/components/messages/MessageList';
 import MessageInput from '@/components/messages/MessageInput';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingProvider, useLoading } from '@/context/loading-context';
+import Loader from '@/components/loading/Loader';
 
 export default function MessagesPage() {
   const { themedClasses } = useThemedClasses();
+  const { showLoading, hideLoading } = useLoading();
   const [messages, setMessages] = useState<Message[]>([]);
   const [danmakuMessages, setDanmakuMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id: string; username: string; avatar?: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDanmakuPlaying, setIsDanmakuPlaying] = useState(true);
   const [danmakuDensity, setDanmakuDensity] = useState(50); // 弹幕密度百分比
   const [showStats, setShowStats] = useState(false);
@@ -32,6 +34,7 @@ export default function MessagesPage() {
 
   // 加载数据
   const loadData = useCallback(async () => {
+    showLoading();
     try {
       const [allMessages, danmakuMsgs, user] = await Promise.all([
         getMessages(),
@@ -69,9 +72,9 @@ export default function MessagesPage() {
     } catch (error) {
       console.error('加载留言失败:', error);
     } finally {
-      setIsLoading(false);
+      hideLoading();
     }
-  }, []);
+  }, [showLoading, hideLoading]);
 
   useEffect(() => {
     loadData();
@@ -109,22 +112,15 @@ export default function MessagesPage() {
     }));
   }, [danmakuMessages]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tech-cyan" />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen" ref={containerRef}>
+    <LoadingProvider>
+      <div className="min-h-screen" ref={containerRef}>
       {/* 页面标题 */}
       <div className="relative overflow-hidden">
         {/* 背景装饰 */}
         <div className="absolute inset-0 bg-gradient-to-b from-tech-cyan/5 to-transparent pointer-events-none" />
 
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 pt-24 pb-12">
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-tech-cyan to-tech-lightcyan mb-6 shadow-lg shadow-tech-cyan/20">
               <Mail className="w-8 h-8 text-white" />
@@ -301,5 +297,6 @@ export default function MessagesPage() {
         />
       </div>
     </div>
+    </LoadingProvider>
   );
 }
