@@ -18,6 +18,10 @@ export default {
       '2xl': '1536px',
     },
     extend: {
+      fontFamily: {
+        sans: ['var(--font-manrope)', 'var(--font-inter)', 'ui-sans-serif', 'system-ui'],
+        display: ['var(--font-syne)', 'var(--font-inter)', 'ui-sans-serif', 'system-ui'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -178,6 +182,10 @@ export default {
           '0%': { transform: 'translateY(-25%)', 'will-change': 'transform' },
           '100%': { transform: 'translateY(25%)', 'will-change': 'transform' },
         },
+        'rotate-y-180': {
+          '0%': { transform: 'rotateY(0deg)', 'will-change': 'transform' },
+          '100%': { transform: 'rotateY(180deg)', 'will-change': 'transform' },
+        },
       },
       // 统一定义animation（只保留一次）
       animation: {
@@ -198,6 +206,8 @@ export default {
         'slide-from-top': 'slide-from-top 1.5s ease-out forwards',
         'vertical-scroll': 'vertical-scroll 20s linear infinite',
         'spin-slow': 'spin 8s linear infinite',
+        'rotate-y-180': 'rotate-y-180 0.7s ease-in-out forwards',
+        'backface-hidden': 'backface-hidden 0s ease-in-out forwards',
       },
       transitionProperty: {
         'height': 'height',

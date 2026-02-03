@@ -80,7 +80,7 @@ export default function Navbar() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          'sticky top-0 z-[100] w-full transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-[100] w-full transition-all duration-300',
           reducedMotion ? 'transition-none' : '',
           scrolled || isHovered
             ? 'bg-glass backdrop-blur-3xl shadow-2xl'

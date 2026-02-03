@@ -1,75 +1,33 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { FileText, Eye, Users, ArrowRight, Heart, MessageCircle, Calendar, AlertCircle, RefreshCw, ExternalLink, Globe } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button';
-import { useLoading } from '@/context/loading-context';
-import { ArticleCardSkeleton } from './ArticleCardSkeleton';
-import FriendLinks from './FriendLinks';
-import ProfileCard from './ProfileCard';
-
-
-
+import { useState, useEffect } from 'react'
+import { ArrowRight, Heart, MessageCircle, Calendar, AlertCircle, RefreshCw, ExternalLink, TrendingUp, Activity } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/Button'
+import { useLoading } from '@/context/loading-context'
+import { ArticleCardSkeleton } from './ArticleCardSkeleton'
+import FriendLinks from './FriendLinks'
+import ProfileCard from './ProfileCard'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts'
 
 interface FriendLink {
-  id: string;
-  name: string;
-  url: string;
-  favicon: string;
-  description?: string;
-}
-
-interface Stat {
-  label: string;
-  value: number;
-  icon: React.ElementType;
+  id: string
+  name: string
+  url: string
+  favicon: string
+  description?: string
 }
 
 interface Article {
-  id: number;
-  title: string;
-  excerpt: string;
-  category: string;
-  date: string;
-  likes: number;
-  comments: number;
-  image?: string;
+  id: number
+  title: string
+  excerpt: string
+  category: string
+  date: string
+  likes: number
+  comments: number
+  image?: string
 }
-
-
-
-// 模拟友链数据
-const mockFriendLinksForFlip: FriendLink[] = [
-  {
-    id: '1',
-    name: '技术博客',
-    description: '分享前端开发经验',
-    url: 'https://example1.com',
-    favicon: 'https://placehold.co/40x40/2563eb/ffffff?text=T'
-  },
-  {
-    id: '2',
-    name: '设计灵感',
-    description: 'UI/UX设计资源',
-    url: 'https://example2.com',
-    favicon: 'https://placehold.co/40x40/10b981/ffffff?text=D'
-  },
-  {
-    id: '3',
-    name: '开源社区',
-    description: '开源项目分享',
-    url: 'https://example3.com',
-    favicon: 'https://placehold.co/40x40/f59e0b/ffffff?text=O'
-  },
-  {
-    id: '4',
-    name: '程序员笔记',
-    description: '算法与数据结构',
-    url: 'https://example4.com',
-    favicon: 'https://placehold.co/40x40/ef4444/ffffff?text=C'
-  }
-];
 
 const mockFriendLinks: FriendLink[] = [
   {
@@ -77,34 +35,31 @@ const mockFriendLinks: FriendLink[] = [
     name: 'Next.js',
     url: 'https://nextjs.org',
     favicon: '/assets/nextjs-logo.svg',
-    description: '生产就绪的React框架',
+    description: '生产就绪的React框架'
   },
   {
     id: '2',
     name: 'Vercel',
     url: 'https://vercel.com',
     favicon: '/assets/vercel-logo.svg',
-    description: '开发. 预览. 部署.',
+    description: '开发. 预览. 部署.'
   },
   {
     id: '3',
     name: 'Tailwind CSS',
     url: 'https://tailwindcss.com',
     favicon: '/assets/tailwind-logo.svg',
-    description: '快速构建现代网站',
+    description: '快速构建现代网站'
   },
   {
     id: '4',
     name: 'Radix UI',
     url: 'https://www.radix-ui.com',
     favicon: '/assets/radix-logo.svg',
-    description: '无样式、可访问的UI组件',
-  },
-];
+    description: '无样式、可访问的UI组件'
+  }
+]
 
-
-
-// 模拟文章数据
 const mockArticles: Article[] = [
   {
     id: 1,
@@ -136,77 +91,46 @@ const mockArticles: Article[] = [
     comments: 24,
     image: '/assets/nextjs-cover.jpg'
   }
-];
+]
 
+const monthlyStatsData = [
+  { month: '1月', articles: 8, views: 12450, likes: 320 },
+  { month: '2月', articles: 12, views: 18920, likes: 485 },
+  { month: '3月', articles: 15, views: 24680, likes: 620 },
+  { month: '4月', articles: 10, views: 21340, likes: 540 },
+  { month: '5月', articles: 18, views: 28750, likes: 780 },
+  { month: '6月', articles: 22, views: 34560, likes: 950 }
+]
 
+const weeklyActivityData = [
+  { day: '周一', visitors: 145, engagement: 78 },
+  { day: '周二', visitors: 168, engagement: 85 },
+  { day: '周三', visitors: 152, engagement: 72 },
+  { day: '周四', visitors: 178, engagement: 90 },
+  { day: '周五', visitors: 165, engagement: 82 },
+  { day: '周六', visitors: 132, engagement: 65 },
+  { day: '周日', visitors: 128, engagement: 60 }
+]
 
-// 友站链接翻转卡片组件
-function FriendLinkFlipCard() {
-  return (
-    <section className="flip-card" style={{ width: '100%', minHeight: '200px' }} aria-label="友站链接卡片">
-      <div className="flip-card-inner" style={{ minHeight: '200px' }}>
-        {/* 背面 - 友链列表 */}
-        <div className="flip-card-back rounded-2xl transition-all duration-300 glass-card overflow-hidden">
-          {/* 背面内容 */}
-          <div className="h-full flex flex-col p-4">
-            <h4 className="text-sm font-bold text-foreground mb-3 text-center">友情链接</h4>
+const categoryDistributionData = [
+  { category: '前端开发', count: 45, percentage: 35 },
+  { category: '后端开发', count: 32, percentage: 25 },
+  { category: 'DevOps', count: 20, percentage: 16 },
+  { category: '设计', count: 18, percentage: 14 },
+  { category: '其他', count: 12, percentage: 10 }
+]
 
-            {/* 友链列表 - 2x2 网格 */}
-            <div className="grid grid-cols-2 gap-2 flex-1">
-              {mockFriendLinksForFlip.map((link) => (
-                <a
-                  key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex flex-col items-center justify-center p-2 rounded-lg bg-[var(--card)]/80 hover:bg-tech-cyan/20 transition-colors"
-                >
-                  <img
-                    src={link.favicon}
-                    alt={link.name}
-                    className="w-8 h-8 rounded-full mb-1 group-hover:scale-110 transition-transform"
-                  />
-                  <span className="text-xs font-medium text-foreground group-hover:text-tech-cyan truncate w-full text-center">
-                    {link.name}
-                  </span>
-                </a>
-              ))}
-            </div>
-
-            {/* 查看更多按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full mt-2 text-tech-cyan hover:bg-tech-cyan/10 text-xs group"
-            >
-              查看全部
-              <ExternalLink className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// 文章卡片组件
 function ArticleCard({ article, delayClass }: { article: Article; delayClass: string }) {
-  const [imageError, setImageError] = useState(false);
+  const [imageError, setImageError] = useState(false)
 
   return (
-    <article
-      role="article"
-      aria-label={article.title}
-      tabIndex={0}
-      className={`group`}
-    >
+    <article role="article" aria-label={article.title} tabIndex={0} className="group">
       <Card
         key={article.id}
         className={`glass-card backdrop-blur-xl bg-card/40 hover:bg-card/60 hover:shadow-[0_0_40px_var(--shadow-tech-cyan),0_8px_32px_rgba(0,0,0,0.12)] border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] animate-fade-in-up ${delayClass} overflow-hidden cursor-pointer`}
       >
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row">
-            {/* 左侧图片 */}
             <div className="w-full sm:w-48 h-48 sm:h-auto flex-shrink-0 overflow-hidden">
               <img
                 src={imageError ? '/assets/avatar.jpg' : (article.image || '/assets/avatar.jpg')}
@@ -216,21 +140,17 @@ function ArticleCard({ article, delayClass }: { article: Article; delayClass: st
               />
             </div>
 
-            {/* 右侧内容 */}
             <div className="flex-1 p-4 sm:p-6 flex flex-col">
               <div className="flex items-start justify-between gap-4 flex-1">
                 <div className="flex-1 transition-transform duration-300 group-hover:translate-x-2">
-                  {/* 文章标题 */}
                   <h3 className="text-lg sm:text-xl font-bold mb-2 text-foreground group-hover:text-tech-cyan transition-colors">
                     {article.title}
                   </h3>
 
-                  {/* 文章摘要 */}
                   <p className="text-muted-foreground mb-3 sm:mb-4 line-clamp-2 text-sm sm:text-base">
                     {article.excerpt}
                   </p>
 
-                  {/* 文章元信息 */}
                   <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                     <div className="flex items-center gap-1" aria-label={`发布日期：${article.date}`}>
                       <Calendar className="w-4 h-4" />
@@ -250,7 +170,6 @@ function ArticleCard({ article, delayClass }: { article: Article; delayClass: st
                   </div>
                 </div>
 
-                {/* 箭头图标 */}
                 <div className="flex-shrink-0">
                   <div
                     className="w-10 h-10 rounded-full bg-tech-cyan/20 flex items-center justify-center group-hover:bg-tech-cyan transition-colors"
@@ -265,12 +184,11 @@ function ArticleCard({ article, delayClass }: { article: Article; delayClass: st
         </CardContent>
       </Card>
     </article>
-  );
+  )
 }
 
-// 文章列表组件
 function ArticleList({ articles, loading, error, onRetry }: { articles: Article[]; loading: boolean; error: string | null; onRetry: () => void }) {
-  const delayClasses = ['animate-delay-50', 'animate-delay-100', 'animate-delay-150'];
+  const delayClasses = ['animate-delay-50', 'animate-delay-100', 'animate-delay-150']
 
   if (loading) {
     return (
@@ -284,7 +202,7 @@ function ArticleList({ articles, loading, error, onRetry }: { articles: Article[
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -303,7 +221,7 @@ function ArticleList({ articles, loading, error, onRetry }: { articles: Article[
           </Button>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
@@ -314,15 +232,10 @@ function ArticleList({ articles, loading, error, onRetry }: { articles: Article[
 
       <div className="space-y-4 sm:space-y-6">
         {articles.map((article, index) => (
-          <ArticleCard
-            key={article.id}
-            article={article}
-            delayClass={delayClasses[index % delayClasses.length]}
-          />
+          <ArticleCard key={article.id} article={article} delayClass={delayClasses[index % delayClasses.length]} />
         ))}
       </div>
 
-      {/* 查看更多按钮 */}
       <div className="text-center pt-4">
         <Button
           variant="link"
@@ -334,58 +247,152 @@ function ArticleList({ articles, loading, error, onRetry }: { articles: Article[
         </Button>
       </div>
     </div>
-  );
+  )
+}
+
+function StatsCharts() {
+  return (
+    <div className="space-y-6">
+      <Card className="glass-card backdrop-blur-xl bg-card/40 border-white/10 p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-tech-cyan" />
+            <h3 className="text-lg font-bold text-foreground">月度统计</h3>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Activity className="w-4 h-4" />
+            <span>6个月数据</span>
+          </div>
+        </div>
+
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={monthlyStatsData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <XAxis
+              dataKey="month"
+              stroke="#9ca3af"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#9ca3af"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                border: '1px solid rgba(6, 182, 212, 0.3)',
+                borderRadius: '8px',
+                color: '#fff'
+              }}
+              itemStyle={{ color: '#06b6d4' }}
+            />
+            <Bar dataKey="articles" fill="#06b6d4" radius={[4, 4, 0, 0]} name="文章数" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      <Card className="glass-card backdrop-blur-xl bg-card/40 border-white/10 p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Activity className="w-5 h-5 text-tech-cyan" />
+            <h3 className="text-lg font-bold text-foreground">周活跃度</h3>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>实时更新</span>
+          </div>
+        </div>
+
+        <ResponsiveContainer width="100%" height={200}>
+          <AreaChart data={weeklyActivityData}>
+            <defs>
+              <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <XAxis
+              dataKey="day"
+              stroke="#9ca3af"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#9ca3af"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                border: '1px solid rgba(6, 182, 212, 0.3)',
+                borderRadius: '8px',
+                color: '#fff'
+              }}
+              itemStyle={{ color: '#06b6d4' }}
+            />
+            <Area
+              type="monotone"
+              dataKey="visitors"
+              stroke="#06b6d4"
+              strokeWidth={2}
+              fillOpacity={1}
+              fill="url(#colorVisitors)"
+              name="访客数"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </Card>
+    </div>
+  )
 }
 
 export default function StatsPanel() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { showLoading, hideLoading } = useLoading();
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const { showLoading, hideLoading } = useLoading()
 
   useEffect(() => {
-    // 模拟数据加载
-    showLoading();
+    showLoading()
     const timer = setTimeout(() => {
-      hideLoading();
-      setLoading(false);
-    }, 1500);
+      hideLoading()
+      setLoading(false)
+    }, 1500)
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleRetry = () => {
-    setError(null);
-    showLoading();
-    setLoading(true);
+    setError(null)
+    showLoading()
+    setLoading(true)
     setTimeout(() => {
-      hideLoading();
-      setLoading(false);
-    }, 1500);
-  };
+      hideLoading()
+      setLoading(false)
+    }, 1500)
+  }
 
   return (
     <section className="py-8 sm:py-10 md:py-12 lg:py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {/* 左侧列 - 垂直堆叠 */}
           <div className="md:col-span-1 flex flex-col gap-6">
-            {/* 个人资料卡片 */}
             <ProfileCard />
-            {/* 友情链接 */}
             <FriendLinks links={mockFriendLinks} />
           </div>
 
-          {/* 右侧文章列表 */}
-          <div className="md:col-span-2">
-            <ArticleList
-              articles={mockArticles}
-              loading={loading}
-              error={error}
-              onRetry={handleRetry}
-            />
+          <div className="md:col-span-2 flex flex-col gap-6">
+            <ArticleList articles={mockArticles} loading={loading} error={error} onRetry={handleRetry} />
+            <StatsCharts />
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

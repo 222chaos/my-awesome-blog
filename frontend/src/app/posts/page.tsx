@@ -41,7 +41,7 @@ export default function PostsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 pt-24 pb-8">
         <Breadcrumb
           items={[
             { label: '首页', href: '/' },

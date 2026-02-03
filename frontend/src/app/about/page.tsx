@@ -32,7 +32,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
-      <div className="container mx-auto px-4 py-12 md:py-16 lg:py-20">
+      <div className="container mx-auto px-4 pt-24 pb-12 md:pb-16 lg:pb-20">
         <Card className="max-w-4xl mx-auto mb-12 overflow-hidden border-border shadow-lg transition-all duration-300 hover:shadow-xl">
           <CardContent className="p-8 md:p-12">
             <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6">

@@ -1,55 +1,148 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import GlassCard from '@/components/ui/GlassCard';
-import { useTheme } from '@/context/theme-context';
+import { useState, useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Award, Calendar, Image, Video, ChevronDown, ChevronRight, Badge, ExternalLink, FileText } from 'lucide-react'
+import GlassCard from '@/components/ui/GlassCard'
+import { cn } from '@/lib/utils'
 
-// 注册ScrollTrigger插件
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger)
+}
+
+interface MediaItem {
+  type: 'image' | 'video' | 'article'
+  url: string
+  title: string
 }
 
 interface TimelineEvent {
-  date: string;
-  title: string;
-  description: string;
+  id: string
+  date: string
+  title: string
+  description: string
+  badge?: {
+    type: 'milestone' | 'achievement' | 'award' | 'project'
+    label: string
+    color: string
+  }
+  media?: MediaItem[]
+  link?: string
 }
 
-interface TimelineProps {
-  events: TimelineEvent[];
+const mockEvents: TimelineEvent[] = [
+  {
+    id: '1',
+    date: '2024-12',
+    title: '完成100篇技术博客',
+    description: '坚持写作100篇技术博客，分享前端、后端和DevOps相关的知识和经验',
+    badge: {
+      type: 'milestone',
+      label: '里程碑',
+      color: 'from-purple-500 to-pink-500'
+    }
+  },
+  {
+    id: '2',
+    date: '2024-10',
+    title: '开源项目获得500+ Star',
+    description: '个人开源项目在GitHub上获得超过500个Star，感谢社区的支持',
+    badge: {
+      type: 'achievement',
+      label: '成就',
+      color: 'from-yellow-500 to-orange-500'
+    },
+    media: [
+      { type: 'image', url: '/assets/project-screenshot.jpg', title: '项目截图' }
+    ],
+    link: 'https://github.com/yourproject'
+  },
+  {
+    id: '3',
+    date: '2024-08',
+    title: '技术文章被推荐',
+    description: '多篇技术文章被掘金、知乎等平台推荐，累计阅读量超过10万',
+    badge: {
+      type: 'award',
+      label: '荣誉',
+      color: 'from-red-500 to-pink-500'
+    },
+    media: [
+      { type: 'article', url: '/articles/featured', title: '推荐文章' }
+    ]
+  },
+  {
+    id: '4',
+    date: '2024-06',
+    title: '发布第一个开源项目',
+    description: '正式发布第一个开源项目，为开发者提供实用的工具库',
+    badge: {
+      type: 'project',
+      label: '项目',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    media: [
+      { type: 'video', url: '/assets/project-demo.mp4', title: '项目演示' }
+    ],
+    link: 'https://github.com/yourproject'
+  },
+  {
+    id: '5',
+    date: '2024-03',
+    title: '开始技术博客之旅',
+    description: '创建个人技术博客，开始系统性地记录学习和成长历程',
+    badge: {
+      type: 'milestone',
+      label: '起点',
+      color: 'from-green-500 to-emerald-500'
+    }
+  }
+]
+
+const badgeIcons = {
+  milestone: Award,
+  achievement: Award,
+  award: Badge,
+  project: FileText
 }
 
-// 单个事件项的包装组件
-function TimelineEventItem({ event, index }: { event: TimelineEvent; index: number }) {
-  const itemRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
+const mediaIcons = {
+  image: Image,
+  video: Video,
+  article: FileText
+}
 
-  const isLeft = index % 2 === 0;
+interface TimelineEventItemProps {
+  event: TimelineEvent
+  index: number
+}
+
+function TimelineEventItem({ event, index }: TimelineEventItemProps) {
+  const itemRef = useRef<HTMLDivElement>(null)
+  const dotRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showMediaPreview, setShowMediaPreview] = useState(false)
+
+  const isLeft = index % 2 === 0
 
   useEffect(() => {
-    const item = itemRef.current;
-    const dot = dotRef.current;
-    const card = cardRef.current;
-    const line = lineRef.current;
+    const item = itemRef.current
+    const dot = dotRef.current
+    const card = cardRef.current
 
-    if (!item || !dot || !card || typeof window === 'undefined') return;
+    if (!item || !dot || !card || typeof window === 'undefined') return
 
-    // 创建时间轴来协调多个动画
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: item,
         start: 'top 85%',
         end: 'top 15%',
-        scrub: 1,
-        // markers: true, // 开启此行可显示调试标记
+        scrub: 1
       }
-    });
+    })
 
-    // 为时间轴点设置缩放和脉冲动画
     tl.fromTo(dot,
       { scale: 0, opacity: 0, boxShadow: '0 0 0px var(--tech-cyan)' },
       {
@@ -57,26 +150,11 @@ function TimelineEventItem({ event, index }: { event: TimelineEvent; index: numb
         opacity: 1,
         boxShadow: '0 0 20px var(--tech-cyan)',
         duration: 0.8,
-        ease: 'elastic.out(1, 0.5)',
+        ease: 'elastic.out(1, 0.5)'
       },
       0
-    );
+    )
 
-    // 为连接线段设置动画（仅对非第一个元素）
-    if (line && index > 0) {
-      tl.fromTo(line,
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          duration: 1.2,
-          transformOrigin: 'top',
-          ease: 'power2.inOut'
-        },
-        0
-      );
-    }
-
-    // 为卡片设置更丰富的视差滚动效果
     tl.fromTo(card,
       {
         x: isLeft ? -80 : 80,
@@ -92,93 +170,25 @@ function TimelineEventItem({ event, index }: { event: TimelineEvent; index: numb
         rotateY: 0,
         scale: 1,
         duration: 1.2,
-        ease: 'power3.out',
+        ease: 'power3.out'
       },
-      '<0.2' // 与前一个动画重叠0.2秒开始
-    );
+      '<0.2'
+    )
 
-    // 为卡片内部元素添加延迟动画
-    const titleElement = card.querySelector('h4');
-    const descElement = card.querySelector('p');
-    const dateElement = card.querySelector('.text-sm');
-
-    if (titleElement) {
-      tl.fromTo(titleElement,
-        { y: 15, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: 'power2.out'
-        },
-        '<0.3' // 在上面动画基础上再延迟0.3秒
-      );
-    }
-
-    if (descElement) {
-      tl.fromTo(descElement,
-        { y: 15, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          ease: 'power2.out'
-        },
-        '<0.1' // 紧随标题之后
-      );
-    }
-
-    if (dateElement) {
-      tl.fromTo(dateElement,
-        { y: 10, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.5,
-          ease: 'power2.out'
-        },
-        '<0.4' // 在标题之前
-      );
-    }
-
-    // 为整个项目添加轻微的浮动效果
-    tl.fromTo(item,
-      { y: 0 },
-      {
-        y: 8,
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      },
-      0
-    ).pause(); // 暂停自动播放，仅在滚动时激活
-
-    // 返回清理函数
     return () => {
-      tl.scrollTrigger?.kill();
-      tl.kill();
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, [isLeft, index]);
+      tl.scrollTrigger?.kill()
+      tl.kill()
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    }
+  }, [isLeft, index])
+
+  const BadgeIcon = event.badge ? badgeIcons[event.badge.type] : null
 
   return (
     <div
       ref={itemRef}
-      className={`relative flex items-start mb-12 ${isLeft ? 'flex-row' : 'flex-row-reverse'}`}
+      className={cn('relative flex items-start mb-12', isLeft ? 'flex-row' : 'flex-row-reverse')}
     >
-      {/* 连接线段 - 只对非第一个元素显示 */}
-      {index > 0 && (
-        <div
-          ref={lineRef}
-          className="absolute left-8 top-[-60px] h-[60px] w-0.5 origin-top"
-          style={{
-            background: 'linear-gradient(to bottom, transparent, var(--tech-cyan))'
-          }}
-        ></div>
-      )}
-
-      {/* 日期点 */}
       <div className="relative z-20 w-16 h-16 flex items-center justify-center">
         <div
           ref={dotRef}
@@ -188,35 +198,154 @@ function TimelineEventItem({ event, index }: { event: TimelineEvent; index: numb
             boxShadow: '0 0 15px var(--tech-cyan)',
             filter: 'blur(0.5px)'
           }}
-        ></div>
+        />
       </div>
 
-      {/* 事件卡片 */}
       <GlassCard
         ref={cardRef}
         className="flex-1 ml-4 relative z-10"
         hoverEffect={true}
         padding="md"
       >
-        <div className="text-sm text-tech-cyan mb-2 transition-all duration-300 group-hover:text-tech-lightcyan">{event.date}</div>
-        <h4 className="text-lg font-bold text-foreground mb-2 transition-all duration-300">{event.title}</h4>
-        <p className="text-muted-foreground transition-all duration-300">{event.description}</p>
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-tech-cyan" />
+            <span className="text-sm text-tech-cyan font-medium">{event.date}</span>
+          </div>
+
+          {event.badge && BadgeIcon && (
+            <div
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold',
+                'bg-gradient-to-r',
+                event.badge.color,
+                'text-white'
+              )}
+            >
+              <BadgeIcon className="w-3.5 h-3.5" />
+              {event.badge.label}
+            </div>
+          )}
+        </div>
+
+        <h4 className="text-lg font-bold text-foreground mb-2">{event.title}</h4>
+
+        <p
+          className={cn(
+            'text-muted-foreground transition-all duration-300',
+            !isExpanded && 'line-clamp-2'
+          )}
+        >
+          {event.description}
+        </p>
+
+        {(event.media || event.link) && (
+          <div className="mt-4 space-y-3">
+            {event.media && event.media.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setShowMediaPreview(!showMediaPreview)}
+                  className="flex items-center gap-2 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
+                  aria-expanded={showMediaPreview}
+                  aria-label={showMediaPreview ? '隐藏媒体预览' : '显示媒体预览'}
+                >
+                  {showMediaPreview ? (
+                    <>
+                      <ChevronDown className="w-4 h-4" />
+                      隐藏媒体
+                    </>
+                  ) : (
+                    <>
+                      <ChevronRight className="w-4 h-4" />
+                      查看媒体 ({event.media.length})
+                    </>
+                  )}
+                </button>
+
+                {showMediaPreview && (
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2 animate-fade-in-up">
+                    {event.media.map((media, idx) => {
+                      const MediaIcon = mediaIcons[media.type]
+                      return (
+                        <div
+                          key={idx}
+                          className={cn(
+                            'relative group overflow-hidden rounded-lg',
+                            'bg-glass/20 border border-glass-border',
+                            'cursor-pointer transition-all duration-300',
+                            'hover:scale-105 hover:shadow-lg'
+                          )}
+                          onClick={() => window.open(media.url, '_blank')}
+                          aria-label={`查看${media.title}`}
+                        >
+                          <div className="p-3 flex flex-col items-center gap-2">
+                            <MediaIcon className="w-8 h-8 text-tech-cyan" />
+                            <span className="text-xs text-center text-foreground">{media.title}</span>
+                          </div>
+
+                          <div className="absolute inset-0 bg-tech-cyan/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <ExternalLink className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {event.link && (
+              <a
+                href={event.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
+              >
+                查看详情
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
+          </div>
+        )}
+
+        {event.description.length > 100 && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="mt-3 flex items-center gap-1 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="w-4 h-4" />
+                收起
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" />
+                展开更多
+              </>
+            )}
+          </button>
+        )}
       </GlassCard>
     </div>
-  );
+  )
 }
 
-export default function Timeline({ events }: TimelineProps) {
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const verticalLineRef = useRef<HTMLDivElement>(null);
+function ChevronUp({ className }: { className?: string }) {
+  return <ChevronDown className={className} style={{ transform: 'rotate(180deg)' }} />
+}
+
+export default function Timeline() {
+  const timelineRef = useRef<HTMLDivElement>(null)
+  const verticalLineRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const timeline = timelineRef.current;
-    const verticalLine = verticalLineRef.current;
+    const timeline = timelineRef.current
+    const verticalLine = verticalLineRef.current
 
-    if (!timeline || !verticalLine || typeof window === 'undefined') return;
+    if (!timeline || !verticalLine || typeof window === 'undefined') return
 
-    // 为整个时间轴添加进入动画
     gsap.fromTo(timeline,
       { y: 60, opacity: 0, scale: 0.98 },
       {
@@ -232,9 +361,8 @@ export default function Timeline({ events }: TimelineProps) {
           toggleActions: 'play none none reverse'
         }
       }
-    );
+    )
 
-    // 为垂直主轴线设置动画
     gsap.fromTo(verticalLine,
       { scaleY: 0 },
       {
@@ -249,17 +377,12 @@ export default function Timeline({ events }: TimelineProps) {
           scrub: 0.5
         }
       }
-    );
+    )
 
-    // 返回清理函数
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, []);
-
-  if (!events || events.length === 0) {
-    return null;
-  }
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    }
+  }, [])
 
   return (
     <section className="py-16 lg:py-20 relative overflow-hidden">
@@ -269,7 +392,6 @@ export default function Timeline({ events }: TimelineProps) {
         </h2>
 
         <div ref={timelineRef} className="relative max-w-4xl mx-auto">
-          {/* 垂直线 - 主轴 */}
           <div
             ref={verticalLineRef}
             className="absolute left-8 top-0 bottom-0 w-0.5 origin-top"
@@ -277,16 +399,15 @@ export default function Timeline({ events }: TimelineProps) {
               background: 'linear-gradient(to bottom, transparent 0%, var(--tech-cyan) 10%, var(--tech-cyan) 90%, transparent 100%)',
               filter: 'blur(0.5px)'
             }}
-          ></div>
+          />
 
-          {/* 添加装饰性光效元素 */}
-          <div className="absolute left-8 top-0 h-full w-40 -ml-20 bg-gradient-to-r from-transparent via-tech-cyan/10 to-transparent opacity-30 pointer-events-none"></div>
+          <div className="absolute left-8 top-0 h-full w-40 -ml-20 bg-gradient-to-r from-transparent via-tech-cyan/10 to-transparent opacity-30 pointer-events-none" />
 
-          {events.map((event, index) => (
-            <TimelineEventItem key={index} event={event} index={index} />
+          {mockEvents.map((event, index) => (
+            <TimelineEventItem key={event.id} event={event} index={index} />
           ))}
         </div>
       </div>
     </section>
-  );
+  )
 }

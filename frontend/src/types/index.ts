@@ -17,6 +17,15 @@ export interface Category {
   count: number;
 }
 
+// 后端分类类型（带文章数）
+export interface BackendCategoryWithCount {
+  id: string;
+  name: string;
+  article_count: number;
+  is_active: boolean;
+  description?: string;
+}
+
 // 标签类型
 export interface Tag {
   name: string;
@@ -48,6 +57,15 @@ export interface TimelineItem {
   date: string;
   title: string;
   description: string;
+}
+
+// 后端时间轴事件类型
+export interface BackendTimelineEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  event_date: string;
+  is_active: boolean;
 }
 
 // 新的时间轴事件类型
@@ -164,4 +182,28 @@ export interface Album {
   endDate?: string;
   status?: string;
   sortOrder?: number;
+}
+
+// 后端文章类型（带作者信息）
+export interface BackendArticleWithAuthor {
+  id: string;
+  title: string;
+  excerpt: string | null;
+  content: string;
+  published_at: string;
+  read_time: number | null;
+  cover_image: string | null;
+  categories: Array<{
+    id: string;
+    name: string;
+  }>;
+  tags?: Array<{
+    id: string;
+    name: string;
+  }>;
+  author?: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
 }

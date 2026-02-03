@@ -99,7 +99,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
     : `https://my-awesome-blog.com/posts/${params.id}`;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <div className="container mx-auto px-4 pt-24 pb-8 max-w-3xl">
       <div className="mb-6">
         <Breadcrumb
           items={[

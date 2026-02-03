@@ -13,7 +13,7 @@ import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService'; // 导入 RelatedArticle 类型
 import { useLoading } from '@/context/loading-context';
 import PostCard from '@/components/ui/PostCard';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/Progress';
 import MediaPlayer from '@/components/ui/MediaPlayer';
 
 interface Article {
