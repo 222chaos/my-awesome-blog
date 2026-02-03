@@ -67,7 +67,7 @@ export default function Navbar() {
     { href: '/', label: '首页', icon: Home },
     { href: '/home', label: '家', icon: Home },
     { href: '/articles', label: '文章', icon: BookOpen },
-    { href: '/gallery', label: '相册', icon: Camera },
+    { href: '/albums', label: '相册', icon: Camera },
     { href: '/tools', label: '百宝箱', icon: Wrench },
     { href: '/messages', label: '留言', icon: Mail },
     { href: '/contact', label: '联系我', icon: Mail },

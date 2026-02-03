@@ -117,10 +117,10 @@ export const getCurrentUser = async (): Promise<UserProfile | null> => {
  * @param credentials 登录凭据（用户名/密码）
  * @returns 登录结果
  */
-export const loginUser = async (credentials: { email: string; password: string }): Promise<{ success: boolean; user?: UserProfile; error?: string }> => {
+export const loginUser = async (credentials: { username: string; password: string }): Promise<{ success: boolean; user?: UserProfile; error?: string }> => {
   try {
     // 步骤1：调用登录API获取token
-    const loginResult = await loginApi(credentials.email, credentials.password);
+    const loginResult = await loginApi(credentials.username, credentials.password);
 
     // 步骤2：获取用户信息
     const userData = await getCurrentUserApi();

@@ -132,19 +132,19 @@ export default function Home() {
       <div id="content" className="bg-background">
         <HeroSection />
 
-        <div className="container mx-auto px-4 py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">
           <StatsPanel />
         </div>
 
-        <div className="container mx-auto px-4 py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">
           <TagCloud tags={categories.map(cat => ({ name: cat.name, count: cat.count }))} />
         </div>
 
-        <div className="container mx-auto px-4 py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">
           <Timeline events={timelineEvents} />
         </div>
 
-        <div className="container mx-auto px-4 py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">
           <Portfolio
             projects={[{
               id: '1',

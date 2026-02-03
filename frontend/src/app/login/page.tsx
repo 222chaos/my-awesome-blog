@@ -9,7 +9,7 @@ import { useLoading } from '@/context/loading-context';
 import './form-styles.css';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,15 +27,14 @@ export default function LoginPage() {
     setError('');
     
     // 客户端验证
-    if (!email || !password) {
+    if (!username || !password) {
       setError('请填写所有必填字段');
       return;
     }
     
-    // 验证邮箱格式
-    const emailRegex = /^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email)) {
-      setError('请输入有效的邮箱地址');
+    // 验证用户名长度
+    if (username.length < 3) {
+      setError('用户名长度至少为3位');
       return;
     }
     
@@ -48,7 +47,7 @@ export default function LoginPage() {
     showLoading();
 
     try {
-      const result = await loginUser({ email, password });
+      const result = await loginUser({ username, password });
 
       if (result.success && result.user) {
         console.log('Login successful, attempting to navigate to profile');
@@ -133,16 +132,16 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <input
-                id="email"
+                id="username"
                 type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
                 className="bg-transparent"
               />
-              <label htmlFor="email" className="absolute pointer-events-none text-white/80">
-                {Array.from('Email').map((char, index) => (
+              <label htmlFor="username" className="absolute pointer-events-none text-white/80">
+                {Array.from('用户名').map((char, index) => (
                   <span
                     key={index}
                     style={{ transitionDelay: `${index * 50}ms` }}
@@ -165,7 +164,7 @@ export default function LoginPage() {
                 className="bg-transparent"
               />
               <label htmlFor="password" className="absolute pointer-events-none text-white/80">
-                {Array.from('Password').map((char, index) => (
+                {Array.from('密码').map((char, index) => (
                   <span
                     key={index}
                     style={{ transitionDelay: `${index * 50}ms` }}

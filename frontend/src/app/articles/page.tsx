@@ -183,7 +183,7 @@ export default function ArticlesPage() {
   return (
     <div className="min-h-screen bg-background relative">
       {/* 媒体播放组件 - 使用绝对定位紧贴浏览器顶部 */}
-      <div className="h-[25vh] overflow-hidden absolute top-0 left-0 right-0 z-10 -mt-16 sm:-mt-14 lg:-mt-16">
+      <div className="h-[45vh] overflow-hidden absolute top-0 left-0 right-0 z-10 -mt-16 sm:-mt-14 lg:-mt-16">
         <MediaPlayer
           mediaItems={[
             {
@@ -194,11 +194,12 @@ export default function ArticlesPage() {
             }
           ]}
           autoPlay={true}
-          aspectRatio="aspect-[4/1]"
+          aspectRatio=""
+          fitMode="cover"
         />
       </div>
 
-      <div className="max-w-7xl mx-auto pt-40"> {/* 增加顶部填充以避免内容被媒体组件遮挡 */}
+      <div className="max-w-7xl mx-auto pt-[48vh] md:pt-[50vh]"> {/* 增加顶部填充以避免内容被媒体组件遮挡 */}
 
         {/* 搜索和排序栏 */}
         <GlassCard className="mb-6 p-4">

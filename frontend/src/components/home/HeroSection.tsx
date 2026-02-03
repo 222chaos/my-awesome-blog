@@ -41,7 +41,7 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative h-screen flex flex-col items-center justify-center overflow-hidden -mt-16"
+      className="relative h-screen flex flex-col items-center justify-center overflow-hidden"
       aria-label="英雄区域"
     >
       {/* 视频背景或静态背景 - 保持在底层 */}

@@ -224,8 +224,8 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* 媒体播放组件 - 使用绝对定位紧贴浏览器顶部 */}
-      <div className="h-[25vh] overflow-hidden absolute top-0 left-0 right-0 z-10 -mt-16 sm:-mt-14 lg:-mt-16">
+      {/* 媒体播放组件 - 改为相对定位，占据正常文档流 */}
+      <div className="h-[30vh] overflow-hidden relative z-10">
         {article && (
           <MediaPlayer
             mediaItems={[
@@ -242,7 +242,7 @@ export default function ArticleDetailPage() {
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto pt-40"> {/* 增加顶部填充以避免内容被媒体组件遮挡 */}
+      <div className="max-w-7xl mx-auto pt-12 pb-8"> {/* 增加顶部填充，确保内容不被遮挡 */}
         {/* 返回按钮 */}
         <div className="inline-block mt-6 ml-4">
           <Link href="/articles" prefetch={false}>

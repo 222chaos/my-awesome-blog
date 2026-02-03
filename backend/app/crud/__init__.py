@@ -37,7 +37,9 @@ from app.crud.friend_link import (
 
 from app.crud.portfolio import (
     get_portfolio, get_portfolios, create_portfolio,
-    update_portfolio, delete_portfolio
+    update_portfolio, delete_portfolio,
+    get_portfolio_images, get_portfolio_cover_image,
+    add_image_to_portfolio, remove_image_from_portfolio
 )
 
 from app.crud.timeline_event import (

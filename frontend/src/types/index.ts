@@ -148,3 +148,20 @@ export interface CreateMessageRequest {
   color?: string;
   isDanmaku?: boolean;
 }
+
+// 相册类型
+export interface Album {
+  id: string;
+  title: string;
+  description: string;
+  coverImage: string;
+  date: string;
+  featured: boolean;
+  images: number;
+  slug?: string;
+  technologies?: string[];
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+  sortOrder?: number;
+}

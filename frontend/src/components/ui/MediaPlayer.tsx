@@ -16,13 +16,15 @@ interface MediaPlayerProps {
   autoPlay?: boolean;
   loop?: boolean;
   aspectRatio?: string;
+  fitMode?: 'cover' | 'contain' | 'fill'; // 新增：控制媒体内容显示方式
 }
 
 export default function MediaPlayer({ 
   mediaItems, 
   autoPlay = false, 
   loop = true,
-  aspectRatio = 'aspect-video'
+  aspectRatio = '',
+  fitMode = 'contain' // 默认改为 contain 以完整显示内容
 }: MediaPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
@@ -114,9 +116,9 @@ export default function MediaPlayer({
   };
 
   return (
-    <div className="relative w-full group">
-      <div className={`relative w-full overflow-hidden ${aspectRatio}`}>
-        <div className="absolute inset-0 flex items-center justify-center">
+    <div className="relative w-full h-full group">
+      <div className={`relative w-full h-full overflow-hidden ${aspectRatio}`}>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           {currentMedia.type === 'video' ? (
             <video
               ref={videoRef}
@@ -125,26 +127,24 @@ export default function MediaPlayer({
               muted={isMuted}
               loop={loop}
               onEnded={handleMediaEnd}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-${fitMode}`}
               style={{
                 objectPosition: 'center',
                 transform: `rotate(${rotation}deg)`,
                 maxWidth: '100%',
-                maxHeight: '100%',
-                animation: 'vertical-scroll 20s linear infinite'
+                maxHeight: '100%'
               }}
             />
           ) : (
             <img
               src={currentMedia.src}
               alt={currentMedia.alt || ''}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-${fitMode}`}
               style={{
                 objectPosition: 'center',
                 transform: `rotate(${rotation}deg)`,
                 maxWidth: '100%',
-                maxHeight: '100%',
-                animation: 'vertical-scroll 20s linear infinite'
+                maxHeight: '100%'
               }}
             />
           )}
@@ -195,13 +195,6 @@ export default function MediaPlayer({
             </div>
           </div>
         </div>
-
-        {/* 媒体标题 */}
-        {currentMedia.caption && (
-          <div className="absolute bottom-16 left-0 right-0 text-center text-white text-lg font-semibold px-4">
-            {currentMedia.caption}
-          </div>
-        )}
 
         {/* 导航指示器 */}
         {mediaItems.length > 1 && (

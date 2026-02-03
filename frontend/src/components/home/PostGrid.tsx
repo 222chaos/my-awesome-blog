@@ -32,7 +32,7 @@ const PostCardItemWithTheme = React.memo(({ post, index, glassCardClass }: PostC
     comments={post.comments}
     href={`/posts/${post.id}`}
     className={`animate-fade-scale-up ${glassCardClass}`}
-    style={{ animationDelay: `${index * 100}ms` }}
+    style={{ animationDelay: `${Math.min(index * 50, 200)}ms` }}
   />
 ));
 
@@ -105,7 +105,7 @@ export default function PostGrid({ posts, loading = false, hasMore = true, onLoa
     <section className="py-16 lg:py-20">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
-          Latest Articles
+          最新文章
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

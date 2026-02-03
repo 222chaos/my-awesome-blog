@@ -22,6 +22,7 @@ class Image(Base):
 
     # Relationship
     variants = relationship("ImageVariant", back_populates="image", cascade="all, delete-orphan")
+    portfolio_images = relationship("PortfolioImage", back_populates="image", cascade="all, delete-orphan")
 
 
 class ImageVariant(Base):

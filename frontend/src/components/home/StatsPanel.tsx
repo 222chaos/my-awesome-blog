@@ -202,7 +202,7 @@ function ArticleCard({ article, delayClass }: { article: Article; delayClass: st
     >
       <Card
         key={article.id}
-        className={`glass-card backdrop-blur-xl bg-card/40 hover:bg-card/60 hover:shadow-[0_0_40px_var(--shadow-tech-cyan),0_8px_32px_rgba(0,0,0,0.12)] border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] cursor-pointer animate-fade-in-up ${delayClass} overflow-hidden`}
+        className={`glass-card backdrop-blur-xl bg-card/40 hover:bg-card/60 hover:shadow-[0_0_40px_var(--shadow-tech-cyan),0_8px_32px_rgba(0,0,0,0.12)] border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-[1.02] animate-fade-in-up ${delayClass} overflow-hidden cursor-pointer`}
       >
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row">
@@ -365,7 +365,7 @@ export default function StatsPanel() {
 
   return (
     <section className="py-8 sm:py-10 md:py-12 lg:py-16">
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {/* 左侧列 - 垂直堆叠 */}
           <div className="md:col-span-1 flex flex-col gap-6">

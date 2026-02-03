@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, Date, DateTime, Boolean, UUID
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 import uuid
 from app.core.database import Base
 
@@ -23,3 +24,6 @@ class Portfolio(Base):
     sort_order = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationship with images through association table
+    portfolio_images = relationship("PortfolioImage", back_populates="portfolio", cascade="all, delete-orphan")
