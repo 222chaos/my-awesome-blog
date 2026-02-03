@@ -9,11 +9,10 @@ import Portfolio from '@/components/home/Portfolio';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/Button';
-import type { Post, Category, PopularPost, TimelineItem } from '@/types';
+import type { Post, PopularPost, TimelineItem } from '@/types';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineItem[]>([]);
 
@@ -87,15 +86,6 @@ export default function Home() {
       },
     ]);
 
-    setCategories([
-      { name: '开发', count: 12 },
-      { name: '设计', count: 8 },
-      { name: '后端', count: 5 },
-      { name: '前端', count: 10 },
-      { name: '安全', count: 4 },
-      { name: 'DevOps', count: 6 },
-    ]);
-
     setPopularPosts([
       { id: 'getting-started-with-nextjs', title: 'Next.js 14 入门指南', date: '1月15日' },
       { id: 'tailwind-css-tips', title: '高级 Tailwind CSS 技巧', date: '1月10日' },
@@ -137,7 +127,7 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">
-          <TagCloud tags={categories.map(cat => ({ name: cat.name, count: cat.count }))} />
+          <TagCloud />
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">

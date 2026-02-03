@@ -1,67 +1,46 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/context/theme-context';
+import { SiReact, SiNextdotjs, SiTypescript, SiTailwindcss, SiPython, SiPostgresql, SiFastapi, SiDocker, SiGit, SiGithub, SiVercel } from 'react-icons/si';
+import LogoLoop, { LogoItem } from '@/components/ui/LogoLoop';
 
-interface Tag {
-  name: string;
-  count: number;
+interface TechStackProps {
 }
 
-interface TagCloudProps {
-  tags: Tag[];
-}
+const techLogos: LogoItem[] = [
+  { node: <SiReact />, title: "React", href: "https://react.dev" },
+  { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
+  { node: <SiTypescript />, title: "TypeScript", href: "https://www.typescriptlang.org" },
+  { node: <SiTailwindcss />, title: "Tailwind CSS", href: "https://tailwindcss.com" },
+  { node: <SiPython />, title: "Python", href: "https://www.python.org" },
+  { node: <SiPostgresql />, title: "PostgreSQL", href: "https://www.postgresql.org" },
+  { node: <SiFastapi />, title: "FastAPI", href: "https://fastapi.tiangolo.com" },
+  { node: <SiDocker />, title: "Docker", href: "https://www.docker.com" },
+  { node: <SiGit />, title: "Git", href: "https://git-scm.com" },
+  { node: <SiGithub />, title: "GitHub", href: "https://github.com" },
+  { node: <SiVercel />, title: "Vercel", href: "https://vercel.com" },
+];
 
-// 根据标签数量计算大小
-function getSizeClass(count: number, maxCount: number): string {
-  const ratio = count / maxCount;
-  if (ratio > 0.8) return 'text-lg px-4 py-2';
-  if (ratio > 0.5) return 'text-base px-3 py-1.5';
-  return 'text-sm px-2 py-1';
-}
-
-// 根据标签数量计算颜色
-function getColorClass(count: number, maxCount: number): string {
-  const ratio = count / maxCount;
-  if (ratio > 0.8) return 'text-tech-cyan border-tech-cyan';
-  if (ratio > 0.5) return 'text-muted-foreground border-glass-border';
-  return 'text-muted-foreground border-glass-border';
-}
-
-export default function TagCloud({ tags }: TagCloudProps) {
-
-  
-  if (!tags || tags.length === 0) {
-    return null;
-  }
-
-  // 找到最大数量以计算相对大小
-  const maxCount = Math.max(...tags.map(tag => tag.count));
-
+export default function TagCloud({ }: TechStackProps) {
   return (
     <section className="py-12 lg:py-16">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-12 animate-fade-in-up">
-          标签云
+          技术栈
         </h2>
-        
-        <div className="flex flex-wrap justify-center gap-3">
-          {tags.map((tag, index) => (
-            <button
-              key={tag.name}
-              className={cn(
-                'rounded-full border transition-all duration-300',
-                'hover:scale-110 hover:shadow-lg',
-                'hover:border-tech-cyan',
-                getSizeClass(tag.count, maxCount),
-                getColorClass(tag.count, maxCount)
-              )}
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {tag.name}
-              <span className="ml-1 text-xs opacity-60">({tag.count})</span>
-            </button>
-          ))}
+
+        <div className="py-8">
+          <LogoLoop
+            logos={techLogos}
+            speed={80}
+            direction="left"
+            logoHeight={60}
+            gap={48}
+            pauseOnHover={true}
+            scaleOnHover={true}
+            fadeOut={true}
+            ariaLabel="技术栈图标"
+            className="py-4"
+          />
         </div>
       </div>
     </section>

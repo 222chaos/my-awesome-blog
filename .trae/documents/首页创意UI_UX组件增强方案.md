@@ -1,64 +1,26 @@
-## 首页创意UI/UX组件增强方案
+## 将 LogoLoop 组件应用到标签云
 
-### 新增组件（5个）
+### 需要执行的步骤：
 
-1. **FeaturedHighlights 横幅** - 英雄区域下方，展示置顶文章/精选内容/公告
-   - 横向滚动卡片，玻璃拟态效果
-   - 自动播放 + 手动切换
-   - 发光边框和脉冲动画
+1. **创建 LogoLoop 组件**
+   - 创建 `frontend/src/components/ui/LogoLoop.tsx`
+   - 基于 `docs/logo.md` 中的完整代码实现
 
-2. **TechStack 技术栈展示** - 展示技术能力
-   - 3D旋转卡片展示
-   - 技能熟练度进度条
-   - 分类标签（前端/后端/工具）
+2. **修改 TagCloud 组件**
+   - 保留现有的 `Tag` 接口和 `TagCloudProps` 接口
+   - 删除原有的静态标签按钮代码
+   - 使用 LogoLoop 组件替代，配置：
+     - 横向滚动 (`direction="left"`)
+     - 适当的滚动速度
+     - 悬停暂停
+     - 边缘渐隐效果
+   - 将标签数据转换为 LogoLoop 的 `LogoItem` 格式
 
-3. **ReadingStats 阅读统计** - 数据可视化
-   - 阅读时长、分类偏好
-   - 阅读热力图（GitHub风格）
-   - 趋势折线图
+3. **主要改动点**
+   - 从静态按钮布局 → 横向无限滚动动画
+   - 保留标签名称和数量显示
+   - 添加玻璃拟态样式适配主题
 
-4. **ScrollProgress 滚动进度条** - 全局滚动指示
-   - 顶部固定进度条
-   - 渐变色 + 发光效果
-   - 智能显示/隐藏
-
-5. **BackToTop 回到顶部** - 导航辅助
-   - 智能显示/隐藏
-   - 进度圆环显示
-   - 多种动画样式
-
-### 现有组件优化（6个）
-
-1. **HeroSection** - 添加滚动提示、社交图标、搜索框入口、视差效果
-2. **StatsPanel/ProfileCard** - 动态计数动画、图表可视化、3D头像悬浮
-3. **TagCloud** - 添加分类筛选、搜索功能、标签热度趋势
-4. **Timeline** - 里程碑徽章、缩放/展开交互、媒体内容预览
-5. **Portfolio** - 3D卡片翻转、项目分类标签、实时演示按钮
-6. **订阅卡片** - 订阅状态可视化、历史归档链接
-
-### 全局优化
-
-- 页面加载动画
-- 骨架屏优化
-- 页面切换过渡
-- 移动端侧边抽屉
-
----
-
-**预计新增文件：**
-- `FeaturedHighlights.tsx`
-- `TechStack.tsx`
-- `ReadingStats.tsx`
-- `ScrollProgress.tsx`
-- `BackToTop.tsx`
-- `MobileDrawer.tsx`
-
-**预计修改文件：**
-- `page.tsx` (整合新组件)
-- `HeroSection.tsx`
-- `StatsPanel.tsx` / `ProfileCard.tsx`
-- `TagCloud.tsx`
-- `Timeline.tsx`
-- `Portfolio.tsx`
-
-**预计工作量：** 11个组件创建/优化
+### 文件清单：
+- 新建：`frontend/src/components/ui/LogoLoop.tsx`
+- 修改：`frontend/src/components/home/TagCloud.tsx`
