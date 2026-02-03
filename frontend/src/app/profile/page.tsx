@@ -32,7 +32,7 @@ export default function ProfilePage() {
     // 延迟加载数据，确保认证状态有时间同步
     const timer = setTimeout(() => {
       loadProfileData();
-    }, 1200); // 延迟1200毫秒，比ProtectedRoute的延迟时间稍长
+    }, 300); // 减少延迟时间，因为ProtectedRoute现在更快响应
 
     return () => clearTimeout(timer);
   }, []);

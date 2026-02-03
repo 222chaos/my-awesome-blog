@@ -25,6 +25,26 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // 客户端验证
+    if (!email || !password) {
+      setError('请填写所有必填字段');
+      return;
+    }
+    
+    // 验证邮箱格式
+    const emailRegex = /^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      setError('请输入有效的邮箱地址');
+      return;
+    }
+    
+    // 验证密码长度
+    if (password.length < 6) {
+      setError('密码长度至少为6位');
+      return;
+    }
+    
     showLoading();
 
     try {
@@ -44,14 +64,14 @@ export default function LoginPage() {
           // 使用 setTimeout 确保状态更新后再跳转
           setTimeout(() => {
             router.push(redirectPath as any);
-          }, 800); // 延迟800毫秒，确保认证状态同步，比ProtectedRoute的延迟时间长
+          }, 300); // 延迟300毫秒，确保认证状态同步
         } else {
           // 如果重定向路径不安全，则默认导航到主页
           console.log('Navigating to default profile page');
           // 使用 setTimeout 确保状态更新后再跳转
           setTimeout(() => {
             router.push('/profile' as any);
-          }, 800); // 延迟800毫秒，确保认证状态同步，比ProtectedRoute的延迟时间长
+          }, 300); // 延迟300毫秒，确保认证状态同步
         }
       } else {
         console.log('Login failed:', result.error);

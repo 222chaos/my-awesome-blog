@@ -97,8 +97,6 @@ export const uploadAvatar = async (userId: string, file: File): Promise<string> 
  * @returns 当前登录用户信息
  */
 export const getCurrentUser = async (): Promise<UserProfile | null> => {
-  await delay(300); // 模拟网络延迟
-
   // 使用 auth API 检查登录状态
   if (!isAuthenticated()) {
     return null;
@@ -126,6 +124,10 @@ export const loginUser = async (credentials: { email: string; password: string }
 
     // 步骤2：获取用户信息
     const userData = await getCurrentUserApi();
+    
+    if (!userData) {
+      throw new Error('无法获取用户信息');
+    }
 
     // 登录成功，返回用户信息
     return {
