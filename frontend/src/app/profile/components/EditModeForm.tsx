@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/Label';
-import { validateSocialLink } from '@/services/userService';
+import { validateSocialLink } from '@/lib/validation';
 
 interface EditModeFormProps {
   initialData: {

@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Mail, Globe, Twitter, Github, Linkedin, User, UserRound, AtSign, Link as LinkIcon, MapPin, Calendar } from 'lucide-react';
 import { UserProfile, UserStats } from '@/types';
-import { fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats, uploadMockAvatar } from '@/lib/api/profile';
-import { validateSocialLink, getCurrentUser } from '@/services/userService';
+import { fetchCurrentUserProfile, updateUserProfile, uploadAvatar, fetchCurrentUserStats } from '@/lib/api/profile';
+import { validateSocialLink } from '@/lib/validation';
+import { getCurrentUserApi } from '@/lib/api/auth';
 import { useLoading } from '@/context/loading-context';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import TabNavigation from './components/TabNavigation';
@@ -43,7 +44,7 @@ export default function ProfilePage() {
       setIsPageLoading(true);
 
       // 检查登录状态
-      const currentUser = await getCurrentUser();
+      const currentUser = await getCurrentUserApi();
       if (!currentUser) {
         // 未登录，自动重定向到登录页
         router.push('/login');
@@ -88,19 +89,9 @@ export default function ProfilePage() {
           router.push('/login');
           return;
         }
-        // 如果真实API失败，尝试使用模拟API
-        try {
-          const file = e.target.files[0];
-          const result = await uploadMockAvatar(file);
-          setFormData((prev: Partial<UserProfile>) => ({
-            ...prev,
-            avatar: result.avatar_url
-          }));
-        } catch (mockError) {
-          console.error('Error uploading avatar with mock:', mockError);
-          setSaveStatus({ success: false, message: '上传头像失败，请重试。' });
-          setTimeout(() => setSaveStatus(null), 3000);
-        }
+        // 如果是其他错误，显示错误信息
+        setSaveStatus({ success: false, message: '上传头像失败，请重试。' });
+        setTimeout(() => setSaveStatus(null), 3000);
       }
     }
   };

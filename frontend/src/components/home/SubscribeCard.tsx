@@ -5,6 +5,7 @@ import { Mail, CheckCircle, XCircle, FileText, Calendar, Bell, ExternalLink, Arr
 import GlassCard from '@/components/ui/GlassCard'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import { subscriptionService } from '@/services/subscriptionService'
 
 interface SubscriptionStatus {
   isSubscribed: boolean
@@ -50,7 +51,8 @@ export default function SubscribeCard() {
 
     setStatus('loading')
 
-    setTimeout(() => {
+    try {
+      await subscriptionService.createSubscription(email)
       setStatus('success')
       setSubscriptionStatus({
         isSubscribed: true,
@@ -60,19 +62,28 @@ export default function SubscribeCard() {
       })
 
       setTimeout(() => setStatus('idle'), 3000)
-    }, 1500)
+    } catch (error) {
+      console.error('Failed to subscribe:', error)
+      setStatus('error')
+    }
   }
 
-  const handleUnsubscribe = () => {
+  const handleUnsubscribe = async () => {
+    if (!subscriptionStatus?.email) return
+
     setStatus('loading')
 
-    setTimeout(() => {
+    try {
+      await subscriptionService.unsubscribe(subscriptionStatus.email)
       setSubscriptionStatus(null)
       setStatus('success')
       setEmail('')
 
       setTimeout(() => setStatus('idle'), 3000)
-    }, 1000)
+    } catch (error) {
+      console.error('Failed to unsubscribe:', error)
+      setStatus('error')
+    }
   }
 
   const formats = [

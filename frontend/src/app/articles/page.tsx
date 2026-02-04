@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { getArticles, getCategories, getTags } from '@/services/articleService';
+import { getArticles, getCategories, getTags, getFeaturedArticles } from '@/services/articleService';
 import { useLoading } from '@/context/loading-context';
 import HoloCard from '@/components/articles/HoloCard';
 import FeaturedCarousel from '@/components/articles/FeaturedCarousel';
@@ -114,7 +114,7 @@ function ArticlesPageContent() {
         const tagsData = await getTags();
         setTags(tagsData);
 
-        const featuredData = await fetch('/api/v1/articles/featured?limit=5').then(res => res.json());
+        const featuredData = await getFeaturedArticles(5);
         setFeaturedArticles(featuredData || []);
       } catch (error) {
         console.error('获取数据失败:', error);
@@ -156,7 +156,11 @@ function ArticlesPageContent() {
       id: article.id,
       title: article.title,
       coverImage: article.featured_image || '/assets/placeholder.jpg',
-      description: article.excerpt
+      description: article.excerpt,
+      date: article.published_at,
+      featured: true,
+      images: 0,
+      slug: article.id
     }));
   };
 
@@ -233,14 +237,14 @@ function ArticlesPageContent() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center py-20"
               >
-                <div className={`text-4xl font-bold mb-4 ${accentClass}`}>
+                <div className={`text-4xl font-bold mb-4 ${getThemeClass('text-tech-cyan', 'text-tech-cyan')}`}>
                   暂无文章
                 </div>
                 <p className={`text-lg ${getThemeClass('text-gray-400', 'text-gray-600')}`}>
                   {selectedCategory || selectedTag || searchQuery
                     ? '没有找到匹配的文章，请尝试其他筛选条件'
                     : '暂无文章发布，请稍后再来'}
-                  </p>
+                </p>
               </motion.div>
             )}
           </div>

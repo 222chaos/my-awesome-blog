@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Message } from '@/types';
 import { getMessages, getDanmakuMessages } from '@/services/messageService';
-import { getCurrentUser } from '@/services/userService';
+import { getCurrentUserApi } from '@/lib/api/auth';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { cn } from '@/lib/utils';
 import { Mail, MessageCircle, Users, Sparkles, Volume2, VolumeX, BarChart3, TrendingUp, Calendar, Clock } from 'lucide-react';
@@ -36,7 +36,7 @@ export default function MessagesPage() {
       const [allMessages, danmakuMsgs, user] = await Promise.all([
         getMessages(),
         getDanmakuMessages(),
-        getCurrentUser(),
+        getCurrentUserApi(),
       ]);
       setMessages(allMessages);
       setDanmakuMessages(danmakuMsgs);
@@ -55,9 +55,12 @@ export default function MessagesPage() {
         return acc;
       }, {} as Record<number, number>);
 
-      const peakHour = Object.entries(hours).reduce((a, b) =>
-        hours[parseInt(a[0])] > hours[parseInt(b[0])] ? a : b
-      )[0];
+      // 添加安全检查，防止空数组reduce错误
+      const peakHour = Object.keys(hours).length > 0
+        ? Object.entries(hours).reduce((a, b) =>
+            hours[parseInt(a[0])] > hours[parseInt(b[0])] ? a : b
+          )[0]
+        : '12'; // 默认值
 
       setStats({
         totalMessages: allMessages.length,

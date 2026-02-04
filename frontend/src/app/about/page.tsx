@@ -1,7 +1,29 @@
+'use client';
+
 import { Card, CardContent } from '@/components/ui/card';
-import { Code2, Layout, Zap, TrendingUp, MessageSquare } from 'lucide-react';
+import { Code2, Layout, Zap, TrendingUp, MessageSquare, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { friendLinkService, FriendLink } from '@/services/friendLinkService';
 
 export default function AboutPage() {
+  const [friendLinks, setFriendLinks] = useState<FriendLink[]>([]);
+  const [loadingLinks, setLoadingLinks] = useState(true);
+
+  useEffect(() => {
+    const loadFriendLinks = async () => {
+      try {
+        const links = await friendLinkService.getFriendLinks({ is_active: true });
+        setFriendLinks(links);
+      } catch (error) {
+        console.error('Failed to load friend links:', error);
+      } finally {
+        setLoadingLinks(false);
+      }
+    };
+
+    loadFriendLinks();
+  }, []);
+
   const features = [
     {
       icon: Code2,
@@ -93,6 +115,49 @@ export default function AboutPage() {
               </p>
             </CardContent>
           </Card>
+
+          {friendLinks.length > 0 && (
+            <Card className="border-border shadow-lg transition-all duration-300 hover:shadow-xl">
+              <CardContent className="p-8 md:p-12">
+                <h2 className="text-2xl font-bold text-foreground mb-6">友情链接</h2>
+                {loadingLinks ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader2 className="w-8 h-8 text-tech-cyan animate-spin" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {friendLinks.map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 rounded-lg bg-muted/50 hover:bg-muted hover:scale-[1.02] transition-all duration-200 cursor-pointer group border border-border"
+                      >
+                        {link.favicon && (
+                          <img
+                            src={link.favicon}
+                            alt={link.name}
+                            className="w-10 h-10 rounded-md group-hover:scale-110 transition-transform duration-200"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-foreground mb-1 truncate group-hover:text-tech-cyan transition-colors">
+                            {link.name}
+                          </h4>
+                          {link.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {link.description}
+                            </p>
+                          )}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

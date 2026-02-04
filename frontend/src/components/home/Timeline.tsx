@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Award, Calendar, Image, Video, ChevronDown, ChevronRight, Badge, ExternalLink, FileText } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import { cn } from '@/lib/utils'
+import { timelineService, TimelineEvent as ApiTimelineEvent } from '@/services/timelineService'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -99,6 +100,22 @@ const mockEvents: TimelineEvent[] = [
     }
   }
 ]
+
+function mapApiEventToTimelineEvent(apiEvent: ApiTimelineEvent): TimelineEvent {
+  return {
+    id: apiEvent.id,
+    date: apiEvent.event_date,
+    title: apiEvent.title,
+    description: apiEvent.description || '',
+    badge: {
+      type: apiEvent.event_type as 'milestone' | 'achievement' | 'award' | 'project',
+      label: apiEvent.event_type === 'milestone' ? '里程碑' :
+             apiEvent.event_type === 'achievement' ? '成就' :
+             apiEvent.event_type === 'award' ? '荣誉' : '项目',
+      color: apiEvent.color || 'from-purple-500 to-pink-500'
+    }
+  }
+}
 
 const badgeIcons = {
   milestone: Award,
@@ -339,6 +356,24 @@ function ChevronUp({ className }: { className?: string }) {
 export default function Timeline() {
   const timelineRef = useRef<HTMLDivElement>(null)
   const verticalLineRef = useRef<HTMLDivElement>(null)
+  const [events, setEvents] = useState<TimelineEvent[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const apiEvents = await timelineService.getTimelineEvents({ is_active: true })
+        setEvents(apiEvents.map(mapApiEventToTimelineEvent))
+      } catch (error) {
+        console.error('Failed to load timeline events:', error)
+        setEvents(mockEvents)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadEvents()
+  }, [])
 
   useEffect(() => {
     const timeline = timelineRef.current
@@ -382,7 +417,7 @@ export default function Timeline() {
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
     }
-  }, [])
+  }, [events])
 
   return (
     <section className="py-16 lg:py-20 relative overflow-hidden">
@@ -391,22 +426,28 @@ export default function Timeline() {
           我的历程
         </h2>
 
-        <div ref={timelineRef} className="relative max-w-4xl mx-auto">
-          <div
-            ref={verticalLineRef}
-            className="absolute left-8 top-0 bottom-0 w-0.5 origin-top"
-            style={{
-              background: 'linear-gradient(to bottom, transparent 0%, var(--tech-cyan) 10%, var(--tech-cyan) 90%, transparent 100%)',
-              filter: 'blur(0.5px)'
-            }}
-          />
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tech-cyan" />
+          </div>
+        ) : (
+          <div ref={timelineRef} className="relative max-w-4xl mx-auto">
+            <div
+              ref={verticalLineRef}
+              className="absolute left-8 top-0 bottom-0 w-0.5 origin-top"
+              style={{
+                background: 'linear-gradient(to bottom, transparent 0%, var(--tech-cyan) 10%, var(--tech-cyan) 90%, transparent 100%)',
+                filter: 'blur(0.5px)'
+              }}
+            />
 
-          <div className="absolute left-8 top-0 h-full w-40 -ml-20 bg-gradient-to-r from-transparent via-tech-cyan/10 to-transparent opacity-30 pointer-events-none" />
+            <div className="absolute left-8 top-0 h-full w-40 -ml-20 bg-gradient-to-r from-transparent via-tech-cyan/10 to-transparent opacity-30 pointer-events-none" />
 
-          {mockEvents.map((event, index) => (
-            <TimelineEventItem key={event.id} event={event} index={index} />
-          ))}
-        </div>
+            {events.map((event, index) => (
+              <TimelineEventItem key={event.id} event={event} index={index} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

@@ -116,7 +116,7 @@ export default function EnhancedArticleDetailPage() {
         setArticle(articleData);
 
         // 获取相关文章
-        const relatedData = await getRelatedArticles(params.id, articleData.category.id);
+        const relatedData = await getRelatedArticles(params.id);
         setRelatedArticles(relatedData);
         
         // 生成目录

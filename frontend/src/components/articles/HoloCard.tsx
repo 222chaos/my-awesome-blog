@@ -20,10 +20,10 @@ interface Article {
     username: string;
     avatar?: string;
   };
-  category: {
+  categories: Array<{
     name: string;
     slug: string;
-  };
+  }>;
   tags: Array<{ id: string; name: string; slug: string }>;
 }
 
@@ -64,17 +64,19 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-          <div className="absolute top-4 left-4">
-            <span className={`
-              px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm
-              ${getThemeClass(
-                'bg-[#EC4899]/90 text-white',
-                'bg-[#EC4899]/90 text-white'
-              )}
-            `}>
-              {article.category.name}
-            </span>
-          </div>
+          {article.categories && article.categories.length > 0 && (
+            <div className="absolute top-4 left-4">
+              <span className={`
+                px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm
+                ${getThemeClass(
+                  'bg-[#EC4899]/90 text-white',
+                  'bg-[#EC4899]/90 text-white'
+                )}
+              `}>
+                {article.categories[0].name}
+              </span>
+            </div>
+          )}
 
           {article.tags.length > 0 && (
             <div className="absolute top-4 right-4 flex flex-wrap gap-1 justify-end">
@@ -192,15 +194,17 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
 
                 <div className="p-6 space-y-6">
                   <div className="flex flex-wrap gap-2">
-                    <span className={`
-                      px-3 py-1 rounded-full text-sm font-medium
-                      ${getThemeClass(
-                        'bg-[#EC4899]/90 text-white',
-                        'bg-[#EC4899]/90 text-white'
-                      )}
-                    `}>
-                      {article.category.name}
-                    </span>
+                    {article.categories && article.categories.length > 0 && (
+                      <span className={`
+                        px-3 py-1 rounded-full text-sm font-medium
+                        ${getThemeClass(
+                          'bg-[#EC4899]/90 text-white',
+                          'bg-[#EC4899]/90 text-white'
+                        )}
+                      `}>
+                        {article.categories[0].name}
+                      </span>
+                    )}
                     {article.tags.map(tag => (
                       <span
                         key={tag.id}

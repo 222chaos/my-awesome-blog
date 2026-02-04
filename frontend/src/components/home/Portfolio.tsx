@@ -120,7 +120,7 @@ export default function Portfolio() {
     : mockProjects.filter(project => project.category === selectedCategory)
 
   const toggleFlip = (projectId: string) => {
-    setFlippedCards(prev => new Set(prev.has(projectId) ? [...prev].filter(id => id !== projectId) : [...prev, projectId]))
+    setFlippedCards(prev => new Set(prev.has(projectId) ? Array.from(prev).filter(id => id !== projectId) : [...Array.from(prev), projectId]))
   }
 
   return (
@@ -253,15 +253,15 @@ export default function Portfolio() {
                       )}
 
                       <div className="flex items-center justify-between">
-                        <Link
+                        <a
                           href={project.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-tech-cyan hover:text-tech-lightcyan transition-colors text-sm font-medium"
+                          className="inline-flex items-center gap-1 text-tech-cyan hover:text-tech-lightcyan transition-colors text-sm font-medium cursor-pointer"
                         >
                           查看演示
                           <ExternalLink className="w-4 h-4" />
-                        </Link>
+                        </a>
 
                         <button
                           onClick={() => toggleFlip(project.id)}
@@ -345,16 +345,16 @@ export default function Portfolio() {
                     )}
 
                     <div className="space-y-2">
-                      <Link
+                      <a
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors text-sm font-medium"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gray-800 text-white hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
                       >
                         <Code className="w-4 h-4" />
                         访问GitHub仓库
                         <ExternalLink className="w-4 h-4" />
-                      </Link>
+                      </a>
 
                       <button
                         onClick={() => toggleFlip(project.id)}

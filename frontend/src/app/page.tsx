@@ -40,8 +40,6 @@ export default function Home() {
 
         <Timeline />
 
-        <Portfolio />
-
         <SubscribeCard />
       </div>
     </div>

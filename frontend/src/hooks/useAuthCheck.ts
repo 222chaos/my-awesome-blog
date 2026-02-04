@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getCurrentUser } from '@/services/userService';
+import { getCurrentUserApi } from '@/lib/api/auth';
 
 /**
  * 自定义Hook：检查用户认证状态
@@ -12,7 +12,7 @@ export const useAuthCheck = (extraCondition?: () => boolean) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await getCurrentUser();
+      const user = await getCurrentUserApi();
       const conditionResult = extraCondition ? extraCondition() : true;
 
       if (!user || !conditionResult) {

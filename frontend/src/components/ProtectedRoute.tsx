@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser } from '@/services/userService';
+import { getCurrentUserApi } from '@/lib/api/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     // 检查认证状态，给认证系统一些时间来同步
     const checkAuth = async () => {
       try {
-        const user = await getCurrentUser();
+        const user = await getCurrentUserApi();
         if (user) {
           setIsAuthorized(true);
         } else {
