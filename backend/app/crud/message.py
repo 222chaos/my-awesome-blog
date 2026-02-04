@@ -161,3 +161,44 @@ def unlike_message(db: Session, message_id: UUID) -> Optional[Message]:
     db.commit()
     db.refresh(db_message)
     return db_message
+
+
+def get_trending_messages(
+    db: Session,
+    limit: int = 10,
+    with_relationships: bool = False
+) -> List[Message]:
+    """Get messages ordered by likes desc"""
+    query = db.query(Message).filter(Message.is_deleted == False)
+    
+    if with_relationships:
+        query = query.options(joinedload(Message.author))
+        
+    return query.order_by(Message.likes.desc()).limit(limit).all()
+
+
+def get_message_activity(
+    db: Session,
+    days: int = 7
+) -> List[dict]:
+    """Get message count for the last N days"""
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+    
+    # Group by date
+    results = db.query(
+        func.date(Message.created_at).label('date'),
+        func.count(Message.id).label('count')
+    ).filter(
+        Message.created_at >= start_date,
+        Message.is_deleted == False
+    ).group_by(
+        func.date(Message.created_at)
+    ).order_by(
+        func.date(Message.created_at)
+    ).all()
+    
+    return [{"date": str(r.date), "count": r.count} for r in results]

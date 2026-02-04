@@ -251,3 +251,46 @@ export const validateMessage = (content: string): { isValid: boolean; error?: st
 
   return { isValid: true };
 };
+
+/**
+ * 获取热门留言
+ * @param limit 限制数量
+ * @returns 热门留言列表
+ */
+export const getTrendingMessages = async (limit: number = 10): Promise<Message[]> => {
+  try {
+    const messages = await apiRequest(`/api/v1/messages/trending?limit=${limit}`);
+    return messages.map((msg: any) => ({
+      id: msg.id,
+      content: msg.content,
+      author: {
+        id: msg.author?.id || '',
+        username: msg.author?.username || '匿名用户',
+        avatar: msg.author?.avatar,
+      },
+      created_at: msg.created_at,
+      color: msg.color || '#00D9FF',
+      isDanmaku: msg.is_danmaku ?? true,
+      likes: msg.likes || 0,
+      replies: [],
+      level: msg.level || 1,
+    }));
+  } catch (error) {
+    console.error('获取热门留言失败:', error);
+    return [];
+  }
+};
+
+/**
+ * 获取留言活跃度
+ * @param days 天数
+ * @returns 活跃度数据
+ */
+export const getMessageActivity = async (days: number = 7): Promise<{date: string, count: number}[]> => {
+  try {
+    return await apiRequest(`/api/v1/messages/stats/activity?days=${days}`);
+  } catch (error) {
+    console.error('获取活跃度失败:', error);
+    return [];
+  }
+};

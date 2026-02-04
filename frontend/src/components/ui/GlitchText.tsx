@@ -1,117 +1,43 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { cn } from '@/lib/utils'
-import { useThemedClasses } from '@/hooks/useThemedClasses'
-
-type GlitchSize = 'sm' | 'md' | 'lg'
+import React from 'react';
+import { cn } from '@/lib/utils';
 
 interface GlitchTextProps {
-  text: string
-  size?: GlitchSize
-  className?: string
-  glitchInterval?: number
+  text: string;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'span' | 'p';
 }
 
-const sizeClasses: Record<GlitchSize, string> = {
-  sm: 'text-2xl md:text-3xl',
-  md: 'text-4xl md:text-5xl',
-  lg: 'text-5xl md:text-6xl lg:text-7xl'
-}
-
-export default function GlitchText({
-  text,
-  size = 'md',
+const GlitchText: React.FC<GlitchTextProps> = ({ 
+  text, 
   className,
-  glitchInterval = 3000
-}: GlitchTextProps) {
-  const [glitching, setGlitching] = useState(false)
-  const [glitchText, setGlitchText] = useState(text)
-  const { getThemeClass } = useThemedClasses()
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGlitching(true)
-      
-      setTimeout(() => {
-        setGlitching(false)
-      }, 200)
-    }, glitchInterval)
-
-    return () => clearInterval(interval)
-  }, [glitchInterval])
-
-  const generateGlitchChars = (str: string): string => {
-    const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~'
-    return str
-      .split('')
-      .map(char => {
-        if (char === ' ') return ' '
-        if (Math.random() > 0.5) return chars[Math.floor(Math.random() * chars.length)]
-        return char
-      })
-      .join('')
-  }
-
-  useEffect(() => {
-    if (glitching) {
-      setGlitchText(generateGlitchChars(text))
-      
-      const glitchInterval = setInterval(() => {
-        setGlitchText(generateGlitchChars(text))
-      }, 50)
-
-      setTimeout(() => {
-        clearInterval(glitchInterval)
-        setGlitchText(text)
-      }, 200)
-
-      return () => clearInterval(glitchInterval)
-    }
-  }, [glitching, text])
+  size = 'md',
+  as: Component = 'h1' 
+}) => {
+  const sizeStyles = {
+    sm: 'text-2xl',
+    md: 'text-4xl',
+    lg: 'text-6xl',
+    xl: 'text-8xl'
+  };
 
   return (
-    <span
-      className={cn(
-        'relative inline-block font-display font-bold',
-        sizeClasses[size],
-        getThemeClass('text-white', 'text-gray-900'),
-        className
-      )}
-      style={{
-        textShadow: glitching
-          ? `2px 0 var(--tech-cyan), -2px 0 var(--tech-pink)`
-          : 'none'
-      }}
-    >
-      {glitchText}
-      
-      {glitching && (
-        <>
-          <span
-            className="absolute top-0 left-0 w-full h-full"
-            style={{
-              color: 'var(--tech-cyan)',
-              transform: 'translate(2px, 0)',
-              opacity: 0.8
-            }}
-            aria-hidden="true"
-          >
-            {glitchText}
-          </span>
-          <span
-            className="absolute top-0 left-0 w-full h-full"
-            style={{
-              color: 'var(--tech-pink)',
-              transform: 'translate(-2px, 0)',
-              opacity: 0.8
-            }}
-            aria-hidden="true"
-          >
-            {glitchText}
-          </span>
-        </>
-      )}
-    </span>
-  )
-}
+    <Component className={cn("relative inline-block font-syne font-bold uppercase tracking-wider text-white", sizeStyles[size], className)}>
+      <span className="relative z-10">{text}</span>
+      <span 
+        className="absolute top-0 left-0 -z-10 w-full h-full text-tech-cyan opacity-70 animate-glitch-1"
+        aria-hidden="true"
+      >
+        {text}
+      </span>
+      <span 
+        className="absolute top-0 left-0 -z-10 w-full h-full text-tech-pink opacity-70 animate-glitch-2"
+        aria-hidden="true"
+      >
+        {text}
+      </span>
+    </Component>
+  );
+};
+
+export default GlitchText;

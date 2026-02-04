@@ -35,7 +35,29 @@ export interface TimelineEventUpdate {
   sort_order?: number;
 }
 
-const API_URL = `${API_BASE_URL}/timeline-events`;
+const API_URL = `/api/v1/timeline-events`;
+
+const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...options.headers,
+  };
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || errorData.message || `请求失败: ${response.status}`);
+  }
+
+  return response.json();
+};
 
 export const timelineService = {
   async getTimelineEvents(params?: { is_active?: boolean; skip?: number; limit?: number }): Promise<TimelineEvent[]> {
@@ -44,53 +66,30 @@ export const timelineService = {
     if (params?.skip !== undefined) queryString.append('skip', params.skip.toString());
     if (params?.limit !== undefined) queryString.append('limit', params.limit.toString());
 
-    const response = await fetch(`${API_URL}?${queryString.toString()}`);
-    if (!response.ok) throw new Error('Failed to fetch timeline events');
-    return response.json();
+    return apiRequest(`${API_URL}?${queryString.toString()}`);
   },
 
   async getTimelineEventById(eventId: string): Promise<TimelineEvent> {
-    const response = await fetch(`${API_URL}/${eventId}`);
-    if (!response.ok) throw new Error('Failed to fetch timeline event');
-    return response.json();
+    return apiRequest(`${API_URL}/${eventId}`);
   },
 
   async createTimelineEvent(eventData: TimelineEventCreate): Promise<TimelineEvent> {
-    const token = localStorage.getItem('access_token');
-    const response = await fetch(API_URL, {
+    return apiRequest(API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: JSON.stringify(eventData),
     });
-    if (!response.ok) throw new Error('Failed to create timeline event');
-    return response.json();
   },
 
   async updateTimelineEvent(eventId: string, eventData: TimelineEventUpdate): Promise<TimelineEvent> {
-    const token = localStorage.getItem('access_token');
-    const response = await fetch(`${API_URL}/${eventId}`, {
+    return apiRequest(`${API_URL}/${eventId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
       body: JSON.stringify(eventData),
     });
-    if (!response.ok) throw new Error('Failed to update timeline event');
-    return response.json();
   },
 
   async deleteTimelineEvent(eventId: string): Promise<void> {
-    const token = localStorage.getItem('access_token');
-    const response = await fetch(`${API_URL}/${eventId}`, {
+    return apiRequest(`${API_URL}/${eventId}`, {
       method: 'DELETE',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
     });
-    if (!response.ok) throw new Error('Failed to delete timeline event');
   },
 };

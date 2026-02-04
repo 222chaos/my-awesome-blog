@@ -207,15 +207,14 @@ async def read_article_by_id(
     Get a specific article by id
     """
     article_uuid = UUID(article_id)
-    article = await crud.get_article_async(db, article_id=article_uuid)
+
+    # Increment view count and get updated article with relationships
+    article = await crud.increment_view_count(db, article_id=article_uuid)
     if not article:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Article not found",
         )
-
-    # Increment view count
-    await crud.increment_view_count(db, article_id=article_uuid)
 
     return article
 

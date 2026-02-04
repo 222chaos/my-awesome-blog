@@ -10,7 +10,7 @@ interface Article {
   id: string;
   title: string;
   excerpt: string;
-  featured_image?: string;
+  cover_image?: string;
   view_count: number;
   likes_count: number;
   read_time: number;
@@ -154,7 +154,7 @@ export default function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
             </div>
 
             <div className="w-full lg:w-2/3 relative">
-              {currentArticle.featured_image && (
+              {currentArticle.cover_image && (
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -162,7 +162,7 @@ export default function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
                   className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl"
                 >
                   <img
-                    src={currentArticle.featured_image}
+                    src={currentArticle.cover_image}
                     alt={currentArticle.title}
                     className="w-full h-full object-cover"
                   />

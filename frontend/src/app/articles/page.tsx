@@ -27,7 +27,7 @@ interface Article {
   published_at: string;
   author_id: string;
   category_id: string;
-  featured_image?: string;
+  cover_image?: string;
   read_time: number;
   likes_count: number;
   comments_count: number;
@@ -155,7 +155,7 @@ function ArticlesPageContent() {
     return articles.map(article => ({
       id: article.id,
       title: article.title,
-      coverImage: article.featured_image || '/assets/placeholder.jpg',
+      coverImage: article.cover_image || '/assets/placeholder.jpg',
       description: article.excerpt,
       date: article.published_at,
       featured: true,

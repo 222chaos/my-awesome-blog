@@ -79,7 +79,7 @@ export default function CommandBar({
           <div className="h-6 w-px bg-white/20" />
 
           <button
-            onClick={() => setFilterOpen(true)}
+            onClick={() => setFilterOpen(!filterOpen)}
             className="p-2 rounded-full hover:bg-white/10 transition-all active:scale-95"
             aria-label="筛选"
           >
@@ -138,7 +138,7 @@ export default function CommandBar({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             onClick={() => setSearchOpen(false)}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-24"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] flex items-start justify-center pt-24"
           >
             <motion.div
               onClick={e => e.stopPropagation()}
@@ -208,7 +208,7 @@ export default function CommandBar({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 400 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="fixed right-0 top-0 h-full w-full md:w-[400px] z-50"
+            className="fixed right-0 top-0 h-full w-full md:w-[400px] z-[110]"
           >
             <div className={`
               h-full w-full backdrop-blur-xl

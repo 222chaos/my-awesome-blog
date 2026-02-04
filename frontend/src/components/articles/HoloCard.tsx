@@ -10,7 +10,7 @@ interface Article {
   id: string;
   title: string;
   excerpt: string;
-  featured_image?: string;
+  cover_image?: string;
   view_count: number;
   likes_count: number;
   comments_count: number;
@@ -20,11 +20,11 @@ interface Article {
     username: string;
     avatar?: string;
   };
-  categories: Array<{
+  categories?: Array<{
+    id: string;
     name: string;
-    slug: string;
   }>;
-  tags: Array<{ id: string; name: string; slug: string }>;
+  tags?: Array<{ id: string; name: string }>;
 }
 
 interface HoloCardProps {
@@ -54,8 +54,8 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
       >
         <div
           style={{
-            backgroundImage: article.featured_image
-              ? `linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%), url(${article.featured_image})`
+            backgroundImage: article.cover_image
+              ? `linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%), url(${article.cover_image})`
               : 'linear-gradient(135deg, #18181B 0%, #27272A 100%)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -73,14 +73,14 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
                   'bg-[#EC4899]/90 text-white'
                 )}
               `}>
-                {article.categories[0].name}
+                {article.categories[0]?.name}
               </span>
             </div>
           )}
 
-          {article.tags.length > 0 && (
+          {article.tags && article.tags.length > 0 && (
             <div className="absolute top-4 right-4 flex flex-wrap gap-1 justify-end">
-              {article.tags.slice(0, 2).map(tag => (
+              {article.tags.slice(0, 2).map((tag) => (
                 <span
                   key={tag.id}
                   className={`
@@ -166,9 +166,9 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
             >
                 <div className="sticky top-0 z-10 flex items-center justify-between p-6 backdrop-blur-lg border-b border-white/10">
                   <div className="flex items-center gap-3">
-                    {article.featured_image && (
+                    {article.cover_image && (
                       <img
-                        src={article.featured_image}
+                        src={article.cover_image}
                         alt={article.title}
                         className="w-12 h-12 rounded-lg object-cover"
                       />
@@ -202,10 +202,10 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
                           'bg-[#EC4899]/90 text-white'
                         )}
                       `}>
-                        {article.categories[0].name}
+                        {article.categories[0]?.name}
                       </span>
                     )}
-                    {article.tags.map(tag => (
+                    {article.tags?.map(tag => (
                       <span
                         key={tag.id}
                         className={`

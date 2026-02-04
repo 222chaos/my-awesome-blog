@@ -1,42 +1,47 @@
 from typing import List, Optional
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql://postgres:123456@localhost:5432/my_awesome_blog"
-    
+
     # Application
     APP_NAME: str = "My Awesome Blog"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
     LOG_DIR: str = "logs"
     STATIC_FILES_DIR: str = "static"
-    
+
     # Security
     SECRET_KEY: str = "your-super-secret-key-change-this-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
+
     # Redis
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     REDIS_PASSWORD: Optional[str] = None
-    
-    # Aliyun OSS Configuration
+
+    # Aliyun OSS Configuration - ALIBABA (Alibaba Cloud, 7 letters)
     ALIBABA_CLOUD_ACCESS_KEY_ID: str = ""
     ALIBABA_CLOUD_ACCESS_KEY_SECRET: str = ""
     ALIBABA_CLOUD_OSS_ENDPOINT: str = "https://oss-cn-hangzhou.aliyuncs.com"
     ALIBABA_CLOUD_OSS_BUCKET_NAME: str = "my-awesome-blog"
     ALIBABA_CLOUD_OSS_REGION: str = "oss-cn-hangzhou"
     ALIBABA_CLOUD_OSS_CDN_DOMAIN: str = ""
-    
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["*","http://localhost:3000", "http://localhost:8000", "http://localhost:8989", "http://localhost:3001"]
-    
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(BASE_DIR / ".env"),
+        env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"
     )
@@ -69,7 +74,7 @@ class Settings(BaseSettings):
             if self.DEBUG:
                 print("WARNING: Alibaba Cloud credentials are not set. OSS functionality will be disabled.")
 
-    # Add these new fields to the Settings class
+    # Add these new fields to Settings class
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: int = 587
     SMTP_USERNAME: Optional[str] = None

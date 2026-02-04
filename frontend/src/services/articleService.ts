@@ -13,7 +13,7 @@ export interface Article {
   published_at: string;
   author_id: string;
   category_id: string;
-  featured_image?: string;
+  cover_image?: string;
   read_time: number; // 阅读时间（分钟）
   likes_count: number; // 点赞数
   comments_count: number; // 评论数

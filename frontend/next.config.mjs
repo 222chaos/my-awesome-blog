@@ -22,8 +22,12 @@ const nextConfig = {
         protocol: 'http',
         hostname: '127.0.0.1',
       },
+      {
+        protocol: 'https',
+        hostname: 'my-awesome-blog.oss-cn-hangzhou.aliyuncs.com',
+      },
     ],
-    formats: ['image/webp', 'image/avif'], // 支持现代图片格式
+    formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },

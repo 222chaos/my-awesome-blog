@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Dict
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -78,6 +78,37 @@ def create_message(
         author_id=current_user.id  # type: ignore
     )
     return message
+
+
+@router.get("/trending", response_model=List[MessageWithAuthor])
+def read_trending_messages(
+    limit: int = Query(10, ge=1, le=50),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get trending messages (most liked)
+    """
+    messages = crud.get_trending_messages(
+        db,
+        limit=limit,
+        with_relationships=True
+    )
+    return messages
+
+
+@router.get("/stats/activity", response_model=List[Dict[str, Any]])
+def read_message_activity(
+    days: int = Query(7, ge=1, le=30),
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get message activity statistics for the last N days
+    """
+    stats = crud.get_message_activity(
+        db,
+        days=days
+    )
+    return stats
 
 
 @router.get("/{message_id}", response_model=MessageWithAuthor)

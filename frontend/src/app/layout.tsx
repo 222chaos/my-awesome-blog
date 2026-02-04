@@ -6,6 +6,7 @@ import Footer from '@/components/navigation/Footer';
 import ThemeWrapper from '@/components/theme-wrapper';
 import { LoadingProvider } from '@/context/loading-context';
 import LoadingHandler from '@/components/loading/LoadingHandler';
+import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' });
@@ -26,6 +27,7 @@ const ClientLayout = ({ children }: { children: React.ReactNode }) => {
           <LoadingHandler>{children}</LoadingHandler>
         </main>
         <Footer />
+        <Toaster />
       </ThemeWrapper>
     </LoadingProvider>
   );

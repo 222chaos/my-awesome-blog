@@ -88,18 +88,14 @@ def upload_image(
         
         # Create image record in database
         image_in = ImageCreate(
-            filename=file.filename,
             original_filename=file.filename,
-            filepath=original_file_url,  # Store the OSS URL
-            title=title or file.filename,
-            description=description,
-            alt_text=alt_text,
+            file_path=original_file_url,  # Store the OSS URL
             file_size=len(file_data),
             mime_type=file.content_type,
             width=image_info['width'],
             height=image_info['height'],
-            is_featured=is_featured,
-            uploader_id=current_user.id
+            alt_text=alt_text,
+            caption=description
         )
         
         image = crud.create_image(db, image=image_in)
