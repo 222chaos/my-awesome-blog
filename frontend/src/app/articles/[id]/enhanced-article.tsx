@@ -12,7 +12,7 @@ import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, Arrow
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService';
 import PostCard from '@/components/ui/PostCard';
-import { Progress } from '@/components/ui/Progress';
+import { Progress } from '@/components/ui/progress';
 
 interface Article {
   id: string;
@@ -83,7 +83,7 @@ const convertToArticle = (related: RelatedArticle): Article => {
     },
     category: {
       id: '1',
-      name: related.category.name,
+      name: related.category?.name || '未分类',
       slug: 'category',
       description: '',
     },
@@ -250,12 +250,14 @@ export default function EnhancedArticleDetailPage() {
                 {/* 文章头部 */}
                 <div className="mb-8">
                   <div className="flex flex-wrap items-center gap-4 mb-4">
-                    <Badge variant="secondary" className={getThemeClass(
-                      'bg-tech-cyan/20 text-tech-cyan',
-                      'bg-blue-100 text-blue-800'
-                    )}>
-                      {article.category.name}
-                    </Badge>
+                    {article.category && (
+                      <Badge variant="secondary" className={getThemeClass(
+                        'bg-tech-cyan/20 text-tech-cyan',
+                        'bg-blue-100 text-blue-800'
+                      )}>
+                        {article.category.name}
+                      </Badge>
+                    )}
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Clock className="h-4 w-4 mr-1" />
                       <span>{article.read_time} 分钟阅读</span>

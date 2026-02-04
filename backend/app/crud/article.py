@@ -22,7 +22,15 @@ async def get_article_async(db: Session, article_id: UUID) -> Optional[Article]:
     if cached_article is not None:
         return cached_article
     
-    article = db.query(Article).filter(Article.id == article_id).first()
+    from sqlalchemy.orm import joinedload
+    article = (
+        db.query(Article)
+        .options(joinedload(Article.author))
+        .options(joinedload(Article.categories))
+        .options(joinedload(Article.tags))
+        .filter(Article.id == article_id)
+        .first()
+    )
     if article:
         await cache_service.set(cache_key, article, expire=3600)  # Cache for 1 hour
     
@@ -196,13 +204,20 @@ async def delete_article(db: Session, article_id: UUID) -> bool:
 
 
 async def increment_view_count(db: Session, article_id: UUID) -> Optional[Article]:
-    db_article = await get_article_async(db, article_id)
+    from sqlalchemy.orm import joinedload
+    db_article = (
+        db.query(Article)
+        .options(joinedload(Article.author))
+        .options(joinedload(Article.categories))
+        .options(joinedload(Article.tags))
+        .filter(Article.id == article_id)
+        .first()
+    )
     if not db_article:
         return None
     
     db_article.view_count = db_article.view_count + 1  # type: ignore
     db.commit()
-    db.refresh(db_article)
     
     # 更新缓存
     cache_key = f"article:{article_id}"
@@ -234,14 +249,15 @@ def get_related_articles(db: Session, article_id: UUID, limit: int = 5):
     
     # Find articles in the same category
     related_by_category = []
-    if original_article.category_id:
+    if original_article.article_categories and len(original_article.article_categories) > 0:
+        category_id = original_article.article_categories[0].category_id
         related_by_category = (
             db.query(Article)
             .join(ArticleCategory)
             .filter(
                 Article.id != article_id,
                 Article.is_published == True,
-                ArticleCategory.category_id == original_article.category_id
+                ArticleCategory.category_id == category_id
             )
             .order_by(Article.view_count.desc())
             .limit(limit)

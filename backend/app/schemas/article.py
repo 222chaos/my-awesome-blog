@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, computed_field
 
 
 # Base schemas
@@ -57,6 +57,12 @@ class ArticleWithAuthor(Article):
     author: Optional["User"] = None
     categories: Optional[List["Category"]] = []
     tags: Optional[List["Tag"]] = []
+    
+    @computed_field
+    def category(self) -> Optional["Category"]:
+        if self.categories and len(self.categories) > 0:
+            return self.categories[0]
+        return None
 
 # For nested relationships
 from app.schemas.user import User
