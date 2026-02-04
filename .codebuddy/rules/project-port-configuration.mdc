@@ -1,0 +1,83 @@
+---
+description: 
+alwaysApply: true
+enabled: true
+updatedAt: 2026-02-04T06:00:37.300Z
+provider: 
+---
+
+# 项目端口配置规则
+
+## 🔧 端口配置说明
+
+### 后端服务端口
+- **正式端口**: `8989`
+- **用途**: FastAPI 后端 API 服务
+- **环境**: 开发/生产环境
+
+### 前端服务端口
+- **端口**: `3000`
+- **用途**: Next.js 前端应用
+- **环境**: 开发/生产环境
+
+### 数据库端口
+- **PostgreSQL**: `5432`（生产环境）
+- **SQLite**: 文件数据库（开发测试）
+
+---
+
+## 📝 前端 API 配置
+
+### 配置文件位置
+`frontend/src/config/api.ts`
+
+### 正确配置
+```typescript
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8989';
+```
+
+### 错误配置（禁止）
+❌ `http://127.0.0.1:8000`
+❌ `http://localhost:8000`
+
+### 环境变量配置（推荐）
+在 `.env` 或 `.env.local` 中设置：
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8989
+```
+
+---
+
+## 🚀 后端启动命令
+
+### 开发环境启动
+```bash
+cd backend
+uvicorn app.main:app --reload --port 8989
+```
+
+### 使用 Docker Compose
+确保 `docker-compose.yml` 中后端服务端口映射为 `8989:8989`
+
+---
+
+## ✅ 开发规范
+
+1. **所有前端 API 请求必须使用端口 8989**
+2. **修改端口时需同步更新以下位置**：
+   - `frontend/src/config/api.ts`
+   - `frontend/.env.local`（如果使用）
+   - `docker-compose.yml`（端口映射）
+   - 后端启动命令
+
+3. **禁止硬编码端口号 8000**（除非有特殊说明）
+
+---
+
+## 🔍 快速检查清单
+
+在提交代码前检查：
+- [ ] `frontend/src/config/api.ts` 使用的是 8989
+- [ ] `docker-compose.yml` 端口映射正确
+- [ ] 服务启动命令端口正确
+- [ ] 环境变量配置正确（如果使用）
