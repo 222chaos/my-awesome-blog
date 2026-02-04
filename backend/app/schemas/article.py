@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, field_serializer
 
@@ -55,8 +55,12 @@ class Article(ArticleInDBBase):
 
 class ArticleWithAuthor(Article):
     author: Optional["User"] = None
-
+    categories: Optional[List["Category"]] = []
+    tags: Optional[List["Tag"]] = []
 
 # For nested relationships
 from app.schemas.user import User
+from app.schemas.category import Category
+from app.schemas.tag import Tag
+ArticleWithAuthor.model_rebuild()
 ArticleWithAuthor.update_forward_refs()

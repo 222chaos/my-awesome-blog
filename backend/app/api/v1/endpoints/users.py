@@ -6,10 +6,15 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_active_user
 from app import crud
 from app.crud.user import get_user_stats
-from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse
+from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse, PasswordUpdate
 from app.models.user import User as UserModel
-from app.services.image_service import ImageService
 from app.services.oss_service import oss_service
+
+try:
+    from app.services.image_service import ImageService
+    IMAGE_SERVICE_AVAILABLE = True
+except ImportError:
+    IMAGE_SERVICE_AVAILABLE = False
 
 router = APIRouter()
 
@@ -96,6 +101,13 @@ def upload_current_user_avatar(
     
     app_logger.info(f"Starting avatar upload for user: {current_user.id}, file: {file.filename}")
     
+    # Check if ImageService is available
+    if not IMAGE_SERVICE_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Avatar upload is currently unavailable due to missing image processing library. Please contact administrator."
+        )
+    
     # Check if file is an allowed image type
     allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
     file_extension = os.path.splitext(file.filename)[1].lower()
@@ -105,7 +117,7 @@ def upload_current_user_avatar(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"File type {file_extension} not allowed. Allowed types: {allowed_extensions}"
         )
-
+    
     # Use ImageService to process avatar
     image_service = ImageService()
 
@@ -197,6 +209,34 @@ def read_current_user_stats(
             detail="User statistics not found"
         )
     return stats
+
+
+@router.put("/me/password", response_model=dict)
+def update_password(
+    *,
+    db: Session = Depends(get_db),
+    password_data: PasswordUpdate,
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """
+    Update current user's password
+    """
+    from app.crud.user import update_user_password
+    
+    result = update_user_password(
+        db, 
+        user_id=current_user.id, 
+        old_password=password_data.old_password,
+        new_password=password_data.new_password
+    )
+    
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="旧密码错误或密码更新失败"
+        )
+    
+    return {"message": "密码更新成功"}
 
 
 @router.get("/{user_id}", response_model=User)

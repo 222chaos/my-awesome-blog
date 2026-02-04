@@ -74,3 +74,9 @@ class UserStats(BaseModel):
 class AvatarResponse(BaseModel):
     avatar_url: str = Field(..., description="头像URL")
     message: str = Field(default="Avatar uploaded successfully", description="上传结果消息")
+
+
+# Password update schema
+class PasswordUpdate(BaseModel):
+    old_password: str = Field(..., min_length=6, max_length=128, description="旧密码")
+    new_password: str = Field(..., min_length=6, max_length=128, description="新密码")

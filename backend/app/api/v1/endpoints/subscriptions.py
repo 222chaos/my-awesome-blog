@@ -53,6 +53,30 @@ def create_subscription(
     return subscription
 
 
+@router.post("/unsubscribe", response_model=dict)
+def unsubscribe(
+    email: str,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Unsubscribe by email
+    """
+    subscription = db.query(crud.Subscription).filter(
+        crud.Subscription.email == email
+    ).first()
+    
+    if not subscription:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Subscription not found for this email",
+        )
+    
+    subscription.is_active = False
+    db.commit()
+    
+    return {"message": "取消订阅成功"}
+
+
 @router.get("/{subscription_id}", response_model=Subscription)
 def read_subscription_by_id(
     subscription_id: str,

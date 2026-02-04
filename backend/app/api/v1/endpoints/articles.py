@@ -19,6 +19,8 @@ def read_articles(
     limit: int = 100,
     published_only: bool = Query(True, description="Only return published articles"),
     author_id: Optional[str] = Query(None, description="Filter by author ID"),
+    category_id: Optional[str] = Query(None, description="Filter by category ID"),
+    tag_id: Optional[str] = Query(None, description="Filter by tag ID"),
     search: Optional[str] = Query(None, description="Search in title and content"),
     db: Session = Depends(get_db)
 ) -> Any:
@@ -27,14 +29,16 @@ def read_articles(
     """
     from uuid import UUID
     author_uuid = UUID(author_id) if author_id else None
+    category_uuid = UUID(category_id) if category_id else None
+    tag_uuid = UUID(tag_id) if tag_id else None
 
     articles = crud.get_articles_with_categories_and_tags(
         db,
         skip=skip,
         limit=limit,
         published_only=published_only,
-        category_id=None,
-        tag_id=None,
+        category_id=category_uuid,
+        tag_id=tag_uuid,
         author_id=author_uuid,
         search=search
     )

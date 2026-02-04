@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
@@ -154,3 +154,22 @@ def get_user_stats(db: Session, user_id: UUID):
         joined_date=joined_date,
         total_views=total_views or 0
     )
+
+
+def update_user_password(db: Session, user_id: UUID, old_password: str, new_password: str) -> bool:
+    """
+    更新用户密码
+    验证旧密码后更新为新密码
+    """
+    user = get_user(db, user_id)
+    if not user:
+        return False
+    
+    # 验证旧密码
+    if not verify_password(old_password, str(user.hashed_password)):
+        return False
+    
+    # 更新为新密码
+    user.hashed_password = get_password_hash(new_password)
+    db.commit()
+    return True
