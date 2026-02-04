@@ -1,94 +1,28 @@
-import { Message, CreateMessageRequest, UserProfile } from '@/types';
-import { getCurrentUser } from './userService';
+import { Message, CreateMessageRequest } from '@/types';
+import { API_BASE_URL } from '@/config/api';
 
-// 模拟留言数据
-let mockMessages: Message[] = [
-  {
-    id: '1',
-    content: '欢迎来到我的个人博客！希望大家多多交流～',
-    author: {
-      id: '1',
-      username: '博主',
-      avatar: '/assets/avatar1.jpg',
-    },
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    color: '#00D9FF',
-    isDanmaku: true,
-    likes: 12,
-    replies: [],
-    level: 5,
-  },
-  {
-    id: '2',
-    content: '博客设计得真不错，学习了！',
-    author: {
-      id: '2',
-      username: '前端小白',
-    },
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-    color: '#FF6B6B',
-    isDanmaku: true,
-    likes: 8,
-    replies: [],
-    level: 3,
-  },
-  {
-    id: '3',
-    content: '期待更多技术文章的分享',
-    author: {
-      id: '3',
-      username: '代码爱好者',
-    },
-    created_at: new Date(Date.now() - 43200000).toISOString(),
-    color: '#4ECDC4',
-    isDanmaku: true,
-    likes: 15,
-    replies: [
-      {
-        id: 'r1',
-        content: '谢谢支持！我会持续更新的',
-        author: {
-          id: '1',
-          username: '博主',
-          avatar: '/assets/avatar1.jpg',
-        },
-        created_at: new Date(Date.now() - 40000000).toISOString(),
-        likes: 5,
-      }
-    ],
-    level: 4,
-  },
-  {
-    id: '4',
-    content: '这个弹幕效果很酷啊！',
-    author: {
-      id: '4',
-      username: '设计师小王',
-    },
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-    color: '#FFE66D',
-    isDanmaku: true,
-    likes: 6,
-    replies: [],
-    level: 2,
-  },
-  {
-    id: '5',
-    content: '支持一下，继续加油！',
-    author: {
-      id: '5',
-      username: '路人甲',
-    },
-    created_at: new Date(Date.now() - 1800000).toISOString(),
-    isDanmaku: false,
-    likes: 3,
-    replies: [],
-    level: 1,
-  },
-];
+// 通用请求函数
+const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...options.headers,
+  };
 
-// 模拟API延迟
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || errorData.message || `请求失败: ${response.status}`);
+  }
+
+  return response.json();
+};
 
 // 弹幕颜色选项
 export const DANMAKU_COLORS = [
@@ -107,10 +41,28 @@ export const DANMAKU_COLORS = [
  * @returns 留言列表
  */
 export const getMessages = async (): Promise<Message[]> => {
-  await delay(300);
-  return [...mockMessages].sort((a, b) =>
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  try {
+    const messages = await apiRequest('/api/v1/messages/');
+    // 转换后端格式到前端格式
+    return messages.map((msg: any) => ({
+      id: msg.id,
+      content: msg.content,
+      author: {
+        id: msg.author?.id || '',
+        username: msg.author?.username || '匿名用户',
+        avatar: msg.author?.avatar,
+      },
+      created_at: msg.created_at,
+      color: msg.color || '#00D9FF',
+      isDanmaku: msg.is_danmaku ?? true,
+      likes: msg.likes || 0,
+      replies: [],
+      level: msg.level || 1,
+    }));
+  } catch (error) {
+    console.error('获取留言失败:', error);
+    return [];
+  }
 };
 
 /**
@@ -118,10 +70,30 @@ export const getMessages = async (): Promise<Message[]> => {
  * @returns 弹幕消息列表
  */
 export const getDanmakuMessages = async (): Promise<Message[]> => {
-  await delay(200);
-  return mockMessages
-    .filter(msg => msg.isDanmaku !== false)
-    .sort(() => Math.random() - 0.5); // 随机排序
+  try {
+    const messages = await apiRequest('/api/v1/messages/danmaku');
+    // 转换后端格式到前端格式并随机排序
+    return messages
+      .map((msg: any) => ({
+        id: msg.id,
+        content: msg.content,
+        author: {
+          id: msg.author?.id || '',
+          username: msg.author?.username || '匿名用户',
+          avatar: msg.author?.avatar,
+        },
+        created_at: msg.created_at,
+        color: msg.color || '#00D9FF',
+        isDanmaku: true,
+        likes: msg.likes || 0,
+        replies: [],
+        level: msg.level || 1,
+      }))
+      .sort(() => Math.random() - 0.5);
+  } catch (error) {
+    console.error('获取弹幕失败:', error);
+    return [];
+  }
 };
 
 /**
@@ -130,34 +102,31 @@ export const getDanmakuMessages = async (): Promise<Message[]> => {
  * @returns 创建的留言
  */
 export const createMessage = async (data: CreateMessageRequest): Promise<Message> => {
-  await delay(500);
+  const response = await apiRequest('/api/v1/messages/', {
+    method: 'POST',
+    body: JSON.stringify({
+      content: data.content,
+      color: data.color,
+      is_danmaku: data.isDanmaku,
+    }),
+  });
 
-  // 获取当前登录用户
-  const currentUser = await getCurrentUser();
-
-  if (!currentUser) {
-    throw new Error('请先登录后再留言');
-  }
-
-  const newMessage: Message = {
-    id: Date.now().toString(),
-    content: data.content.trim(),
+  // 转换后端格式到前端格式
+  return {
+    id: response.id,
+    content: response.content,
     author: {
-      id: currentUser.id,
-      username: currentUser.username,
-      avatar: currentUser.avatar,
+      id: response.author?.id || '',
+      username: response.author?.username || '匿名用户',
+      avatar: response.author?.avatar,
     },
-    created_at: new Date().toISOString(),
-    color: data.color || DANMAKU_COLORS[0].value,
-    isDanmaku: data.isDanmaku ?? true,
-    likes: 0,
+    created_at: response.created_at,
+    color: response.color || '#00D9FF',
+    isDanmaku: response.is_danmaku ?? true,
+    likes: response.likes || 0,
     replies: [],
-    level: 1, // 默认等级
+    level: response.level || 1,
   };
-
-  mockMessages.unshift(newMessage);
-
-  return newMessage;
 };
 
 /**
@@ -166,25 +135,15 @@ export const createMessage = async (data: CreateMessageRequest): Promise<Message
  * @returns 是否删除成功
  */
 export const deleteMessage = async (messageId: string): Promise<boolean> => {
-  await delay(300);
-
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
-    throw new Error('请先登录');
+  try {
+    await apiRequest(`/api/v1/messages/${messageId}`, {
+      method: 'DELETE',
+    });
+    return true;
+  } catch (error) {
+    console.error('删除留言失败:', error);
+    throw error;
   }
-
-  const message = mockMessages.find(m => m.id === messageId);
-  if (!message) {
-    throw new Error('留言不存在');
-  }
-
-  // 只能删除自己的留言
-  if (message.author.id !== currentUser.id) {
-    throw new Error('只能删除自己的留言');
-  }
-
-  mockMessages = mockMessages.filter(m => m.id !== messageId);
-  return true;
 };
 
 /**
@@ -193,15 +152,25 @@ export const deleteMessage = async (messageId: string): Promise<boolean> => {
  * @returns 更新后的留言
  */
 export const likeMessage = async (messageId: string): Promise<Message> => {
-  await delay(200);
+  const response = await apiRequest(`/api/v1/messages/${messageId}/like`, {
+    method: 'POST',
+  });
 
-  const message = mockMessages.find(m => m.id === messageId);
-  if (!message) {
-    throw new Error('留言不存在');
-  }
-
-  message.likes = (message.likes || 0) + 1;
-  return { ...message };
+  return {
+    id: response.id,
+    content: response.content,
+    author: {
+      id: response.author?.id || '',
+      username: response.author?.username || '匿名用户',
+      avatar: response.author?.avatar,
+    },
+    created_at: response.created_at,
+    color: response.color || '#00D9FF',
+    isDanmaku: response.is_danmaku ?? true,
+    likes: response.likes || 0,
+    replies: [],
+    level: response.level || 1,
+  };
 };
 
 /**
@@ -211,32 +180,59 @@ export const likeMessage = async (messageId: string): Promise<Message> => {
  * @returns 更新后的留言
  */
 export const replyToMessage = async (messageId: string, content: string): Promise<Message> => {
-  await delay(300);
+  const response = await apiRequest('/api/v1/messages/', {
+    method: 'POST',
+    body: JSON.stringify({
+      content,
+      parent_id: messageId,
+      is_danmaku: false,
+    }),
+  });
 
-  const currentUser = await getCurrentUser();
-  if (!currentUser) {
-    throw new Error('请先登录');
-  }
-
-  const message = mockMessages.find(m => m.id === messageId);
-  if (!message) {
-    throw new Error('留言不存在');
-  }
-
-  const newReply = {
-    id: `r${Date.now()}`,
-    content: content.trim(),
+  return {
+    id: response.id,
+    content: response.content,
     author: {
-      id: currentUser.id,
-      username: currentUser.username,
-      avatar: currentUser.avatar,
+      id: response.author?.id || '',
+      username: response.author?.username || '匿名用户',
+      avatar: response.author?.avatar,
     },
-    created_at: new Date().toISOString(),
+    created_at: response.created_at,
+    color: response.color || '#00D9FF',
+    isDanmaku: false,
     likes: 0,
+    replies: [],
+    level: response.level || 1,
   };
+};
 
-  message.replies = message.replies ? [...message.replies, newReply] : [newReply];
-  return { ...message };
+/**
+ * 获取留言的回复列表
+ * @param messageId 留言ID
+ * @returns 回复列表
+ */
+export const getMessageReplies = async (messageId: string): Promise<Message[]> => {
+  try {
+    const replies = await apiRequest(`/api/v1/messages/${messageId}/replies`);
+    return replies.map((msg: any) => ({
+      id: msg.id,
+      content: msg.content,
+      author: {
+        id: msg.author?.id || '',
+        username: msg.author?.username || '匿名用户',
+        avatar: msg.author?.avatar,
+      },
+      created_at: msg.created_at,
+      color: msg.color || '#00D9FF',
+      isDanmaku: msg.is_danmaku ?? false,
+      likes: msg.likes || 0,
+      replies: [],
+      level: msg.level || 1,
+    }));
+  } catch (error) {
+    console.error('获取回复失败:', error);
+    return [];
+  }
 };
 
 /**

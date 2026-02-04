@@ -1,20 +1,23 @@
 import { NextRequest } from 'next/server';
 import { Album } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8989/api/v1';
 
 // GET /api/albums - 获取所有相册
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const skip = searchParams.get('skip') || '0';
+    const limit = searchParams.get('limit') || '100';
+
     // 从后端API获取相册数据
-    const response = await fetch(`${API_BASE_URL}/portfolios`);
+    const response = await fetch(`${API_BASE_URL}/albums?skip=${skip}&limit=${limit}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const data = await response.json();
-    const albums: Album[] = data.items || data; // 根据API返回格式调整
+    const albums: Album[] = await response.json();
     
     return Response.json({
       success: true,
