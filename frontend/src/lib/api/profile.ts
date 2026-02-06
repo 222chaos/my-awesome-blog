@@ -1,5 +1,6 @@
 import { UserProfile } from '@/types';
 import { getToken } from '../auth-utils';
+import { API_BASE_URL } from '@/config/api';
 
 export interface UserStats {
   posts: number;
@@ -15,8 +16,7 @@ export interface UserStats {
 // 获取当前用户信息
 export const fetchCurrentUserProfile = async (): Promise<UserProfile> => {
   const token = getToken();
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8989/api/v1';
-  const response = await fetch(`${baseUrl}/users/me`, {
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -49,8 +49,7 @@ export const updateUserProfile = async (profileData: Partial<UserProfile>): Prom
     ...(profileData.linkedin !== undefined && { linkedin: profileData.linkedin })
   };
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8989/api/v1';
-  const response = await fetch(`${baseUrl}/users/me`, {
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -82,8 +81,7 @@ export const updateUserProfile = async (profileData: Partial<UserProfile>): Prom
 // 获取用户统计信息
 export const fetchCurrentUserStats = async (): Promise<UserStats> => {
   const token = getToken();
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8989/api/v1';
-  const response = await fetch(`${baseUrl}/users/me/stats`, {
+  const response = await fetch(`${API_BASE_URL}/users/me/stats`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -117,8 +115,7 @@ export const uploadAvatar = async (file: File): Promise<{ avatar_url: string }> 
   const formData = new FormData();
   formData.append('file', file);
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8989/api/v1';
-  const response = await fetch(`${baseUrl}/users/me/avatar`, {
+  const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`

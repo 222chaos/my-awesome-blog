@@ -204,12 +204,12 @@ function TimelineEventItem({ event, index }: TimelineEventItemProps) {
   return (
     <div
       ref={itemRef}
-      className={cn('relative flex items-start mb-12', isLeft ? 'flex-row' : 'flex-row-reverse')}
+      className={cn('relative flex items-start mb-8 sm:mb-10 lg:mb-12', isLeft ? 'flex-row' : 'flex-row-reverse')}
     >
-      <div className="relative z-20 w-16 h-16 flex items-center justify-center">
+      <div className="relative z-20 w-12 h-16 sm:w-16 flex items-center justify-center flex-shrink-0">
         <div
           ref={dotRef}
-          className="w-5 h-5 bg-tech-cyan rounded-full"
+          className="w-4 h-4 sm:w-5 sm:h-5 bg-tech-cyan rounded-full"
           style={{
             backgroundColor: 'var(--tech-cyan)',
             boxShadow: '0 0 15px var(--tech-cyan)',
@@ -220,36 +220,36 @@ function TimelineEventItem({ event, index }: TimelineEventItemProps) {
 
       <GlassCard
         ref={cardRef}
-        className="flex-1 ml-4 relative z-10"
+        className="flex-1 ml-3 sm:ml-4 relative z-10"
         hoverEffect={true}
-        padding="md"
+        padding="sm"
       >
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-2 sm:mb-3">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-tech-cyan" />
-            <span className="text-sm text-tech-cyan font-medium">{event.date}</span>
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
+            <span className="text-xs sm:text-sm text-tech-cyan font-medium">{event.date}</span>
           </div>
 
           {event.badge && BadgeIcon && (
             <div
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold',
+                'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold',
                 'bg-gradient-to-r',
                 event.badge.color,
                 'text-white'
               )}
             >
-              <BadgeIcon className="w-3.5 h-3.5" />
+              <BadgeIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               {event.badge.label}
             </div>
           )}
         </div>
 
-        <h4 className="text-lg font-bold text-foreground mb-2">{event.title}</h4>
+        <h4 className="text-base sm:text-lg font-bold text-foreground mb-1.5 sm:mb-2">{event.title}</h4>
 
         <p
           className={cn(
-            'text-muted-foreground transition-all duration-300',
+            'text-xs sm:text-sm text-muted-foreground transition-all duration-300',
             !isExpanded && 'line-clamp-2'
           )}
         >
@@ -257,30 +257,30 @@ function TimelineEventItem({ event, index }: TimelineEventItemProps) {
         </p>
 
         {(event.media || event.link) && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
             {event.media && event.media.length > 0 && (
               <div>
                 <button
                   onClick={() => setShowMediaPreview(!showMediaPreview)}
-                  className="flex items-center gap-2 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
+                  className="flex items-center gap-2 text-xs sm:text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
                   aria-expanded={showMediaPreview}
                   aria-label={showMediaPreview ? '隐藏媒体预览' : '显示媒体预览'}
                 >
                   {showMediaPreview ? (
                     <>
-                      <ChevronDown className="w-4 h-4" />
+                      <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       隐藏媒体
                     </>
                   ) : (
                     <>
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       查看媒体 ({event.media.length})
                     </>
                   )}
                 </button>
 
                 {showMediaPreview && (
-                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2 animate-fade-in-up">
+                  <div className="mt-2 sm:mt-3 grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 animate-fade-in-up">
                     {event.media.map((media, idx) => {
                       const MediaIcon = mediaIcons[media.type]
                       return (
@@ -295,13 +295,13 @@ function TimelineEventItem({ event, index }: TimelineEventItemProps) {
                           onClick={() => window.open(media.url, '_blank')}
                           aria-label={`查看${media.title}`}
                         >
-                          <div className="p-3 flex flex-col items-center gap-2">
-                            <MediaIcon className="w-8 h-8 text-tech-cyan" />
-                            <span className="text-xs text-center text-foreground">{media.title}</span>
+                          <div className="p-2 sm:p-3 flex flex-col items-center gap-1.5 sm:gap-2">
+                            <MediaIcon className="w-6 h-6 sm:w-8 sm:h-8 text-tech-cyan" />
+                            <span className="text-[10px] sm:text-xs text-center text-foreground truncate w-full">{media.title}</span>
                           </div>
 
                           <div className="absolute inset-0 bg-tech-cyan/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <ExternalLink className="w-6 h-6 text-white" />
+                            <ExternalLink className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
                         </div>
                       )
@@ -316,10 +316,10 @@ function TimelineEventItem({ event, index }: TimelineEventItemProps) {
                 href={event.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
+                className="inline-flex items-center gap-2 text-xs sm:text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
               >
                 查看详情
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </a>
             )}
           </div>
@@ -328,17 +328,17 @@ function TimelineEventItem({ event, index }: TimelineEventItemProps) {
         {event.description.length > 100 && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-3 flex items-center gap-1 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
+            className="mt-2 sm:mt-3 flex items-center gap-1 text-xs sm:text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors"
             aria-expanded={isExpanded}
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 收起
               </>
             ) : (
               <>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 展开更多
               </>
             )}
@@ -420,28 +420,28 @@ export default function Timeline() {
   }, [events])
 
   return (
-    <section className="py-16 lg:py-20 relative overflow-hidden">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in-up text-foreground">
+    <section className="py-12 sm:py-14 md:py-16 lg:py-20 relative overflow-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-10 lg:mb-12 animate-fade-in-up text-foreground">
           我的历程
         </h2>
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tech-cyan" />
+          <div className="flex justify-center items-center py-16 sm:py-20">
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-tech-cyan" />
           </div>
         ) : (
-          <div ref={timelineRef} className="relative max-w-4xl mx-auto">
+          <div ref={timelineRef} className="relative max-w-4xl mx-auto px-2 sm:px-4">
             <div
               ref={verticalLineRef}
-              className="absolute left-8 top-0 bottom-0 w-0.5 origin-top"
+              className="absolute left-6 sm:left-8 top-0 bottom-0 w-0.5 origin-top"
               style={{
                 background: 'linear-gradient(to bottom, transparent 0%, var(--tech-cyan) 10%, var(--tech-cyan) 90%, transparent 100%)',
                 filter: 'blur(0.5px)'
               }}
             />
 
-            <div className="absolute left-8 top-0 h-full w-40 -ml-20 bg-gradient-to-r from-transparent via-tech-cyan/10 to-transparent opacity-30 pointer-events-none" />
+            <div className="absolute left-6 sm:left-8 top-0 h-full w-32 sm:w-40 -ml-16 sm:-ml-20 bg-gradient-to-r from-transparent via-tech-cyan/10 to-transparent opacity-30 pointer-events-none" />
 
             {events.map((event, index) => (
               <TimelineEventItem key={event.id} event={event} index={index} />

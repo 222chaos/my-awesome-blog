@@ -50,26 +50,33 @@ export function ThemeProvider({
     setIsMounted(true);
   }, []);
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+  const getInitialResolvedTheme = (): 'light' | 'dark' => {
     if (typeof window === 'undefined') {
       return 'dark';
     }
 
     try {
       const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        const savedTheme = stored as Theme;
-        if (savedTheme === 'light' || savedTheme === 'dark') {
-          return savedTheme;
-        }
+      const savedTheme = stored ? (stored as Theme) : defaultTheme;
+      
+      if (savedTheme === 'light') {
+        return 'light';
       }
-
+      
+      if (savedTheme === 'dark') {
+        return 'dark';
+      }
+      
       // 如果是自动模式或无效值，根据系统偏好决定
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } catch (e) {
       console.warn('无法确定初始主题:', e);
       return 'dark';
     }
+  };
+
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+    return getInitialResolvedTheme();
   });
 
   // 强制更新主题的方法

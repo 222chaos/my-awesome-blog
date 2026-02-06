@@ -10,6 +10,7 @@ from app.models.article_category import ArticleCategory
 from app.models.article_tag import ArticleTag
 from app.models.friend_link import FriendLink
 from app.models.portfolio import Portfolio
+from app.models.portfolio_image import PortfolioImage
 from app.models.timeline_event import TimelineEvent
 from app.models.subscription import Subscription
 from app.models.image import Image, ImageVariant

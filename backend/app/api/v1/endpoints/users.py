@@ -19,6 +19,25 @@ except ImportError:
 router = APIRouter()
 
 
+@router.get("/admin", response_model=User)
+def get_admin_user(
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get admin/superuser information for public display
+    Returns the first superuser found
+    """
+    from sqlalchemy.orm import Session
+
+    admin = db.query(UserModel).filter(UserModel.is_superuser == True).first()
+    if not admin:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Admin user not found"
+        )
+    return admin
+
+
 @router.get("/", response_model=List[User])
 def read_users(
     skip: int = 0,

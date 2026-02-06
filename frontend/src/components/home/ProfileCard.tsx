@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { FileText, Eye, Users, Activity, Globe } from 'lucide-react'
+import { FileText, Eye, Users, Activity, Globe, User } from 'lucide-react'
 import GlassCard from '@/components/ui/GlassCard'
 import { cn } from '@/lib/utils'
+import { getCurrentUserApi, getAdminUserApi } from '@/lib/api/auth'
 
 interface Stat {
   label: string
@@ -22,8 +23,40 @@ export default function ProfileCard() {
 
   const [isVisible, setIsVisible] = useState(false)
   const [animatedValues, setAnimatedValues] = useState<{ [key: string]: number }>({})
+  const [userAvatar, setUserAvatar] = useState<string | null>(null)
+  const [userName, setUserName] = useState('POETIZE')
+  const [userBio, setUserBio] = useState('分享技术与生活，记录成长点滴')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const animationFrameRef = useRef<number>()
+
+  // 获取当前用户信息，未登录时获取管理员信息作为默认
+  useEffect(() => {
+    const fetchUser = async () => {
+      // 先尝试获取当前登录用户
+      const user = await getCurrentUserApi()
+      if (user) {
+        setIsLoggedIn(true)
+        setUserAvatar(user.avatar || null)
+        setUserName(user.username || user.fullName || 'POETIZE')
+        setUserBio(user.bio || '分享技术与生活，记录成长点滴')
+      } else {
+        // 未登录时获取管理员信息作为默认
+        setIsLoggedIn(false)
+        const admin = await getAdminUserApi()
+        if (admin) {
+          setUserAvatar(admin.avatar || null)
+          setUserName(admin.username || admin.fullName || 'POETIZE')
+          setUserBio(admin.bio || '分享技术与生活，记录成长点滴')
+        } else {
+          setUserAvatar(null)
+          setUserName('POETIZE')
+          setUserBio('分享技术与生活，记录成长点滴')
+        }
+      }
+    }
+    fetchUser()
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -96,17 +129,18 @@ export default function ProfileCard() {
       className="rounded-2xl p-6 sm:p-8 transition-all duration-300"
       aria-label="个人信息卡片"
     >
-      <div className="flex justify-center mb-4 sm:mb-6">
-        <div className="relative group">
+      <div className="flex flex-col items-center mb-6 sm:mb-8">
+        <div className="relative group mb-4">
           <div
             className={cn(
-              'w-28 h-28 sm:w-32 sm:h-32 rounded-full',
-              'bg-gradient-to-br from-tech-cyan to-tech-lightcyan',
+              'w-24 h-24 sm:w-28 sm:h-28 rounded-full',
+              userAvatar ? '' : 'bg-gradient-to-br from-tech-cyan to-tech-lightcyan',
               'flex items-center justify-center shadow-lg',
               'transition-all duration-500 ease-out',
               'cursor-pointer',
               'transform-gpu',
-              'group-hover:rotate-y-12 group-hover:scale-110'
+              'group-hover:scale-110',
+              'overflow-hidden'
             )}
             style={{
               transformStyle: 'preserve-3d',
@@ -116,32 +150,44 @@ export default function ProfileCard() {
             tabIndex={0}
             aria-label="查看头像"
           >
-            <Users className="w-14 h-14 sm:w-16 sm:h-16 text-white transform-gpu" />
+            {userAvatar ? (
+              <img
+                src={userAvatar}
+                alt="用户头像"
+                className="w-full h-full object-cover"
+                onError={() => setUserAvatar(null)}
+              />
+            ) : (
+              <User className="w-12 h-12 sm:w-14 sm:h-14 text-white transform-gpu" />
+            )}
           </div>
 
           <div
-            className="absolute bottom-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white dark:border-gray-900 animate-pulse"
-            aria-label="在线状态"
+            className={cn(
+              'absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-white dark:border-gray-900 animate-pulse',
+              isLoggedIn ? 'bg-green-500' : 'bg-gray-400'
+            )}
+            aria-label={isLoggedIn ? '在线状态' : '离线状态'}
           />
 
-          <div className="absolute -top-2 -right-2 bg-tech-cyan text-white text-xs px-2 py-1 rounded-full animate-bounce">
-            {realTimeVisitors} 人在线
+          <div className="absolute -top-1 -right-1 bg-tech-cyan text-white text-[10px] sm:text-xs px-2 py-0.5 rounded-full">
+            {realTimeVisitors}
           </div>
         </div>
+
+        <h3 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
+          {userName}
+        </h3>
+        <p className="text-center text-muted-foreground text-sm max-w-[280px]">
+          {userBio}
+        </p>
       </div>
 
-      <h3 className="text-xl sm:text-2xl font-bold text-center mb-2 text-foreground">
-        POETIZE
-      </h3>
-      <p className="text-center text-muted-foreground mb-6 sm:mb-8 text-sm">
-        分享技术与生活，记录成长点滴
-      </p>
-
-      <div className="mb-6 p-4 rounded-lg bg-glass/20 border border-glass-border">
+      <div className="mb-5 p-3 rounded-lg bg-glass/20 border border-glass-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-tech-cyan" />
-            <span className="text-sm text-gray-400">实时访客</span>
+            <span className="text-xs sm:text-sm text-gray-400">实时访客</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
@@ -149,9 +195,9 @@ export default function ProfileCard() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              <span className="text-sm font-medium text-green-400">{onlineUsers}</span>
+              <span className="text-xs sm:text-sm font-medium text-green-400">{onlineUsers}</span>
             </div>
-            <Globe className="w-4 h-4 text-gray-500" />
+            <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
           </div>
         </div>
       </div>
@@ -164,10 +210,10 @@ export default function ProfileCard() {
           return (
             <div
               key={stat.label}
-              className="flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg hover:bg-tech-cyan/10 transition-colors group"
+              className="flex flex-col items-center justify-center p-2.5 sm:p-3 rounded-lg hover:bg-tech-cyan/10 transition-colors group"
               role="listitem"
             >
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2">
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 mb-1.5 sm:mb-2">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 40 40">
                   <circle
                     cx="20"
@@ -201,14 +247,14 @@ export default function ProfileCard() {
                   </defs>
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-tech-cyan" />
+                  <stat.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
                 </div>
               </div>
 
-              <span className="text-tech-cyan font-bold text-lg sm:text-xl mb-1">
+              <span className="text-tech-cyan font-bold text-sm sm:text-lg mb-0.5">
                 {animatedValues[stat.label]?.toLocaleString() || '0'}
               </span>
-              <span className="text-foreground font-medium text-xs sm:text-sm">
+              <span className="text-foreground font-medium text-[10px] sm:text-xs">
                 {stat.label}
               </span>
             </div>

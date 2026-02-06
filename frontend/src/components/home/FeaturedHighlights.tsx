@@ -1,193 +1,279 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { ChevronRight, Pin, Star, TrendingUp, ArrowRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Pin, Star, TrendingUp, ArrowRight, Eye, Heart, Flame, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface HighlightItem {
   id: string
-  type: 'pinned' | 'featured' | 'achievement' | 'quick-link'
+  type: 'pinned' | 'featured' | 'trending' | 'latest'
   title: string
-  description?: string
-  icon?: React.ReactNode
-  link?: string
-  badge?: string
-  color?: string
+  description: string
+  icon: React.ReactNode
+  link: string
+  badge: string
+  color: string
+  stats: {
+    views?: number
+    likes?: number
+    comments?: number
+  }
+  category?: string
+  readTime?: string
 }
 
 const mockHighlights: HighlightItem[] = [
   {
     id: '1',
     type: 'pinned',
-    title: '置顶文章',
-    description: '深入理解React Server Components',
+    title: '深入理解 React Server Components',
+    description: '探索 Next.js 14 中 Server Components 的核心概念、最佳实践和性能优化技巧。',
     icon: <Pin className="w-5 h-5" />,
-    link: '/articles/pinned',
-    badge: '热门',
-    color: 'from-red-500 to-orange-500'
+    link: '/articles/react-server-components',
+    badge: '置顶',
+    color: 'from-red-500 to-orange-500',
+    category: 'React',
+    readTime: '15 min',
+    stats: {
+      views: 12580,
+      likes: 892,
+      comments: 156
+    }
   },
   {
     id: '2',
     type: 'featured',
-    title: '精选内容',
-    description: 'Next.js 14最佳实践指南',
+    title: 'Next.js 14 最佳实践指南',
+    description: '全面介绍 Next.js 14 的新特性、架构设计模式和生产环境部署策略。',
     icon: <Star className="w-5 h-5" />,
-    link: '/articles/featured',
+    link: '/articles/nextjs-best-practices',
     badge: '精选',
-    color: 'from-tech-cyan to-tech-sky'
+    color: 'from-tech-cyan to-tech-sky',
+    category: 'Next.js',
+    readTime: '20 min',
+    stats: {
+      views: 8932,
+      likes: 654,
+      comments: 89
+    }
   },
   {
     id: '3',
-    type: 'achievement',
-    title: '最新成就',
-    description: '完成100篇技术博客',
-    icon: <TrendingUp className="w-5 h-5" />,
-    link: '/achievements',
-    badge: '里程碑',
-    color: 'from-purple-500 to-pink-500'
+    type: 'trending',
+    title: 'TypeScript 高级类型系统',
+    description: '深入掌握 TypeScript 高级类型、泛型、条件类型和工具类型的使用技巧。',
+    icon: <Flame className="w-5 h-5" />,
+    link: '/articles/typescript-advanced-types',
+    badge: '热门',
+    color: 'from-purple-500 to-pink-500',
+    category: 'TypeScript',
+    readTime: '18 min',
+    stats: {
+      views: 15234,
+      likes: 1245,
+      comments: 234
+    }
   },
   {
     id: '4',
-    type: 'quick-link',
-    title: '快速导航',
-    description: '访问项目作品集',
-    icon: <ArrowRight className="w-5 h-5" />,
-    link: '/portfolio',
-    badge: '推荐',
-    color: 'from-green-500 to-emerald-500'
+    type: 'latest',
+    title: '全栈开发实战：从零到一',
+    description: '使用 Next.js、FastAPI 和 PostgreSQL 构建完整的全栈应用程序。',
+    icon: <TrendingUp className="w-5 h-5" />,
+    link: '/articles/fullstack-development',
+    badge: '最新',
+    color: 'from-green-500 to-emerald-500',
+    category: '全栈',
+    readTime: '25 min',
+    stats: {
+      views: 3456,
+      likes: 234,
+      comments: 45
+    }
   }
 ]
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+}
+
+const cardVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 20,
+    scale: 0.95
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94]
+    }
+  }
+}
+
+function formatNumber(num: number): string {
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'k'
+  }
+  return num.toString()
+}
+
 export default function FeaturedHighlights() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-
-  useEffect(() => {
-    if (isPaused) return
-
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % mockHighlights.length)
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [isPaused])
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % mockHighlights.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + mockHighlights.length) % mockHighlights.length)
-  }
-
   return (
-    <section
-      className="relative overflow-hidden py-4 sm:py-6 bg-gradient-to-b from-tech-darkblue to-transparent"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center gap-3 mb-4">
+    <section className="relative overflow-hidden py-6 sm:py-8 lg:py-10 bg-gradient-to-b from-tech-darkblue to-transparent">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center gap-3 mb-6 sm:mb-8"
+        >
           <div className="flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-tech-cyan to-tech-sky rounded-full" />
-            <h2 className="text-lg sm:text-xl font-bold text-white">
+            <div className="w-1 h-7 sm:h-8 bg-gradient-to-b from-tech-cyan to-tech-sky rounded-full animate-pulse-glow" />
+            <h2 className="text-xl sm:text-2xl font-bold text-white">
               精选推荐
             </h2>
           </div>
-          <span className="text-xs text-gray-400">
-            {currentIndex + 1} / {mockHighlights.length}
+          <div className="flex-1 h-px bg-gradient-to-r from-glass-border/50 to-transparent" />
+          <span className="text-xs sm:text-sm text-gray-400">
+            {mockHighlights.length} 篇精选
           </span>
-        </div>
+        </motion.div>
 
-        <div className="relative">
-          <div className="flex gap-4 overflow-hidden">
-            {mockHighlights.map((item, index) => (
-              <div
-                key={item.id}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+        >
+          {mockHighlights.map((item, index) => (
+            <motion.div
+              key={item.id}
+              variants={cardVariants}
+              whileHover={{ 
+                y: -8,
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+              className="group"
+            >
+              <a
+                href={item.link}
                 className={cn(
-                  'flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 xl:w-1/4',
-                  'transition-all duration-500 ease-out transform',
-                  index === currentIndex ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none absolute'
+                  'block h-full bg-glass/30 backdrop-blur-xl border border-glass-border rounded-2xl',
+                  'p-5 sm:p-6 transition-all duration-300',
+                  'hover:shadow-2xl hover:shadow-tech-cyan/10',
+                  'cursor-pointer relative overflow-hidden',
+                  'before:absolute before:inset-0 before:rounded-2xl before:pointer-events-none',
+                  'before:bg-gradient-to-br before:from-white/5 before:to-transparent',
+                  'group-hover:before:from-white/10'
                 )}
               >
-                <a
-                  href={item.link}
-                  className={cn(
-                    'block h-full bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg',
-                    'p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg',
-                    'cursor-pointer group'
-                  )}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-4">
+                    <motion.div
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
                       className={cn(
-                        'p-2 rounded-lg bg-gradient-to-br',
-                        item.color || 'from-tech-cyan to-tech-sky',
-                        'text-white'
+                        'p-3 rounded-xl bg-gradient-to-br',
+                        item.color,
+                        'text-white shadow-lg'
                       )}
                     >
                       {item.icon}
-                    </div>
-                    {item.badge && (
+                    </motion.div>
+                    <div className="flex flex-col gap-2 items-end">
                       <span
                         className={cn(
-                          'px-2 py-1 text-xs font-medium rounded-full bg-tech-cyan/20 text-tech-cyan border border-tech-cyan/30'
+                          'px-2.5 py-1 text-xs font-semibold rounded-full',
+                          'bg-tech-cyan/20 text-tech-cyan border border-tech-cyan/30',
+                          'shadow-sm'
                         )}
                       >
                         {item.badge}
                       </span>
-                    )}
+                      {item.category && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 bg-glass/50 px-2 py-1 rounded">
+                          {item.category}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-tech-cyan transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-tech-cyan transition-colors">
                     {item.title}
                   </h3>
 
-                  {item.description && (
-                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">
-                      {item.description}
-                    </p>
-                  )}
+                  <p className="text-xs sm:text-sm text-gray-400 mb-4 line-clamp-3 leading-relaxed">
+                    {item.description}
+                  </p>
 
-                  <div className="flex items-center text-tech-cyan text-sm font-medium">
-                    <span>了解更多</span>
-                    <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                      {item.readTime && (
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{item.readTime}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-glass-border/50">
+                      <div className="flex items-center gap-3">
+                        {item.stats.views && (
+                          <div className="flex items-center gap-1 group-hover:text-tech-cyan transition-colors">
+                            <Eye className="w-3.5 h-3.5" />
+                            <span className="text-xs font-medium">{formatNumber(item.stats.views)}</span>
+                          </div>
+                        )}
+                        {item.stats.likes && (
+                          <div className="flex items-center gap-1 group-hover:text-pink-400 transition-colors">
+                            <Heart className="w-3.5 h-3.5" />
+                            <span className="text-xs font-medium">{formatNumber(item.stats.likes)}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex items-center text-tech-cyan text-sm font-medium group-hover:translate-x-1 transition-transform duration-200">
+                        <span className="text-xs sm:text-sm">阅读</span>
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </div>
+                    </div>
                   </div>
-                </a>
-              </div>
-            ))}
-          </div>
+                </div>
 
-          <div className="flex justify-center gap-2 mt-4">
-            {mockHighlights.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={cn(
-                  'h-2 rounded-full transition-all duration-300',
-                  index === currentIndex ? 'w-8 bg-tech-cyan' : 'w-2 bg-gray-600 hover:bg-gray-500'
-                )}
-                aria-label={`切换到第 ${index + 1} 个推荐`}
-              />
-            ))}
-          </div>
+                <motion.div
+                  className="absolute inset-0 rounded-2xl bg-gradient-to-br from-tech-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  initial={false}
+                />
+              </a>
+            </motion.div>
+          ))}
+        </motion.div>
 
-          <button
-            onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 sm:-translate-x-4 bg-glass/30 backdrop-blur-xl border border-glass-border rounded-full p-2 text-white hover:bg-glass/50 transition-colors opacity-0 hover:opacity-100"
-            aria-label="上一个"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-8 sm:mt-10 text-center"
+        >
+          <a
+            href="/articles"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-glass/30 backdrop-blur-xl border border-glass-border rounded-full text-white hover:bg-glass/50 hover:border-tech-cyan/50 hover:shadow-lg hover:shadow-tech-cyan/10 transition-all duration-300 cursor-pointer group"
           >
-            <ChevronRight className="w-5 h-5 rotate-180" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 sm:translate-x-4 bg-glass/30 backdrop-blur-xl border border-glass-border rounded-full p-2 text-white hover:bg-glass/50 transition-colors opacity-0 hover:opacity-100"
-            aria-label="下一个"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+            <span className="text-sm sm:text-base font-medium">查看更多精选</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </a>
+        </motion.div>
       </div>
     </section>
   )

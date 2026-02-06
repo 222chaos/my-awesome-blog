@@ -10,9 +10,8 @@ export interface Article {
   view_count: number;
   created_at: string;
   updated_at: string;
-  published_at: string;
+  published_at: string | null;
   author_id: string;
-  category_id: string;
   cover_image?: string;
   read_time: number; // 阅读时间（分钟）
   likes_count: number; // 点赞数
@@ -24,15 +23,21 @@ export interface Article {
     email: string;
     avatar?: string;
     bio?: string;
-    reputation: number; // 声誉分数
-    followers_count: number; // 关注者数量
+    reputation?: number; // 声誉分数
+    followers_count?: number; // 关注者数量
   };
-  category: {
+  category?: {
     id: string;
     name: string;
     slug: string;
     description: string;
   };
+  categories?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+  }>;
   tags: Array<{
     id: string;
     name: string;
@@ -102,15 +107,15 @@ export const getArticles = async (filters?: {
   if (filters?.search) params.append('search', filters.search);
 
   const queryString = params.toString();
-  const endpoint = `/api/v1/articles/${queryString ? `?${queryString}` : ''}`;
-  
+  const endpoint = `/articles/${queryString ? `?${queryString}` : ''}`;
+
   return apiRequest(endpoint);
 };
 
 // 根据ID获取文章详情
 export const getArticleById = async (id: string): Promise<Article | null> => {
   try {
-    return await apiRequest(`/api/v1/articles/${id}`);
+    return await apiRequest(`/articles/${id}`);
   } catch (error) {
     console.error(`获取文章 ${id} 失败:`, error);
     return null;
@@ -120,7 +125,7 @@ export const getArticleById = async (id: string): Promise<Article | null> => {
 // 根据Slug获取文章详情
 export const getArticleBySlug = async (slug: string): Promise<Article | null> => {
   try {
-    return await apiRequest(`/api/v1/articles/slug/${slug}`);
+    return await apiRequest(`/articles/slug/${slug}`);
   } catch (error) {
     console.error(`获取文章 ${slug} 失败:`, error);
     return null;
@@ -130,7 +135,7 @@ export const getArticleBySlug = async (slug: string): Promise<Article | null> =>
 // 获取相关文章
 export const getRelatedArticles = async (articleId: string): Promise<RelatedArticle[]> => {
   try {
-    return await apiRequest(`/api/v1/articles/related/${articleId}`);
+    return await apiRequest(`/articles/related/${articleId}`);
   } catch (error) {
     console.error('获取相关文章失败:', error);
     return [];
@@ -140,7 +145,7 @@ export const getRelatedArticles = async (articleId: string): Promise<RelatedArti
 // 获取分类列表
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    return await apiRequest('/api/v1/categories/');
+    return await apiRequest('/categories/');
   } catch (error) {
     console.error('获取分类列表失败:', error);
     return [];
@@ -150,7 +155,7 @@ export const getCategories = async (): Promise<Category[]> => {
 // 获取标签列表
 export const getTags = async (): Promise<Tag[]> => {
   try {
-    return await apiRequest('/api/v1/tags/');
+    return await apiRequest('/tags/');
   } catch (error) {
     console.error('获取标签列表失败:', error);
     return [];
@@ -160,7 +165,7 @@ export const getTags = async (): Promise<Tag[]> => {
 // 获取精选文章
 export const getFeaturedArticles = async (limit: number = 5): Promise<Article[]> => {
   try {
-    return await apiRequest(`/api/v1/articles/featured?limit=${limit}`);
+    return await apiRequest(`/articles/featured?limit=${limit}`);
   } catch (error) {
     console.error('获取精选文章失败:', error);
     return [];
@@ -170,7 +175,7 @@ export const getFeaturedArticles = async (limit: number = 5): Promise<Article[]>
 // 获取热门文章
 export const getPopularArticles = async (limit: number = 10): Promise<Article[]> => {
   try {
-    return await apiRequest(`/api/v1/articles/popular?limit=${limit}`);
+    return await apiRequest(`/articles/popular?limit=${limit}`);
   } catch (error) {
     console.error('获取热门文章失败:', error);
     return [];
@@ -187,10 +192,69 @@ export const searchArticles = async (query: string, filters?: {
     params.append('q', query);
     if (filters?.category_slug) params.append('category_slug', filters.category_slug);
     if (filters?.tag_slug) params.append('tag_slug', filters.tag_slug);
-    
-    return await apiRequest(`/api/v1/articles/search?${params.toString()}`);
+
+    return await apiRequest(`/articles/search?${params.toString()}`);
   } catch (error) {
     console.error('搜索文章失败:', error);
     return [];
   }
+};
+
+// 上传图片
+export const uploadImage = async (file: File, options?: {
+  title?: string;
+  description?: string;
+  alt_text?: string;
+  is_featured?: boolean;
+}): Promise<string> => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
+  if (!token) {
+    throw new Error('需要登录才能上传图片');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  if (options?.title) formData.append('title', options.title);
+  if (options?.description) formData.append('description', options.description);
+  if (options?.alt_text) formData.append('alt_text', options.alt_text);
+  if (options?.is_featured !== undefined) formData.append('is_featured', String(options.is_featured));
+
+  const response = await fetch(`${API_BASE_URL}/images/`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || errorData.message || '上传图片失败');
+  }
+
+  const data = await response.json();
+  return data.file_path || data.url;
+};
+
+// 更新文章
+export const updateArticle = async (id: string, data: Partial<Omit<Article, 'id' | 'created_at' | 'updated_at' | 'author_id' | 'author'>>): Promise<Article> => {
+  return apiRequest(`/articles/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+};
+
+// 设置文章封面（便捷方法）
+export const setArticleCover = async (articleId: string, file: File, options?: {
+  title?: string;
+  description?: string;
+  alt_text?: string;
+}): Promise<Article> => {
+  const imageUrl = await uploadImage(file, {
+    ...options,
+    is_featured: true,
+  });
+
+  return updateArticle(articleId, { cover_image: imageUrl });
 };

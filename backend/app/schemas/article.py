@@ -16,7 +16,8 @@ class ArticleBase(BaseModel):
 
 # Create schemas
 class ArticleCreate(ArticleBase):
-    pass
+    category_id: Optional[UUID] = None
+    tags: Optional[List[UUID]] = []
 
 
 class ArticleCreateWithAuthor(ArticleCreate):
@@ -41,6 +42,10 @@ class ArticleInDBBase(ArticleBase):
     published_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+    read_time: Optional[int] = 0
+    likes_count: int = 0
+    comments_count: int = 0
+    shares_count: int = 0
 
     @field_serializer('id', 'author_id')
     def serialize_uuids(self, value: UUID) -> str:

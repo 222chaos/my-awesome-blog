@@ -1,14 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowRight, Heart, MessageCircle, Calendar, AlertCircle, RefreshCw, ExternalLink, TrendingUp, Activity } from 'lucide-react'
+import { ArrowRight, Heart, MessageCircle, Calendar, AlertCircle, RefreshCw, ExternalLink, TrendingUp, Activity, FileText, Eye, ArrowUp, ArrowDown, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/Button'
 import { useLoading } from '@/context/loading-context'
 import { ArticleCardSkeleton } from './ArticleCardSkeleton'
 import FriendLinks from './FriendLinks'
 import ProfileCard from './ProfileCard'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area, Legend } from 'recharts'
+import { motion } from 'framer-motion'
 
 interface FriendLink {
   id: string
@@ -251,102 +252,291 @@ function ArticleList({ articles, loading, error, onRetry }: { articles: Article[
 }
 
 function StatsCharts() {
+  const monthlyTotal = monthlyStatsData.reduce((sum, item) => sum + item.articles, 0)
+  const monthlyViewsTotal = monthlyStatsData.reduce((sum, item) => sum + item.views, 0)
+  const monthlyAvg = Math.round(monthlyTotal / monthlyStatsData.length)
+  const monthlyGrowth = ((monthlyStatsData[5].articles - monthlyStatsData[0].articles) / monthlyStatsData[0].articles * 100)
+
+  const weeklyVisitorsTotal = weeklyActivityData.reduce((sum, item) => sum + item.visitors, 0)
+  const weeklyAvg = Math.round(weeklyVisitorsTotal / weeklyActivityData.length)
+  const peakDay = weeklyActivityData.reduce((max, item) => item.visitors > max.visitors ? item : max)
+  const engagementRate = Math.round((weeklyActivityData.reduce((sum, item) => sum + item.engagement, 0) / weeklyVisitorsTotal * 100))
+
   return (
-    <div className="space-y-6">
-      <Card className="glass-card backdrop-blur-xl bg-card/40 border-white/10 p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Card className="glass-card backdrop-blur-xl bg-card/40 border-white/10 p-5 sm:p-6 overflow-hidden hover:shadow-[0_0_40px_var(--shadow-tech-cyan),0_8px_32px_rgba(0,0,0,0.12)] transition-all duration-300">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-tech-cyan" />
-            <h3 className="text-lg font-bold text-foreground">月度统计</h3>
+            <motion.div 
+              className="p-2 rounded-lg bg-tech-cyan/20"
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <TrendingUp className="w-5 h-5 text-tech-cyan" />
+            </motion.div>
+            <h3 className="text-lg sm:text-xl font-bold text-foreground">月度统计</h3>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Activity className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-glass/30 px-3 py-1.5 rounded-full">
+            <Activity className="w-3.5 h-3.5" />
             <span>6个月数据</span>
           </div>
         </div>
 
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={monthlyStatsData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          <motion.div 
+            className="p-3 rounded-xl bg-glass/30 border border-glass-border/50 text-center"
+            whileHover={{ y: -3, borderColor: 'rgba(6, 182, 212, 0.3)' }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <FileText className="w-3.5 h-3.5 text-tech-cyan" />
+              <span className="text-[10px] text-muted-foreground">文章数</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-bold text-tech-cyan">
+              {monthlyTotal}
+            </div>
+            <div className="flex items-center justify-center gap-1 mt-1">
+              {monthlyGrowth >= 0 ? (
+                <ArrowUp className="w-3 h-3 text-green-500" />
+              ) : (
+                <ArrowDown className="w-3 h-3 text-red-500" />
+              )}
+              <span className={`text-xs font-medium ${monthlyGrowth >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {Math.abs(monthlyGrowth).toFixed(1)}%
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="p-3 rounded-xl bg-glass/30 border border-glass-border/50 text-center"
+            whileHover={{ y: -3, borderColor: 'rgba(6, 182, 212, 0.3)' }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Eye className="w-3.5 h-3.5 text-purple-500" />
+              <span className="text-[10px] text-muted-foreground">访问量</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-bold text-purple-500">
+              {(monthlyViewsTotal / 1000).toFixed(1)}k
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">
+              月均 {Math.round(monthlyAvg)}
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="p-3 rounded-xl bg-glass/30 border border-glass-border/50 text-center"
+            whileHover={{ y: -3, borderColor: 'rgba(6, 182, 212, 0.3)' }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <TrendingUp className="w-3.5 h-3.5 text-orange-500" />
+              <span className="text-[10px] text-muted-foreground">月均</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-bold text-orange-500">
+              {monthlyAvg}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">
+              稳定增长
+            </div>
+          </motion.div>
+        </div>
+
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={monthlyStatsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="gradientArticles" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.7} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis
               dataKey="month"
-              stroke="#9ca3af"
-              fontSize={12}
+              stroke="rgba(255,255,255,0.1)"
+              fontSize={11}
               tickLine={false}
               axisLine={false}
+              tick={{ fill: 'rgba(255,255,255,0.5)' }}
             />
             <YAxis
-              stroke="#9ca3af"
-              fontSize={12}
+              stroke="rgba(255,255,255,0.1)"
+              fontSize={11}
               tickLine={false}
               axisLine={false}
+              tick={{ fill: 'rgba(255,255,255,0.5)' }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                border: '1px solid rgba(6, 182, 212, 0.4)',
                 borderRadius: '8px',
-                color: '#fff'
+                color: '#fff',
+                fontSize: '12px',
+                padding: '8px 12px'
               }}
-              itemStyle={{ color: '#06b6d4' }}
+              itemStyle={{ color: '#06b6d4', fontWeight: 600 }}
             />
-            <Bar dataKey="articles" fill="#06b6d4" radius={[4, 4, 0, 0]} name="文章数" />
+            <Bar 
+              dataKey="articles" 
+              fill="url(#gradientArticles)" 
+              radius={[6, 6, 0, 0]} 
+              name="文章数"
+              maxBarSize={50}
+            />
           </BarChart>
         </ResponsiveContainer>
       </Card>
 
-      <Card className="glass-card backdrop-blur-xl bg-card/40 border-white/10 p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
+      <Card className="glass-card backdrop-blur-xl bg-card/40 border-white/10 p-5 sm:p-6 overflow-hidden hover:shadow-[0_0_40px_var(--shadow-tech-cyan),0_8px_32px_rgba(0,0,0,0.12)] transition-all duration-300">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-tech-cyan" />
-            <h3 className="text-lg font-bold text-foreground">周活跃度</h3>
+            <motion.div 
+              className="p-2 rounded-lg bg-tech-cyan/20"
+              whileHover={{ scale: 1.1, rotate: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Activity className="w-5 h-5 text-tech-cyan" />
+            </motion.div>
+            <h3 className="text-lg sm:text-xl font-bold text-foreground">周活跃度</h3>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>实时更新</span>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-glass/30 px-3 py-1.5 rounded-full">
+            <span>实时数据</span>
+            <motion.span 
+              className="w-2 h-2 bg-green-500 rounded-full"
+              animate={{ 
+                scale: [1, 1.3, 1],
+                opacity: [1, 0.7, 1]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
           </div>
         </div>
 
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={weeklyActivityData}>
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          <motion.div 
+            className="p-3 rounded-xl bg-glass/30 border border-glass-border/50 text-center"
+            whileHover={{ y: -3, borderColor: 'rgba(6, 182, 212, 0.3)' }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Users className="w-3.5 h-3.5 text-tech-cyan" />
+              <span className="text-[10px] text-muted-foreground">本周访客</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-bold text-tech-cyan">
+              {weeklyVisitorsTotal}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">
+              日均 {weeklyAvg}
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="p-3 rounded-xl bg-glass/30 border border-glass-border/50 text-center"
+            whileHover={{ y: -3, borderColor: 'rgba(6, 182, 212, 0.3)' }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Activity className="w-3.5 h-3.5 text-pink-500" />
+              <span className="text-[10px] text-muted-foreground">互动率</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-bold text-pink-500">
+              {engagementRate}%
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">
+              高于平均
+            </div>
+          </motion.div>
+
+          <motion.div 
+            className="p-3 rounded-xl bg-glass/30 border border-glass-border/50 text-center"
+            whileHover={{ y: -3, borderColor: 'rgba(6, 182, 212, 0.3)' }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <TrendingUp className="w-3.5 h-3.5 text-green-500" />
+              <span className="text-[10px] text-muted-foreground">峰值日</span>
+            </div>
+            <div className="text-xl sm:text-2xl font-bold text-green-500">
+              {peakDay.day}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">
+              {peakDay.visitors} 人
+            </div>
+          </motion.div>
+        </div>
+
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={weeklyActivityData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+              <linearGradient id="gradientVisitors" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="gradientEngagement" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ec4899" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="#ec4899" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis
               dataKey="day"
-              stroke="#9ca3af"
-              fontSize={12}
+              stroke="rgba(255,255,255,0.1)"
+              fontSize={11}
               tickLine={false}
               axisLine={false}
+              tick={{ fill: 'rgba(255,255,255,0.5)' }}
             />
             <YAxis
-              stroke="#9ca3af"
-              fontSize={12}
+              stroke="rgba(255,255,255,0.1)"
+              fontSize={11}
               tickLine={false}
               axisLine={false}
+              tick={{ fill: 'rgba(255,255,255,0.5)' }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                border: '1px solid rgba(6, 182, 212, 0.3)',
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                border: '1px solid rgba(6, 182, 212, 0.4)',
                 borderRadius: '8px',
-                color: '#fff'
+                color: '#fff',
+                fontSize: '12px',
+                padding: '8px 12px'
               }}
-              itemStyle={{ color: '#06b6d4' }}
+            />
+            <Legend 
+              verticalAlign="top" 
+              height={36}
+              iconType="circle"
+              wrapperStyle={{ fontSize: '12px' }}
             />
             <Area
               type="monotone"
               dataKey="visitors"
               stroke="#06b6d4"
-              strokeWidth={2}
+              strokeWidth={2.5}
               fillOpacity={1}
-              fill="url(#colorVisitors)"
+              fill="url(#gradientVisitors)"
               name="访客数"
+              dot={{ fill: '#06b6d4', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, strokeWidth: 2 }}
             />
-          </AreaChart>
+            <Area
+              type="monotone"
+              dataKey="engagement"
+              stroke="#ec4899"
+              strokeWidth={2.5}
+              fillOpacity={1}
+              fill="url(#gradientEngagement)"
+              name="互动数"
+              dot={{ fill: '#ec4899', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, strokeWidth: 2 }}
+            />
+          </LineChart>
         </ResponsiveContainer>
       </Card>
     </div>
@@ -381,16 +571,19 @@ export default function StatsPanel() {
   return (
     <section className="py-8 sm:py-10 md:py-12 lg:py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          <div className="md:col-span-1 flex flex-col gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          <div className="lg:col-span-4 flex flex-col gap-6">
             <ProfileCard />
             <FriendLinks links={mockFriendLinks} />
           </div>
 
-          <div className="md:col-span-2 flex flex-col gap-6">
+          <div className="lg:col-span-8">
             <ArticleList articles={mockArticles} loading={loading} error={error} onRetry={handleRetry} />
-            <StatsCharts />
           </div>
+        </div>
+
+        <div className="mt-6 lg:mt-8">
+          <StatsCharts />
         </div>
       </div>
     </section>

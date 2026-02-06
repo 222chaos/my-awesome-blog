@@ -94,17 +94,17 @@ export default function SubscribeCard() {
 
   return (
     <GlassCard
-      className="container mx-auto px-4 py-8 mt-12"
+      className="container mx-auto px-4 py-6 sm:py-8 md:py-10"
       padding="lg"
       aria-label="订阅卡片"
     >
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-tech-cyan to-tech-sky mb-4 animate-bounce">
-            <Mail className="w-8 h-8 text-white" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-tech-cyan to-tech-sky mb-3 sm:mb-4 animate-bounce">
+            <Mail className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
             订阅更新
           </h3>
 
@@ -114,46 +114,46 @@ export default function SubscribeCard() {
         </div>
 
         {subscriptionStatus?.isSubscribed ? (
-          <div className="space-y-6">
-            <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/30">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+          <div className="space-y-4 sm:space-y-6">
+            <div className="p-4 sm:p-6 rounded-xl bg-green-500/10 border border-green-500/30">
+              <div className="flex items-start gap-2 sm:gap-3">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-lg font-semibold text-foreground mb-2">
+                  <h4 className="text-base sm:text-lg font-semibold text-foreground mb-1.5 sm:mb-2">
                     订阅成功！
                   </h4>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     感谢您的订阅。我们已向 <span className="text-tech-cyan font-medium">{subscriptionStatus.email}</span> 发送确认邮件。
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-glass/20 border border-glass-border">
-                <div className="flex items-center gap-2 mb-2">
-                  <Mail className="w-4 h-4 text-tech-cyan" />
-                  <span className="text-xs text-muted-foreground">订阅邮箱</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="p-3 sm:p-4 rounded-lg bg-glass/20 border border-glass-border">
+                <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                  <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">订阅邮箱</span>
                 </div>
-                <p className="text-sm font-medium text-foreground">{subscriptionStatus.email}</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground truncate">{subscriptionStatus.email}</p>
               </div>
 
-              <div className="p-4 rounded-lg bg-glass/20 border border-glass-border">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-tech-cyan" />
-                  <span className="text-xs text-muted-foreground">订阅日期</span>
+              <div className="p-3 sm:p-4 rounded-lg bg-glass/20 border border-glass-border">
+                <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">订阅日期</span>
                 </div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-xs sm:text-sm font-medium text-foreground">
                   {subscriptionStatus.subscribedDate ? new Date(subscriptionStatus.subscribedDate).toLocaleDateString('zh-CN') : '今天'}
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-glass/20 border border-glass-border">
-                <div className="flex items-center gap-2 mb-2">
-                  <Bell className="w-4 h-4 text-tech-cyan" />
-                  <span className="text-xs text-muted-foreground">邮件格式</span>
+              <div className="p-3 sm:p-4 rounded-lg bg-glass/20 border border-glass-border">
+                <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                  <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">邮件格式</span>
                 </div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-xs sm:text-sm font-medium text-foreground">
                   {formats.find(f => f.id === subscriptionStatus.format)?.label}
                 </p>
               </div>
@@ -162,29 +162,29 @@ export default function SubscribeCard() {
             <div>
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center gap-2 text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors mb-4"
+                className="flex items-center gap-2 text-xs sm:text-sm text-tech-cyan hover:text-tech-lightcyan transition-colors mb-3 sm:mb-4"
                 aria-expanded={showPreview}
               >
                 {showPreview ? '隐藏' : '查看'} 邮件预览
-                <ArrowRight className={cn('w-4 h-4 transition-transform', showPreview ? 'rotate-90' : '')} />
+                <ArrowRight className={cn('w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform', showPreview ? 'rotate-90' : '')} />
               </button>
 
               {showPreview && (
-                <div className="p-4 rounded-lg bg-glass/20 border border-glass-border space-y-3 animate-fade-in-up">
-                  <h5 className="text-sm font-semibold text-foreground">最近发送的邮件</h5>
+                <div className="p-3 sm:p-4 rounded-lg bg-glass/20 border border-glass-border space-y-2.5 sm:space-y-3 animate-fade-in-up">
+                  <h5 className="text-xs sm:text-sm font-semibold text-foreground">最近发送的邮件</h5>
                   {mockRecentNewsletters.map(newsletter => (
                     <div
                       key={newsletter.id}
-                      className="p-3 rounded-lg hover:bg-glass/30 transition-colors cursor-pointer"
+                      className="p-2.5 sm:p-3 rounded-lg hover:bg-glass/30 transition-colors cursor-pointer"
                     >
                       <div className="flex items-start justify-between mb-1">
-                        <h6 className="text-sm font-medium text-foreground">{newsletter.title}</h6>
-                        <span className="text-xs text-muted-foreground">{newsletter.date}</span>
+                        <h6 className="text-xs sm:text-sm font-medium text-foreground">{newsletter.title}</h6>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">{newsletter.date}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">{newsletter.preview}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2">{newsletter.preview}</p>
+                      <div className="flex items-center gap-3 mt-2 text-[10px] sm:text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <FileText className="w-3 h-3" />
+                          <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                           {newsletter.readTime}
                         </span>
                       </div>
@@ -205,17 +205,17 @@ export default function SubscribeCard() {
 
               <a
                 href="/archive"
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-glass/40 border border-glass-border text-foreground hover:bg-glass/60 transition-colors text-sm font-medium"
+                className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg bg-glass/40 border border-glass-border text-foreground hover:bg-glass/60 transition-colors text-xs sm:text-sm font-medium"
               >
                 查看历史归档
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </a>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-foreground mb-2">
                 邮箱地址
               </label>
               <input
@@ -224,23 +224,23 @@ export default function SubscribeCard() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 rounded-lg bg-glass/40 border border-glass-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan/50 backdrop-blur-lg transition-all"
+                className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-glass/40 border border-glass-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tech-cyan/50 backdrop-blur-lg transition-all text-sm sm:text-base"
                 disabled={status === 'loading'}
                 aria-invalid={status === 'error'}
               />
               {status === 'error' && (
-                <div className="flex items-center gap-2 mt-2 text-sm text-red-400">
-                  <XCircle className="w-4 h-4" />
+                <div className="flex items-center gap-2 mt-2 text-xs sm:text-sm text-red-400">
+                  <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>请输入有效的邮箱地址</span>
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-3">
+              <label className="block text-xs sm:text-sm font-medium text-foreground mb-2 sm:mb-3">
                 邮件格式
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 {formats.map((format) => {
                   const Icon = format.icon
                   return (
@@ -249,17 +249,17 @@ export default function SubscribeCard() {
                       type="button"
                       onClick={() => setSelectedFormat(format.id)}
                       className={cn(
-                        'p-4 rounded-lg border-2 transition-all duration-200',
-                        'flex flex-col items-center gap-2 text-center',
+                        'p-2.5 sm:p-4 rounded-lg border-2 transition-all duration-200',
+                        'flex flex-col items-center gap-1.5 sm:gap-2 text-center',
                         selectedFormat === format.id
                           ? 'border-tech-cyan bg-tech-cyan/10'
                           : 'border-glass-border bg-glass/20 hover:bg-glass/40'
                       )}
                       aria-pressed={selectedFormat === format.id}
                     >
-                      <Icon className="w-6 h-6 text-tech-cyan" />
-                      <span className="text-sm font-medium text-foreground">{format.label}</span>
-                      <span className="text-xs text-muted-foreground">{format.description}</span>
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-tech-cyan" />
+                      <span className="text-xs sm:text-sm font-medium text-foreground">{format.label}</span>
+                      <span className="text-[10px] sm:text-xs text-muted-foreground">{format.description}</span>
                     </button>
                   )
                 })}
@@ -273,28 +273,28 @@ export default function SubscribeCard() {
             >
               {status === 'loading' ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   处理中...
                 </>
               ) : (
                 <>
-                  <Bell className="w-5 h-5" />
+                  <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                   订阅更新
                 </>
               )}
             </Button>
 
-            <div className="flex flex-col sm:flex-row gap-3 text-xs text-muted-foreground">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 text-[10px] sm:text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-500" />
                 <span>无垃圾邮件</span>
               </div>
               <div className="flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-500" />
                 <span>随时取消</span>
               </div>
               <div className="flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-500" />
                 <span>每周更新</span>
               </div>
             </div>

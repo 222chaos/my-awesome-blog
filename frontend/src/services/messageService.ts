@@ -42,7 +42,7 @@ export const DANMAKU_COLORS = [
  */
 export const getMessages = async (): Promise<Message[]> => {
   try {
-    const messages = await apiRequest('/api/v1/messages/');
+    const messages = await apiRequest('/messages/');
     // 转换后端格式到前端格式
     return messages.map((msg: any) => ({
       id: msg.id,
@@ -71,7 +71,7 @@ export const getMessages = async (): Promise<Message[]> => {
  */
 export const getDanmakuMessages = async (): Promise<Message[]> => {
   try {
-    const messages = await apiRequest('/api/v1/messages/danmaku');
+    const messages = await apiRequest('/messages/danmaku');
     // 转换后端格式到前端格式并随机排序
     return messages
       .map((msg: any) => ({
@@ -102,7 +102,7 @@ export const getDanmakuMessages = async (): Promise<Message[]> => {
  * @returns 创建的留言
  */
 export const createMessage = async (data: CreateMessageRequest): Promise<Message> => {
-  const response = await apiRequest('/api/v1/messages/', {
+  const response = await apiRequest('/messages/', {
     method: 'POST',
     body: JSON.stringify({
       content: data.content,
@@ -136,7 +136,7 @@ export const createMessage = async (data: CreateMessageRequest): Promise<Message
  */
 export const deleteMessage = async (messageId: string): Promise<boolean> => {
   try {
-    await apiRequest(`/api/v1/messages/${messageId}`, {
+    await apiRequest(`/messages/${messageId}`, {
       method: 'DELETE',
     });
     return true;
@@ -152,7 +152,7 @@ export const deleteMessage = async (messageId: string): Promise<boolean> => {
  * @returns 更新后的留言
  */
 export const likeMessage = async (messageId: string): Promise<Message> => {
-  const response = await apiRequest(`/api/v1/messages/${messageId}/like`, {
+  const response = await apiRequest(`/messages/${messageId}/like`, {
     method: 'POST',
   });
 
@@ -180,7 +180,7 @@ export const likeMessage = async (messageId: string): Promise<Message> => {
  * @returns 更新后的留言
  */
 export const replyToMessage = async (messageId: string, content: string): Promise<Message> => {
-  const response = await apiRequest('/api/v1/messages/', {
+  const response = await apiRequest('/messages/', {
     method: 'POST',
     body: JSON.stringify({
       content,
@@ -213,7 +213,7 @@ export const replyToMessage = async (messageId: string, content: string): Promis
  */
 export const getMessageReplies = async (messageId: string): Promise<Message[]> => {
   try {
-    const replies = await apiRequest(`/api/v1/messages/${messageId}/replies`);
+    const replies = await apiRequest(`/messages/${messageId}/replies`);
     return replies.map((msg: any) => ({
       id: msg.id,
       content: msg.content,
@@ -259,7 +259,7 @@ export const validateMessage = (content: string): { isValid: boolean; error?: st
  */
 export const getTrendingMessages = async (limit: number = 10): Promise<Message[]> => {
   try {
-    const messages = await apiRequest(`/api/v1/messages/trending?limit=${limit}`);
+    const messages = await apiRequest(`/messages/trending?limit=${limit}`);
     return messages.map((msg: any) => ({
       id: msg.id,
       content: msg.content,
@@ -288,7 +288,7 @@ export const getTrendingMessages = async (limit: number = 10): Promise<Message[]
  */
 export const getMessageActivity = async (days: number = 7): Promise<{date: string, count: number}[]> => {
   try {
-    return await apiRequest(`/api/v1/messages/stats/activity?days=${days}`);
+    return await apiRequest(`/messages/stats/activity?days=${days}`);
   } catch (error) {
     console.error('获取活跃度失败:', error);
     return [];

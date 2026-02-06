@@ -1,7 +1,6 @@
 """
 测试数据种子脚本
-用于生成丰富的测试数据以测试各个API接口和页面展示效果
-"""
+用于生成丰富的测试数据以测试各个API接口和页面展示效�?"""
 import sys
 from pathlib import Path
 
@@ -37,10 +36,10 @@ def seed_users(db: Session) -> None:
             "username": "admin",
             "email": "admin@example.com",
             "password": "admin123",
-            "full_name": "管理员",
+            "full_name": "管理�?,
             "is_active": True,
             "is_superuser": True,
-            "bio": "这是博客管理员",
+            "bio": "这是博客管理�?,
             "website": "https://example.com",
             "github": "admin_github",
             "twitter": "admin_twitter"
@@ -58,9 +57,9 @@ def seed_users(db: Session) -> None:
             "username": "testuser2",
             "email": "testuser2@example.com",
             "password": "test123",
-            "full_name": "测试用户二",
+            "full_name": "测试用户�?,
             "is_active": True,
-            "bio": "全栈开发者"
+            "bio": "全栈开发�?
         },
         {
             "username": "xiaoming",
@@ -68,7 +67,7 @@ def seed_users(db: Session) -> None:
             "password": "test123",
             "full_name": "小明",
             "is_active": True,
-            "bio": "前端爱好者"
+            "bio": "前端爱好�?
         },
         {
             "username": "daxiong",
@@ -95,13 +94,13 @@ def seed_users(db: Session) -> None:
 
 
 def seed_categories_and_tags(db: Session) -> tuple:
-    """创建分类和标签"""
+    """创建分类和标�?""
     categories_data = [
         {"name": "Python", "slug": "python", "description": "Python编程相关文章"},
-        {"name": "前端开发", "slug": "frontend", "description": "前端开发技术"},
-        {"name": "后端开发", "slug": "backend", "description": "后端开发技术"},
+        {"name": "前端开�?, "slug": "frontend", "description": "前端开发技�?},
+        {"name": "后端开�?, "slug": "backend", "description": "后端开发技�?},
         {"name": "DevOps", "slug": "devops", "description": "DevOps相关内容"},
-        {"name": "数据库", "slug": "database", "description": "数据库技术"},
+        {"name": "数据�?, "slug": "database", "description": "数据库技�?},
         {"name": "人工智能", "slug": "ai", "description": "人工智能相关"},
         {"name": "生活随笔", "slug": "life", "description": "生活感悟"}
     ]
@@ -121,11 +120,11 @@ def seed_categories_and_tags(db: Session) -> tuple:
         {"name": "FastAPI", "slug": "fastapi", "description": "FastAPI框架"},
         {"name": "React", "slug": "react", "description": "React框架"},
         {"name": "Vue.js", "slug": "vuejs", "description": "Vue.js框架"},
-        {"name": "PostgreSQL", "slug": "postgresql", "description": "PostgreSQL数据库"},
+        {"name": "PostgreSQL", "slug": "postgresql", "description": "PostgreSQL数据�?},
         {"name": "Docker", "slug": "docker", "description": "Docker容器"},
         {"name": "Kubernetes", "slug": "kubernetes", "description": "Kubernetes编排"},
         {"name": "TypeScript", "slug": "typescript", "description": "TypeScript语言"},
-        {"name": "Node.js", "slug": "nodejs", "description": "Node.js运行时"},
+        {"name": "Node.js", "slug": "nodejs", "description": "Node.js运行�?},
         {"name": "Redis", "slug": "redis", "description": "Redis缓存"},
         {"name": "Next.js", "slug": "nextjs", "description": "Next.js框架"}
     ]
@@ -150,21 +149,15 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
     
     articles_data = [
         {
-            "title": "FastAPI快速入门指南",
+            "title": "FastAPI快速入门指�?,
             "slug": "fastapi-quick-start",
-            "content": """FastAPI是一个现代、快速（高性能）的Web框架，用于基于标准Python类型提示使用Python 3.6+构建API。
-
+            "content": """FastAPI是一个现代、快速（高性能）的Web框架，用于基于标准Python类型提示使用Python 3.6+构建API�?
 ## 主要特点
 
-- **快速**: 与NodeJS和Go相当的高性能
-- **快速编码**: 将开发功能的速度提高约200％至300％
-- **更少的bug**: 减少约40％的开发错误
-- **直观**: 强大的编辑器支持，到处都能自动补全
-- **简单**: 设计易于使用和学习
-- **标准**: 基于并完全兼容API的开放标准
-""",
-            "excerpt": "FastAPI是一个现代、快速的Web框架，本文带你快速入门",
-            "cover_image": "https://via.placeholder.com/800x400",
+- **快�?*: 与NodeJS和Go相当的高性能
+- **快速编�?*: 将开发功能的速度提高�?00％至300�?- **更少的bug**: 减少�?0％的开发错�?- **直观**: 强大的编辑器支持，到处都能自动补�?- **简�?*: 设计易于使用和学�?- **标准**: 基于并完全兼容API的开放标�?""",
+            "excerpt": "FastAPI是一个现代、快速的Web框架，本文带你快速入�?,
+            "cover_image": None,
             "is_published": True,
             "is_featured": True,
             "is_pinned": True,
@@ -177,19 +170,17 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
         {
             "title": "React Hooks深入解析",
             "slug": "react-hooks-deep-dive",
-            "content": """React Hooks 是React 16.8引入的新特性，它让你无需编写类组件就能使用state和其他React特性。
-
+            "content": """React Hooks 是React 16.8引入的新特性，它让你无需编写类组件就能使用state和其他React特性�?
 ## 常用Hooks
 
 - useState: 在函数组件中添加state
-- useEffect: 在函数组件中处理副作用
-- useContext: 在函数组件中订阅React context
+- useEffect: 在函数组件中处理副作�?- useContext: 在函数组件中订阅React context
 - useReducer: 管理复杂组件的state
 - useCallback: 缓存回调函数
 - useMemo: 缓存计算结果
 """,
-            "excerpt": "深入了解React Hooks的使用方法和最佳实践",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "excerpt": "深入了解React Hooks的使用方法和最佳实�?,
+            "cover_image": None,
             "is_published": True,
             "is_featured": True,
             "read_time": 20,
@@ -201,8 +192,7 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
         {
             "title": "PostgreSQL性能优化实战",
             "slug": "postgresql-performance-optimization",
-            "content": """PostgreSQL是一个强大的开源关系型数据库，本文将介绍多种性能优化技巧。
-
+            "content": """PostgreSQL是一个强大的开源关系型数据库，本文将介绍多种性能优化技巧�?
 ## 索引优化
 
 1. 合理创建索引
@@ -217,8 +207,8 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
 3. 合理使用连接查询
 4. 使用CTE优化复杂查询
 """,
-            "excerpt": "分享PostgreSQL数据库性能优化的实战经验",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "excerpt": "分享PostgreSQL数据库性能优化的实战经�?,
+            "cover_image": None,
             "is_published": True,
             "read_time": 25,
             "published_at": datetime.now() - timedelta(days=20),
@@ -227,26 +217,21 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
             "view_count": 1560
         },
         {
-            "title": "Docker容器化部署最佳实践",
+            "title": "Docker容器化部署最佳实�?,
             "slug": "docker-deployment-best-practices",
-            "content": """Docker已成为现代应用部署的标准工具，本文分享最佳实践。
-
+            "content": """Docker已成为现代应用部署的标准工具，本文分享最佳实践�?
 ## 镜像优化
 
-1. 使用多阶段构建
-2. 选择合适的基础镜像
+1. 使用多阶段构�?2. 选择合适的基础镜像
 3. 清理不必要的文件
-4. 利用缓存层
-
+4. 利用缓存�?
 ## 容器编排
 
-1. Docker Compose本地开发
-2. Kubernetes生产部署
-3. 健康检查配置
-4. 资源限制设置
+1. Docker Compose本地开�?2. Kubernetes生产部署
+3. 健康检查配�?4. 资源限制设置
 """,
-            "excerpt": "Docker容器化部署的最佳实践分享",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "excerpt": "Docker容器化部署的最佳实践分�?,
+            "cover_image": None,
             "is_published": True,
             "is_featured": True,
             "read_time": 18,
@@ -258,8 +243,7 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
         {
             "title": "TypeScript类型系统完全指南",
             "slug": "typescript-type-system-guide",
-            "content": """TypeScript是JavaScript的超集，添加了静态类型定义。
-
+            "content": """TypeScript是JavaScript的超集，添加了静态类型定义�?
 ## 基础类型
 
 - string
@@ -279,8 +263,8 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
 - 条件类型
 - 映射类型
 """,
-            "excerpt": "TypeScript类型系统的完全指南",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "excerpt": "TypeScript类型系统的完全指�?,
+            "cover_image": None,
             "is_published": True,
             "read_time": 30,
             "published_at": datetime.now() - timedelta(days=12),
@@ -291,8 +275,7 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
         {
             "title": "Redis缓存架构设计",
             "slug": "redis-cache-architecture",
-            "content": """Redis是一个高性能的键值存储系统，常用于缓存、会话存储和消息队列。
-
+            "content": """Redis是一个高性能的键值存储系统，常用于缓存、会话存储和消息队列�?
 ## 数据结构
 
 - String: 字符串、整数、浮点数
@@ -304,12 +287,11 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
 ## 应用场景
 
 1. 缓存热点数据
-2. 计数器和排行榜
-3. 分布式锁
+2. 计数器和排行�?3. 分布式锁
 4. 消息队列
 """,
             "excerpt": "深入理解Redis缓存架构设计",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "cover_image": None,
             "is_published": True,
             "read_time": 22,
             "published_at": datetime.now() - timedelta(days=10),
@@ -320,21 +302,15 @@ def seed_articles(db: Session, users: list, categories: list, tags: list) -> lis
         {
             "title": "Vue3 Composition API实战",
             "slug": "vue3-composition-api",
-            "content": """Vue3引入了Composition API，提供更灵活的代码组织方式。
-
+            "content": """Vue3引入了Composition API，提供更灵活的代码组织方式�?
 ## setup函数
 
-setup是Composition API的入口点，在组件创建之前执行。
-
+setup是Composition API的入口点，在组件创建之前执行�?
 ## 响应式API
 
-- ref: 创建响应式引用
-- reactive: 创建响应式对象
-- computed: 创建计算属性
-- watch: 监听响应式数据变化
-""",
+- ref: 创建响应式引�?- reactive: 创建响应式对�?- computed: 创建计算属�?- watch: 监听响应式数据变�?""",
             "excerpt": "Vue3 Composition API实战教程",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "cover_image": None,
             "is_published": True,
             "is_featured": True,
             "read_time": 16,
@@ -346,24 +322,17 @@ setup是Composition API的入口点，在组件创建之前执行。
         {
             "title": "Kubernetes生产环境部署指南",
             "slug": "kubernetes-production-deployment",
-            "content": """Kubernetes是容器编排的事实标准，本文介绍生产环境部署经验。
-
+            "content": """Kubernetes是容器编排的事实标准，本文介绍生产环境部署经验�?
 ## 部署清单
 
-1. 资源请求和限制
-2. 健康检查和就绪检查
-3. 滚动更新策略
-4. 自动扩缩容配置
-5. 持久化存储配置
-
-## 监控和日志
-
+1. 资源请求和限�?2. 健康检查和就绪检�?3. 滚动更新策略
+4. 自动扩缩容配�?5. 持久化存储配�?
+## 监控和日�?
 1. Prometheus指标收集
-2. Grafana可视化
-3. ELK日志聚合
+2. Grafana可视�?3. ELK日志聚合
 """,
             "excerpt": "Kubernetes生产环境部署完整指南",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "cover_image": None,
             "is_published": True,
             "read_time": 28,
             "published_at": datetime.now() - timedelta(days=6),
@@ -374,23 +343,19 @@ setup是Composition API的入口点，在组件创建之前执行。
         {
             "title": "AI辅助编程实践",
             "slug": "ai-assisted-programming",
-            "content": """人工智能正在改变软件开发的方式，本文分享AI辅助编程的实践经验。
-
+            "content": """人工智能正在改变软件开发的方式，本文分享AI辅助编程的实践经验�?
 ## AI工具
 
 1. GitHub Copilot: 代码自动补全
 2. ChatGPT: 技术问答和代码生成
-3. Claude: 代码审查和优化建议
-
-## 最佳实践
-
-1. 理解生成的代码
-2. 保持代码审查习惯
+3. Claude: 代码审查和优化建�?
+## 最佳实�?
+1. 理解生成的代�?2. 保持代码审查习惯
 3. 结合领域知识
 4. 迭代优化
 """,
-            "excerpt": "AI辅助编程的实践经验分享",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "excerpt": "AI辅助编程的实践经验分�?,
+            "cover_image": None,
             "is_published": True,
             "is_pinned": True,
             "read_time": 12,
@@ -400,15 +365,13 @@ setup是Composition API的入口点，在组件创建之前执行。
             "view_count": 2450
         },
         {
-            "title": "Next.js服务端渲染实战",
+            "title": "Next.js服务端渲染实�?,
             "slug": "nextjs-ssr-guide",
-            "content": """Next.js提供了强大的服务端渲染能力，本文深入讲解SSR。
-
+            "content": """Next.js提供了强大的服务端渲染能力，本文深入讲解SSR�?
 ## SSR优势
 
 1. SEO优化
-2. 首屏加载快
-3. 社交媒体分享优化
+2. 首屏加载�?3. 社交媒体分享优化
 
 ## 实现方式
 
@@ -417,8 +380,8 @@ setup是Composition API的入口点，在组件创建之前执行。
 3. getInitialProps
 4. App Router的Server Components
 """,
-            "excerpt": "Next.js服务端渲染完整指南",
-            "cover_image": "https://via.placeholder.com/800x400",
+            "excerpt": "Next.js服务端渲染完整指�?,
+            "cover_image": None,
             "is_published": True,
             "read_time": 24,
             "published_at": datetime.now() - timedelta(days=2),
@@ -429,19 +392,16 @@ setup是Composition API的入口点，在组件创建之前执行。
         {
             "title": "Node.js异步编程深度解析",
             "slug": "nodejs-async-programming",
-            "content": """Node.js的异步编程是其核心特性，本文深入解析。
-
+            "content": """Node.js的异步编程是其核心特性，本文深入解析�?
 ## 事件循环
 
-Node.js使用事件循环处理异步操作。
-
+Node.js使用事件循环处理异步操作�?
 ## 异步模式
 
 1. 回调函数
 2. Promise
 3. async/await
-4. 事件发射器
-""",
+4. 事件发射�?""",
             "excerpt": "Node.js异步编程深度解析",
             "is_published": False,
             "read_time": 20,
@@ -456,29 +416,13 @@ Node.js使用事件循环处理异步操作。
     for article_data in articles_data:
         existing_article = crud.get_article_by_slug(db, slug=article_data["slug"])
         if not existing_article:
-            article_create = ArticleCreate(
-                **{k: v for k, v in article_data.items() if k not in ["tag_ids", "category_id", "author_id"]}
-            )
+            # Map tag_ids to tags for schema
+            create_data = {k: v for k, v in article_data.items() if k not in ["author_id", "view_count"]}
+            if "tag_ids" in create_data:
+                create_data["tags"] = create_data.pop("tag_ids")
+
+            article_create = ArticleCreate(**create_data)
             article = crud.create_article(db, article_create, author_id=admin_user.id)
-            
-            # 关联标签
-            if article_data.get("tag_ids"):
-                from app.models.tag import Tag
-                for tag_id in article_data["tag_ids"]:
-                    tag = db.query(Tag).filter(Tag.id == tag_id).first()
-                    if tag:
-                        article_tag = ArticleTag(article_id=article.id, tag_id=tag.id)
-                        db.add(article_tag)
-            
-            # 关联分类
-            if article_data.get("category_id"):
-                from app.models.category import Category
-                category = db.query(Category).filter(Category.id == article_data["category_id"]).first()
-                if category:
-                    article_category = ArticleCategory(article_id=article.id, category_id=category.id, is_primary=True)
-                    db.add(article_category)
-            
-            db.commit()
             articles.append(article)
             app_logger.info(f"创建文章: {article.title}")
         else:
@@ -491,7 +435,7 @@ def seed_comments(db: Session, users: list, articles: list) -> None:
     """创建测试评论"""
     comments_data = [
         {
-            "content": "这篇文章写得太好了！非常有帮助",
+            "content": "这篇文章写得太好了！非常有帮�?,
             "article_id": str(articles[0].id),
             "is_approved": True
         },
@@ -506,12 +450,12 @@ def seed_comments(db: Session, users: list, articles: list) -> None:
             "is_approved": True
         },
         {
-            "content": "非常好的教程，期待更多内容",
+            "content": "非常好的教程，期待更多内�?,
             "article_id": str(articles[1].id),
             "is_approved": True
         },
         {
-            "content": "PostgreSQL确实很强大，我也在生产环境使用",
+            "content": "PostgreSQL确实很强大，我也在生产环境使�?,
             "article_id": str(articles[2].id),
             "is_approved": True
         },
@@ -531,27 +475,27 @@ def seed_comments(db: Session, users: list, articles: list) -> None:
             "is_approved": True
         },
         {
-            "content": "Vue3的Composition API比Options API更灵活",
+            "content": "Vue3的Composition API比Options API更灵�?,
             "article_id": str(articles[6].id),
             "is_approved": True
         },
         {
-            "content": "K8s确实复杂但很强大，这篇文章总结得很好",
+            "content": "K8s确实复杂但很强大，这篇文章总结得很�?,
             "article_id": str(articles[7].id),
             "is_approved": True
         },
         {
-            "content": "AI辅助编程确实提高了效率",
+            "content": "AI辅助编程确实提高了效�?,
             "article_id": str(articles[8].id),
             "is_approved": True
         },
         {
-            "content": "Next.js的SSR对SEO真的很重要",
+            "content": "Next.js的SSR对SEO真的很重�?,
             "article_id": str(articles[9].id),
             "is_approved": True
         },
         {
-            "content": "等待审核的评论",
+            "content": "等待审核的评�?,
             "article_id": str(articles[0].id),
             "is_approved": False
         }
@@ -570,7 +514,7 @@ def seed_messages(db: Session, users: list) -> None:
     """创建测试留言"""
     messages_data = [
         {
-            "content": "欢迎来到我的博客！",
+            "content": "欢迎来到我的博客�?,
             "is_danmaku": True
         },
         {
@@ -578,27 +522,27 @@ def seed_messages(db: Session, users: list) -> None:
             "is_danmaku": True
         },
         {
-            "content": "期待更多好文章",
+            "content": "期待更多好文�?,
             "is_danmaku": False
         },
         {
-            "content": "设计很漂亮",
+            "content": "设计很漂�?,
             "is_danmaku": True
         },
         {
-            "content": "学到了很多知识",
+            "content": "学到了很多知�?,
             "is_danmaku": False
         },
         {
-            "content": "技术栈选得很合理",
+            "content": "技术栈选得很合�?,
             "is_danmaku": True
         },
         {
-            "content": "界面交互很流畅",
+            "content": "界面交互很流�?,
             "is_danmaku": False
         },
         {
-            "content": "继续加油！",
+            "content": "继续加油�?,
             "is_danmaku": True
         },
         {
@@ -610,7 +554,7 @@ def seed_messages(db: Session, users: list) -> None:
             "is_danmaku": True
         },
         {
-            "content": "FastAPI确实很强大",
+            "content": "FastAPI确实很强�?,
             "is_danmaku": False
         },
         {
@@ -618,11 +562,11 @@ def seed_messages(db: Session, users: list) -> None:
             "is_danmaku": True
         },
         {
-            "content": "数据库优化很有价值",
+            "content": "数据库优化很有价�?,
             "is_danmaku": False
         },
         {
-            "content": "容器化部署很有必要",
+            "content": "容器化部署很有必�?,
             "is_danmaku": True
         },
         {
@@ -630,7 +574,7 @@ def seed_messages(db: Session, users: list) -> None:
             "is_danmaku": False
         },
         {
-            "content": "Redis缓存很重要",
+            "content": "Redis缓存很重�?,
             "is_danmaku": True
         },
         {
@@ -655,7 +599,7 @@ def seed_friend_links(db: Session) -> None:
             "name": "阮一峰的网络日志",
             "url": "https://www.ruanyifeng.com/blog/",
             "favicon": "https://www.ruanyifeng.com/favicon.ico",
-            "description": "知名技术博客，分享前端和编程知识",
+            "description": "知名技术博客，分享前端和编程知�?,
             "sort_order": 1,
             "is_active": True,
             "is_featured": True
@@ -664,7 +608,7 @@ def seed_friend_links(db: Session) -> None:
             "name": "廖雪峰的官方网站",
             "url": "https://www.liaoxuefeng.com/",
             "favicon": "https://www.liaoxuefeng.com/favicon.ico",
-            "description": "提供优质的编程教程",
+            "description": "提供优质的编程教�?,
             "sort_order": 2,
             "is_active": True,
             "is_featured": True
@@ -673,13 +617,13 @@ def seed_friend_links(db: Session) -> None:
             "name": "张鑫旭的博客",
             "url": "https://www.zhangxinxu.com/",
             "favicon": "https://www.zhangxinxu.com/favicon.ico",
-            "description": "专注于前端技术分享",
+            "description": "专注于前端技术分�?,
             "sort_order": 3,
             "is_active": True,
             "is_featured": True
         },
         {
-            "name": "掘金技术社区",
+            "name": "掘金技术社�?,
             "url": "https://juejin.cn/",
             "favicon": "https://juejin.cn/favicon.ico",
             "description": "帮助开发者成长的社区",
@@ -691,7 +635,7 @@ def seed_friend_links(db: Session) -> None:
             "name": "知乎",
             "url": "https://www.zhihu.com/",
             "favicon": "https://static.zhihu.com/heifetz/favicon.ico",
-            "description": "有问题，就会有答案",
+            "description": "有问题，就会有答�?,
             "sort_order": 5,
             "is_active": True,
             "is_featured": False
@@ -700,7 +644,7 @@ def seed_friend_links(db: Session) -> None:
             "name": "V2EX",
             "url": "https://www.v2ex.com/",
             "favicon": "https://www.v2ex.com/static/favicon.ico",
-            "description": "创意工作者们的社区",
+            "description": "创意工作者们的社�?,
             "sort_order": 6,
             "is_active": True,
             "is_featured": False
@@ -718,7 +662,7 @@ def seed_friend_links(db: Session) -> None:
             "name": "Stack Overflow",
             "url": "https://stackoverflow.com/",
             "favicon": "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico",
-            "description": "全球最大的程序员问答社区",
+            "description": "全球最大的程序员问答社�?,
             "sort_order": 8,
             "is_active": True,
             "is_featured": False
@@ -787,11 +731,11 @@ def seed_subscriptions(db: Session) -> None:
 
 
 def seed_timeline_events(db: Session) -> None:
-    """创建时间轴事件"""
+    """创建时间轴事�?""
     timeline_events_data = [
         {
-            "title": "开始技术博客之旅",
-            "description": "创建个人技术博客，开始系统性地记录学习和成长历程",
+            "title": "开始技术博客之�?,
+            "description": "创建个人技术博客，开始系统性地记录学习和成长历�?,
             "event_date": "2024-03-15",
             "event_type": "milestone",
             "icon": "🚀",
@@ -800,8 +744,8 @@ def seed_timeline_events(db: Session) -> None:
             "sort_order": 10
         },
         {
-            "title": "发布第一个开源项目",
-            "description": "正式发布第一个开源项目，为开发者提供实用的工具库",
+            "title": "发布第一个开源项�?,
+            "description": "正式发布第一个开源项目，为开发者提供实用的工具�?,
             "event_date": "2024-06-20",
             "event_type": "project",
             "icon": "📦",
@@ -811,7 +755,7 @@ def seed_timeline_events(db: Session) -> None:
         },
         {
             "title": "技术文章被平台推荐",
-            "description": "多篇技术文章被掘金、知乎等平台推荐，累计阅读量超过10万",
+            "description": "多篇技术文章被掘金、知乎等平台推荐，累计阅读量超过10�?,
             "event_date": "2024-08-10",
             "event_type": "award",
             "icon": "🏆",
@@ -820,17 +764,17 @@ def seed_timeline_events(db: Session) -> None:
             "sort_order": 8
         },
         {
-            "title": "开源项目获得500+ Star",
-            "description": "个人开源项目在GitHub上获得超过500个Star，感谢社区的支持",
+            "title": "开源项目获�?00+ Star",
+            "description": "个人开源项目在GitHub上获得超�?00个Star，感谢社区的支持",
             "event_date": "2024-10-05",
             "event_type": "achievement",
-            "icon": "⭐",
+            "icon": "�?,
             "color": "#F59E0B",
             "is_active": True,
             "sort_order": 7
         },
         {
-            "title": "完成100篇技术博客",
+            "title": "完成100篇技术博�?,
             "description": "坚持写作100篇技术博客，分享前端、后端和DevOps相关的知识和经验",
             "event_date": "2024-12-01",
             "event_type": "milestone",
@@ -841,17 +785,17 @@ def seed_timeline_events(db: Session) -> None:
         },
         {
             "title": "学习FastAPI框架",
-            "description": "深入学习FastAPI框架，并用于实际项目开发",
+            "description": "深入学习FastAPI框架，并用于实际项目开�?,
             "event_date": "2024-04-01",
             "event_type": "achievement",
-            "icon": "⚡",
+            "icon": "�?,
             "color": "#14B8A6",
             "is_active": True,
             "sort_order": 5
         },
         {
             "title": "掌握React Hooks",
-            "description": "熟练掌握React Hooks的使用，重构了多个组件",
+            "description": "熟练掌握React Hooks的使用，重构了多个组�?,
             "event_date": "2024-05-15",
             "event_type": "achievement",
             "icon": "⚛️",
@@ -860,18 +804,18 @@ def seed_timeline_events(db: Session) -> None:
             "sort_order": 4
         },
         {
-            "title": "优化PostgreSQL数据库",
+            "title": "优化PostgreSQL数据�?,
             "description": "对生产环境的PostgreSQL数据库进行深度优化，性能提升50%",
             "event_date": "2024-07-20",
             "event_type": "achievement",
-            "icon": "🗄️",
+            "icon": "🗄�?,
             "color": "#0EA5E9",
             "is_active": True,
             "sort_order": 3
         },
         {
-            "title": "搭建Docker容器化环境",
-            "description": "完成全栈应用的Docker容器化部署",
+            "title": "搭建Docker容器化环�?,
+            "description": "完成全栈应用的Docker容器化部�?,
             "event_date": "2024-09-01",
             "event_type": "project",
             "icon": "🐳",
@@ -881,7 +825,7 @@ def seed_timeline_events(db: Session) -> None:
         },
         {
             "title": "开始AI辅助编程实践",
-            "description": "探索并实践AI辅助编程，提升开发效率",
+            "description": "探索并实践AI辅助编程，提升开发效�?,
             "event_date": "2024-11-15",
             "event_type": "milestone",
             "icon": "🤖",
@@ -896,20 +840,20 @@ def seed_timeline_events(db: Session) -> None:
         if not any(e.title == event_data["title"] for e in existing_events):
             event_create = TimelineEventCreate(**event_data)
             event = crud.create_timeline_event(db, event_create)
-            app_logger.info(f"创建时间轴事件: {event.title}")
+            app_logger.info(f"创建时间轴事�? {event.title}")
 
 
 def seed_typewriter_contents(db: Session) -> None:
-    """创建打字机内容"""
+    """创建打字机内�?""
     typewriter_contents_data = [
         {"text": "欢迎来到我的博客", "priority": 1, "is_active": True},
         {"text": "记录技术成长与生活点滴", "priority": 2, "is_active": True},
         {"text": "探索无限可能", "priority": 3, "is_active": True},
-        {"text": "分享知识，传递价值", "priority": 4, "is_active": True},
+        {"text": "分享知识，传递价�?, "priority": 4, "is_active": True},
         {"text": "代码改变世界", "priority": 5, "is_active": True},
-        {"text": "持续学习，不断进步", "priority": 6, "is_active": True},
+        {"text": "持续学习，不断进�?, "priority": 6, "is_active": True},
         {"text": "热爱技术，享受编程", "priority": 7, "is_active": True},
-        {"text": "与社区共同成长", "priority": 8, "is_active": True}
+        {"text": "与社区共同成�?, "priority": 8, "is_active": True}
     ]
     
     existing = crud.get_active_typewriter_contents(db)
@@ -917,18 +861,18 @@ def seed_typewriter_contents(db: Session) -> None:
         for content_data in typewriter_contents_data:
             content_create = TypewriterContentCreate(**content_data)
             content = crud.create_typewriter_content(db, content_create)
-            app_logger.info(f"创建打字机内容: {content.text}")
+            app_logger.info(f"创建打字机内�? {content.text}")
 
 
 def seed_portfolios(db: Session, admin_user) -> None:
-    """创建作品集数据"""
+    """创建作品集数�?""
     from app.models.portfolio import Portfolio
     
     portfolios_data = [
         {
             "title": "个人博客系统",
             "slug": "personal-blog",
-            "description": "使用FastAPI + Next.js构建的个人博客系统，支持文章、评论、留言等功能",
+            "description": "使用FastAPI + Next.js构建的个人博客系统，支持文章、评论、留言等功�?,
             "cover_image": "https://via.placeholder.com/600x400",
             "demo_url": "https://example.com",
             "github_url": "https://github.com/username/blog",
@@ -950,7 +894,7 @@ def seed_portfolios(db: Session, admin_user) -> None:
             "sort_order": 2
         },
         {
-            "title": "React组件库",
+            "title": "React组件�?,
             "slug": "react-ui-lib",
             "description": "基于React的UI组件库，提供高质量的通用组件",
             "cover_image": "https://via.placeholder.com/600x400",
@@ -964,7 +908,7 @@ def seed_portfolios(db: Session, admin_user) -> None:
         {
             "title": "API监控平台",
             "slug": "api-monitor",
-            "description": "用于监控API性能和状态的平台，支持告警和可视化",
+            "description": "用于监控API性能和状态的平台，支持告警和可视�?,
             "cover_image": "https://via.placeholder.com/600x400",
             "demo_url": "https://example.com",
             "github_url": "https://github.com/username/api-monitor",
@@ -974,9 +918,9 @@ def seed_portfolios(db: Session, admin_user) -> None:
             "sort_order": 4
         },
         {
-            "title": "自动化部署工具",
+            "title": "自动化部署工�?,
             "slug": "deploy-tool",
-            "description": "简化应用部署流程的自动化工具，支持多种云平台",
+            "description": "简化应用部署流程的自动化工具，支持多种云平�?,
             "cover_image": "https://via.placeholder.com/600x400",
             "demo_url": "https://example.com",
             "github_url": "https://github.com/username/deploy-tool",
@@ -986,9 +930,9 @@ def seed_portfolios(db: Session, admin_user) -> None:
             "sort_order": 5
         },
         {
-            "title": "数据可视化大屏",
+            "title": "数据可视化大�?,
             "slug": "data-visualization",
-            "description": "企业级数据可视化大屏项目，使用ECharts和React开发",
+            "description": "企业级数据可视化大屏项目，使用ECharts和React开�?,
             "cover_image": "https://via.placeholder.com/600x400",
             "demo_url": "https://example.com",
             "github_url": "https://github.com/username/data-viz",
@@ -1007,11 +951,11 @@ def seed_portfolios(db: Session, admin_user) -> None:
             port_create = PortfolioCreate(**portfolio_data)
             portfolio = crud.create_portfolio(db, port_create)
             
-            app_logger.info(f"创建作品集: {portfolio.title}")
+            app_logger.info(f"创建作品�? {portfolio.title}")
 
 
 def main():
-    """主函数"""
+    """主函�?""
     print("=" * 60)
     print("测试数据种子脚本")
     print("=" * 60)
@@ -1021,16 +965,16 @@ def main():
     try:
         print("\n1. 创建用户...")
         users = seed_users(db)
-        print(f"   创建了 {len(users)} 个用户")
+        print(f"   创建�?{len(users)} 个用�?)
         
-        print("\n2. 创建分类和标签...")
+        print("\n2. 创建分类和标�?..")
         categories, tags = seed_categories_and_tags(db)
-        print(f"   创建了 {len(categories)} 个分类")
-        print(f"   创建了 {len(tags)} 个标签")
+        print(f"   创建�?{len(categories)} 个分�?)
+        print(f"   创建�?{len(tags)} 个标�?)
         
         print("\n3. 创建文章...")
         articles = seed_articles(db, users, categories, tags)
-        print(f"   创建了 {len(articles)} 篇文章")
+        print(f"   创建�?{len(articles)} 篇文�?)
         
         print("\n4. 创建评论...")
         seed_comments(db, users, articles)
@@ -1048,31 +992,31 @@ def main():
         seed_subscriptions(db)
         print("   创建订阅完成")
         
-        print("\n8. 创建时间轴事件...")
+        print("\n8. 创建时间轴事�?..")
         seed_timeline_events(db)
-        print("   创建时间轴事件完成")
+        print("   创建时间轴事件完�?)
         
-        print("\n9. 创建打字机内容...")
+        print("\n9. 创建打字机内�?..")
         seed_typewriter_contents(db)
-        print("   创建打字机内容完成")
+        print("   创建打字机内容完�?)
         
-        print("\n10. 创建作品集...")
+        print("\n10. 创建作品�?..")
         seed_portfolios(db, users[0])
-        print("   创建作品集完成")
+        print("   创建作品集完�?)
         
         db.commit()
         print("\n" + "=" * 60)
-        print("测试数据创建完成！")
+        print("测试数据创建完成�?)
         print("=" * 60)
         print("\n测试账号:")
-        print("  管理员: admin / admin123")
-        print("  普通用户: testuser1 / test123")
-        print("  普通用户: testuser2 / test123")
+        print("  管理�? admin / admin123")
+        print("  普通用�? testuser1 / test123")
+        print("  普通用�? testuser2 / test123")
         print("=" * 60)
         
     except Exception as e:
         db.rollback()
-        app_logger.error(f"创建测试数据时出错: {e}")
+        app_logger.error(f"创建测试数据时出�? {e}")
         print(f"\n错误: {e}")
         raise
     finally:

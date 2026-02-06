@@ -40,7 +40,7 @@ export function FocusCards({ cards, className }: FocusCardsProps) {
               >
                 <div className="relative aspect-video overflow-hidden">
                   <img
-                    src={card.coverImage || '/assets/placeholder.jpg'}
+                    src={card.coverImage || '/assets/placeholder.svg'}
                     alt={card.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="lazy"

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface LoadingContextType {
   isLoading: boolean;
@@ -13,8 +13,8 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 export function LoadingProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const showLoading = () => setIsLoading(true);
-  const hideLoading = () => setIsLoading(false);
+  const showLoading = useCallback(() => setIsLoading(true), []);
+  const hideLoading = useCallback(() => setIsLoading(false), []);
 
   const value = {
     isLoading,

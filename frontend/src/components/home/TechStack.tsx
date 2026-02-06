@@ -45,9 +45,9 @@ const logoLoopItems: LogoItem[] = techItems.map((item) => ({
 
 export default function TechStack() {
   return (
-    <section className="py-8 sm:py-10 md:py-12 lg:py-16">
+    <section className="py-6 sm:py-8 md:py-10 lg:py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 mb-5 sm:mb-6">
           <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-tech-cyan to-tech-sky rounded-full animate-fade-in-up" />
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground animate-fade-in-up">
             技术栈
@@ -61,13 +61,13 @@ export default function TechStack() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-tech-cyan to-transparent opacity-50 animate-pulse" />
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-tech-cyan to-transparent opacity-50 animate-pulse" />
 
-          <div className="mb-6">
-            <p className="text-sm sm:text-base text-muted-foreground mb-4">
+          <div className="mb-5">
+            <p className="text-sm sm:text-base text-muted-foreground">
               本项目使用现代化技术栈构建，注重性能、可维护性和开发体验。
             </p>
           </div>
 
-          <div className="py-4">
+          <div className="py-3 sm:py-4">
             <LogoLoop
               logos={logoLoopItems}
               speed={80}
@@ -78,22 +78,22 @@ export default function TechStack() {
             />
           </div>
 
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {techItems.slice(0, 6).map((item, index) => (
+          <div className="mt-5 sm:mt-6 grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3">
+            {techItems.slice(0, 8).map((item, index) => (
               <div
                 key={item.name}
-                className="flex flex-col items-center p-3 rounded-lg bg-glass/30 backdrop-blur-xl border border-glass-border hover:border-tech-cyan/30 hover:scale-105 transition-all duration-300 cursor-pointer group animate-fade-in-up"
+                className="flex flex-col items-center p-2 sm:p-3 rounded-lg bg-glass/30 backdrop-blur-xl border border-glass-border hover:border-tech-cyan/30 hover:scale-105 transition-all duration-300 cursor-pointer group animate-fade-in-up"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-glass/50 flex items-center justify-center mb-2 group-hover:bg-tech-cyan/20 transition-colors"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-glass/50 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:bg-tech-cyan/20 transition-colors"
                   style={{ backgroundColor: `${item.color}20` }}
                 >
                   <div className="text-gray-400 group-hover:text-tech-cyan transition-colors">
                     {item.icon}
                   </div>
                 </div>
-                <span className="text-xs font-medium text-gray-300 group-hover:text-white transition-colors text-center">
+                <span className="text-[10px] sm:text-xs font-medium text-gray-300 group-hover:text-white transition-colors text-center truncate w-full">
                   {item.name}
                 </span>
               </div>
@@ -101,9 +101,9 @@ export default function TechStack() {
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg p-4 sm:p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-tech-cyan to-tech-sky flex items-center justify-center mb-3 sm:mb-4">
+        <div className="mt-5 sm:mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg p-4 sm:p-5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-tech-cyan to-tech-sky flex items-center justify-center mb-3">
               <Code2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 group-hover:text-tech-cyan transition-colors">
@@ -114,8 +114,8 @@ export default function TechStack() {
             </p>
           </div>
 
-          <div className="bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg p-4 sm:p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group delay-100">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-3 sm:mb-4">
+          <div className="bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg p-4 sm:p-5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group delay-100">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-3">
               <Server className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 group-hover:text-tech-cyan transition-colors">
@@ -126,8 +126,8 @@ export default function TechStack() {
             </p>
           </div>
 
-          <div className="bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg p-4 sm:p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group delay-200">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mb-3 sm:mb-4">
+          <div className="bg-glass/30 backdrop-blur-xl border border-glass-border rounded-lg p-4 sm:p-5 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group delay-200">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mb-3">
               <Cloud className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 group-hover:text-tech-cyan transition-colors">

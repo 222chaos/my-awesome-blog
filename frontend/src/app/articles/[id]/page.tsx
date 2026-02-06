@@ -10,11 +10,14 @@ import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Calendar, Tag, User, Eye, MessageCircle, Share2, Bookmark, Heart, ArrowLeft, Clock, ThumbsUp, MessageSquare, TrendingUp, Award, Users } from 'lucide-react';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService'; // 导入 RelatedArticle 类型
+import { useCodeBlockEnhancement } from '@/hooks/useCodeBlockEnhancement';
+import { getArticleById, getRelatedArticles, RelatedArticle } from '@/services/articleService';
 import { useLoading } from '@/context/loading-context';
 import PostCard from '@/components/ui/PostCard';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/Progress';
 import MediaPlayer from '@/components/ui/MediaPlayer';
+import ReadingProgressBar from '@/components/articles/ReadingProgressBar';
+import CommentTree, { Comment } from '@/components/articles/CommentTree';
 
 interface Article {
   id: string;
@@ -70,8 +73,8 @@ const convertToArticle = (related: RelatedArticle): Article => {
     author_id: '1',
     category_id: '1',
     featured_image: undefined,
-    read_time: 0, // 使用默认值
-    likes_count: 0, // 使用默认值
+    read_time: 0,
+    likes_count: 0,
     comments_count: 0,
     shares_count: 0,
     author: {
@@ -93,10 +96,91 @@ const convertToArticle = (related: RelatedArticle): Article => {
   };
 };
 
+// 示例评论数据
+const sampleComments: Comment[] = [
+  {
+    id: '1',
+    content: '这篇文章写得太好了！对我帮助很大，特别是关于性能优化的部分。',
+    author: {
+      id: 'user1',
+      username: '张三',
+    },
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+    likes: 24,
+    replies: [
+      {
+        id: '1-1',
+        content: '确实，我也学到了很多。作者的分享非常有价值！',
+        author: {
+          id: 'user2',
+          username: '李四',
+        },
+        createdAt: new Date(Date.now() - 3600000 * 1).toISOString(),
+        likes: 8,
+      },
+      {
+        id: '1-2',
+        content: '希望能有更多这样的高质量文章！',
+        author: {
+          id: 'user3',
+          username: '王五',
+        },
+        createdAt: new Date(Date.now() - 3600000 * 0.5).toISOString(),
+        likes: 5,
+      },
+    ],
+  },
+  {
+    id: '2',
+    content: '请问作者，这个方案在生产环境中有实际应用吗？效果如何？',
+    author: {
+      id: 'user4',
+      username: '赵六',
+    },
+    createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+    likes: 12,
+    replies: [],
+  },
+  {
+    id: '3',
+    content: '代码示例非常清晰，注释也很详细。点赞！',
+    author: {
+      id: 'user5',
+      username: '孙七',
+    },
+    createdAt: new Date(Date.now() - 3600000 * 8).toISOString(),
+    likes: 18,
+    replies: [
+      {
+        id: '3-1',
+        content: '同感，这种风格的文章我很喜欢。',
+        author: {
+          id: 'user6',
+          username: '周八',
+        },
+        createdAt: new Date(Date.now() - 3600000 * 7).toISOString(),
+        likes: 3,
+        replies: [
+          {
+            id: '3-1-1',
+            content: '期待作者继续分享！',
+            author: {
+              id: 'user7',
+              username: '吴九',
+            },
+            createdAt: new Date(Date.now() - 3600000 * 6).toISOString(),
+            likes: 2,
+          },
+        ],
+      },
+    ],
+  },
+];
+
 export default function ArticleDetailPage() {
   const params = useParams<{ id: string }>();
   const [article, setArticle] = useState<Article | null>(null);
-  const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]); // 使用从服务导入的类型
+  const [relatedArticles, setRelatedArticles] = useState<RelatedArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -104,9 +188,14 @@ export default function ArticleDetailPage() {
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
   const [toc, setToc] = useState<{ id: string; text: string; level: number }[]>([]);
   const [activeHeading, setActiveHeading] = useState('');
+  const [readingProgress, setReadingProgress] = useState(0);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
   const tocRef = useRef<HTMLDivElement>(null);
   const { themedClasses, getThemeClass } = useThemedClasses();
   const { showLoading, hideLoading } = useLoading();
+
+  useCodeBlockEnhancement(contentRef);
 
   useEffect(() => {
     const fetchArticleData = async () => {
@@ -125,6 +214,9 @@ export default function ArticleDetailPage() {
 
         // 生成目录
         generateTableOfContents(articleData.content);
+
+        // 设置示例评论
+        setComments(sampleComments);
       } catch (err) {
         console.error('获取文章数据失败:', err);
         setError('获取文章数据失败');
@@ -156,20 +248,39 @@ export default function ArticleDetailPage() {
     setToc(tocItems);
   };
 
-  // 监听滚动事件以高亮当前标题
+  // 监听滚动事件以高亮当前标题并计算阅读进度
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200;
 
+      // 高亮当前标题
       for (const item of toc) {
         const element = document.getElementById(item.id);
         if (element && element.offsetTop <= scrollPosition) {
           setActiveHeading(item.id);
         }
       }
+
+      // 计算阅读进度
+      if (contentRef.current) {
+        const content = contentRef.current;
+        const contentTop = content.offsetTop;
+        const contentHeight = content.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrollTop = window.scrollY;
+
+        const progress = Math.min(
+          100,
+          Math.max(
+            0,
+            ((scrollTop - contentTop + windowHeight) / contentHeight) * 100
+          )
+        );
+        setReadingProgress(Math.round(progress));
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [toc]);
 
@@ -224,6 +335,9 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen bg-background relative">
+      {/* 阅读进度条 */}
+      <ReadingProgressBar targetRef={contentRef} />
+
       {/* 媒体播放组件 - 改为相对定位，占据正常文档流 */}
       <div className="h-[30vh] overflow-hidden relative z-10">
         {article && (
@@ -242,7 +356,7 @@ export default function ArticleDetailPage() {
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto pt-12 pb-8"> {/* 增加顶部填充，确保内容不被遮挡 */}
+      <div className="max-w-7xl mx-auto pt-12 pb-8">
         {/* 返回按钮 */}
         <div className="inline-block mt-6 ml-4">
           <Link href="/articles" prefetch={false}>
@@ -347,7 +461,7 @@ export default function ArticleDetailPage() {
                 </div>
 
                 {/* 文章内容 */}
-                <GlassCard className={`mb-8 p-6 md:p-8 ${cardBgClass}`}>
+                <GlassCard ref={contentRef} className={`mb-8 p-6 md:p-8 ${cardBgClass}`}>
                   <div className={`prose max-w-none ${getThemeClass('prose-invert', '')} ${textClass}`}>
                     <div dangerouslySetInnerHTML={{ __html: article.content }} />
                   </div>
@@ -455,7 +569,7 @@ export default function ArticleDetailPage() {
                 {/* 评论区域 */}
                 <GlassCard className={`p-6 ${cardBgClass}`}>
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className={`text-xl font-semibold ${textClass}`}>评论 ({article.comments_count})</h3>
+                    <h3 className={`text-xl font-semibold ${textClass}`}>评论 ({comments.length})</h3>
                     <Button variant="outline" size="sm" className={getThemeClass(
                       'border-glass-border hover:bg-glass/40 text-foreground',
                       'border-gray-300 hover:bg-gray-50 text-gray-800'
@@ -465,67 +579,25 @@ export default function ArticleDetailPage() {
                     </Button>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="flex">
-                      <div className="mr-4 flex-shrink-0">
-                        <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <div className={`font-medium ${textClass}`}>用户名</div>
-                          <div className="text-xs text-muted-foreground">2023年10月12日</div>
-                        </div>
-                        <p className={mutedTextClass}>
-                          这是一条评论内容，提供了对文章的见解和反馈。评论可以促进读者之间的交流和讨论。
-                        </p>
-                        <div className="flex items-center mt-2">
-                          <Button variant="ghost" size="sm" className={`text-xs ${getThemeClass('text-foreground/70 hover:text-tech-cyan', 'text-gray-600 hover:text-blue-600')}`}>
-                            <ThumbsUp className="h-3 w-3 mr-1" />
-                            12
-                          </Button>
-                          <Button variant="ghost" size="sm" className={`ml-2 text-xs ${getThemeClass('text-foreground/70 hover:text-tech-cyan', 'text-gray-600 hover:text-blue-600')}`}>
-                            <MessageSquare className="h-3 w-3 mr-1" />
-                            回复
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+                  <CommentTree
+                    comments={comments}
+                    onReply={(commentId) => console.log('回复评论:', commentId)}
+                    onLike={(commentId) => console.log('点赞评论:', commentId)}
+                  />
 
-                    <div className="ml-14 flex">
-                      <div className="mr-4 flex-shrink-0">
-                        <div className="bg-gray-200 border-2 border-dashed rounded-xl w-8 h-8" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <div className={`font-medium text-sm ${textClass}`}>用户名</div>
-                          <div className="text-xs text-muted-foreground">2023年10月12日</div>
-                        </div>
-                        <p className={mutedTextClass}>
-                          这是一条回复评论，继续了之前的讨论。
-                        </p>
-                        <div className="flex items-center mt-2">
-                          <Button variant="ghost" size="sm" className={`text-xs ${getThemeClass('text-foreground/70 hover:text-tech-cyan', 'text-gray-600 hover:text-blue-600')}`}>
-                            <ThumbsUp className="h-3 w-3 mr-1" />
-                            3
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-4">
-                      <textarea
-                        rows={4}
-                        placeholder="写下你的评论..."
-                        className={`w-full px-4 py-3 rounded-lg border ${
-                          getThemeClass(
-                            'bg-glass/20 border-glass-border text-foreground placeholder:text-foreground/50',
-                            'bg-white/80 border-gray-300 text-gray-800 placeholder:text-gray-500'
-                          )
-                        } focus:outline-none focus:ring-2 focus:ring-tech-cyan`}
-                      ></textarea>
-                      <div className="mt-4 flex justify-end">
-                        <Button>发表评论</Button>
-                      </div>
+                  <div className="pt-6 mt-6 border-t border-dashed border-opacity-30">
+                    <textarea
+                      rows={4}
+                      placeholder="写下你的评论..."
+                      className={`w-full px-4 py-3 rounded-lg border ${
+                        getThemeClass(
+                          'bg-glass/20 border-glass-border text-foreground placeholder:text-foreground/50',
+                          'bg-white/80 border-gray-300 text-gray-800 placeholder:text-gray-500'
+                        )
+                      } focus:outline-none focus:ring-2 focus:ring-tech-cyan`}
+                    ></textarea>
+                    <div className="mt-4 flex justify-end">
+                      <Button>发表评论</Button>
                     </div>
                   </div>
                 </GlassCard>
@@ -565,9 +637,9 @@ export default function ArticleDetailPage() {
                 <div>
                   <div className="flex justify-between mb-1">
                     <span className={`text-sm ${mutedTextClass}`}>阅读进度</span>
-                    <span className={`text-sm ${mutedTextClass}`}>45%</span>
+                    <span className={`text-sm ${mutedTextClass}`}>{readingProgress}%</span>
                   </div>
-                  <Progress value={45} className="w-full" />
+                  <Progress value={readingProgress} className="w-full" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

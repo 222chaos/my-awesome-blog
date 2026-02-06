@@ -186,6 +186,30 @@ export default {
           '0%': { transform: 'rotateY(0deg)', 'will-change': 'transform' },
           '100%': { transform: 'rotateY(180deg)', 'will-change': 'transform' },
         },
+        'scanline': {
+          '0%': { transform: 'translateY(-100%)', 'will-change': 'transform' },
+          '100%': { transform: 'translateY(100%)', 'will-change': 'transform' },
+        },
+        'holo-glow': {
+          '0%, 100%': { boxShadow: '0 0 10px rgba(0,217,255,0.2)', 'will-change': 'box-shadow' },
+          '50%': { boxShadow: '0 0 20px rgba(0,217,255,0.4)', 'will-change': 'box-shadow' },
+        },
+        'particle-explode': {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1', 'will-change': 'transform, opacity' },
+          '100%': { transform: 'translate(var(--tx, 0), var(--ty, 0)) scale(0)', opacity: '0', 'will-change': 'transform, opacity' },
+        },
+        'tech-border': {
+          '0%, 100%': { borderColor: 'rgba(0,217,255,0.3)', 'will-change': 'border-color' },
+          '50%': { borderColor: 'rgba(0,217,255,0.6)', 'will-change': 'border-color' },
+        },
+        'rainbow-shift': {
+          '0%': { filter: 'hue-rotate(0deg)', 'will-change': 'filter' },
+          '100%': { filter: 'hue-rotate(360deg)', 'will-change': 'filter' },
+        },
+        'level-glow': {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(255,255,255,0)', 'will-change': 'box-shadow' },
+          '50%': { boxShadow: '0 0 0 8px rgba(255,255,255,0.3)', 'will-change': 'box-shadow' },
+        },
       },
       // 统一定义animation（只保留一次）
       animation: {
@@ -208,6 +232,12 @@ export default {
         'spin-slow': 'spin 8s linear infinite',
         'rotate-y-180': 'rotate-y-180 0.7s ease-in-out forwards',
         'backface-hidden': 'backface-hidden 0s ease-in-out forwards',
+        'scanline': 'scanline 2s linear infinite',
+        'holo-glow': 'holo-glow 2s ease-in-out infinite',
+        'particle-explode': 'particle-explode 0.8s ease-out forwards',
+        'tech-border': 'tech-border 2s ease-in-out infinite',
+        'rainbow-shift': 'rainbow-shift 3s linear infinite',
+        'level-glow': 'level-glow 2s ease-in-out infinite',
       },
       transitionProperty: {
         'height': 'height',

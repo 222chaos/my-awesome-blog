@@ -136,16 +136,42 @@ def get_articles(
 
 
 def create_article(db: Session, article: ArticleCreate, author_id: UUID) -> Article:
+    from app.models.tag import Tag
+    from app.models.category import Category
+    from app.models.article_tag import ArticleTag
+    from app.models.article_category import ArticleCategory
+
     db_article = Article(
-        **article.model_dump(),
+        **article.model_dump(exclude={'tags', 'category_id'}),
         author_id=author_id,
     )
-    
+
     # Set published_at if article is published
     if article.is_published:
         db_article.published_at = datetime.now(timezone.utc)  # type: ignore
-    
+
     db.add(db_article)
+    db.flush()  # Get the ID without committing
+
+    # Associate category
+    if article.category_id:
+        category = db.query(Category).filter(Category.id == article.category_id).first()
+        if category:
+            article_category = ArticleCategory(
+                article_id=db_article.id,
+                category_id=category.id,
+                is_primary=True
+            )
+            db.add(article_category)
+
+    # Associate tags
+    if article.tags:
+        for tag_id in article.tags:
+            tag = db.query(Tag).filter(Tag.id == tag_id).first()
+            if tag:
+                article_tag = ArticleTag(article_id=db_article.id, tag_id=tag.id)
+                db.add(article_tag)
+
     db.commit()
     db.refresh(db_article)
     return db_article

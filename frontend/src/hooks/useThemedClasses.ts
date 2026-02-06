@@ -25,20 +25,20 @@ export const useThemedClasses = () => {
 
   const themedClasses = useMemo(() => ({
     dropdownBgClass: resolvedTheme === 'dark'
-      ? 'bg-slate-900/95 backdrop-blur-xl border border-slate-700/50'
-      : 'bg-white/95 backdrop-blur-xl border-gray-300',
+      ? 'bg-glass/95 backdrop-blur-2xl border border-glass-border'
+      : 'bg-white/95 backdrop-blur-2xl border-gray-200',
     dropdownItemClass: resolvedTheme === 'dark'
-      ? 'focus:bg-tech-cyan/20 hover:bg-slate-700/30'
-      : 'focus:bg-gray-100 hover:bg-gray-50',
+      ? 'focus:bg-tech-cyan/15 hover:bg-glass/40 transition-all duration-200'
+      : 'focus:bg-tech-cyan/10 hover:bg-gray-50 transition-all duration-200',
     textColorClass: resolvedTheme === 'dark'
-      ? 'text-foreground/90 group-hover:text-tech-cyan'
-      : 'text-gray-800 group-hover:text-tech-cyan',
+      ? 'text-foreground group-hover:text-tech-cyan transition-colors duration-200'
+      : 'text-gray-800 group-hover:text-tech-cyan transition-colors duration-200',
     separatorClass: resolvedTheme === 'dark'
-      ? 'bg-slate-700/30'
-      : 'bg-gray-200',
+      ? 'bg-glass-border/50'
+      : 'bg-gray-200/60',
     dropdownShadowClass: resolvedTheme === 'dark'
-      ? 'shadow-xl shadow-tech-cyan/10'
-      : 'shadow-lg shadow-gray-300/30',
+      ? 'shadow-2xl shadow-tech-cyan/5'
+      : 'shadow-xl shadow-gray-400/20',
     // 新增通用类
     textClass: resolvedTheme === 'dark' ? 'text-foreground' : 'text-gray-800',
     mutedTextClass: resolvedTheme === 'dark' ? 'text-foreground/70' : 'text-gray-600',

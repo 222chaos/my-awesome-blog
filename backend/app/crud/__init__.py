@@ -79,5 +79,7 @@ from app.crud.message import (
     hard_delete_message,
     like_message,
     unlike_message,
+    get_trending_messages,
+    get_message_activity,
 )
 

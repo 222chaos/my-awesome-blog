@@ -1,0 +1,280 @@
+"""
+为文章添加封面图片的脚本
+从 Unsplash 下载图片并上传到后端，然后设置为文章封面
+"""
+import sys
+import requests
+import os
+import io
+from pathlib import Path
+import uuid
+import time
+from typing import List, Optional
+
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+
+class ArticleCoverUploader:
+    """文章封面上传器"""
+
+    def __init__(self, base_url: str = "http://127.0.0.1:8989/api/v1"):
+        self.base_url = base_url
+        self.token = None
+        self.headers = {}
+
+    def login(self, username: str = "admin", password: str = "admin123") -> bool:
+        """登录获取 token"""
+        print("=" * 60)
+        print("登录中...")
+        print("=" * 60)
+
+        login_data = {"username": username, "password": password}
+        response = requests.post(
+            f"{self.base_url}/auth/login",
+            data=login_data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            self.token = data.get("access_token")
+            self.headers = {"Authorization": f"Bearer {self.token}"}
+            print(f"✓ 登录成功，Token: {self.token[:30]}...")
+            return True
+        else:
+            print(f"✗ 登录失败: {response.text}")
+            return False
+
+    def get_articles(self, published_only: bool = True, limit: int = 100) -> List[dict]:
+        """获取文章列表"""
+        print("\n" + "=" * 60)
+        print("获取文章列表...")
+        print("=" * 60)
+
+        params = {"limit": limit}
+        if published_only:
+            params["published_only"] = "true"
+
+        response = requests.get(f"{self.base_url}/articles/", params=params)
+
+        if response.status_code == 200:
+            articles = response.json()
+            print(f"✓ 获取到 {len(articles)} 篇文章")
+            return articles
+        else:
+            print(f"✗ 获取文章失败: {response.text}")
+            return []
+
+    def download_image(
+        self, keywords: Optional[str] = None, width: int = 1200, height: int = 630
+    ) -> bytes:
+        """从 picsum.photos 下载随机图片"""
+        import random
+
+        random_seed = random.randint(1000, 99999999)
+        url = f"https://picsum.photos/seed/{random_seed}/{width}/{height}.jpg"
+
+        try:
+            response = requests.get(url, timeout=30)
+            if response.status_code == 200:
+                print(f"  ✓ 下载图片成功: {len(response.content)} bytes")
+                return response.content
+            else:
+                print(f"  ✗ 下载图片失败: HTTP {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"  ✗ 下载图片异常: {e}")
+            return None
+
+    def upload_image(
+        self, image_data: bytes, filename: str = None, alt_text: str = None
+    ) -> Optional[str]:
+        """上传图片到后端"""
+        if not filename:
+            filename = f"cover_{uuid.uuid4().hex[:12]}.jpg"
+
+        files = {"file": (filename, io.BytesIO(image_data), "image/jpeg")}
+        data = {"is_featured": "true"}
+        if alt_text:
+            data["alt_text"] = alt_text
+
+        response = requests.post(
+            f"{self.base_url}/images/",
+            files=files,
+            data=data,
+            headers=self.headers,
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            image_url = result.get("file_path") or result.get("url")
+            print(f"  ✓ 上传图片成功: {image_url}")
+            return image_url
+        else:
+            print(f"  ✗ 上传图片失败: {response.text}")
+            return None
+
+    def update_article_cover(self, article_id: str, cover_url: str) -> bool:
+        """更新文章封面"""
+        response = requests.put(
+            f"{self.base_url}/articles/{article_id}",
+            json={"cover_image": cover_url},
+            headers=self.headers,
+        )
+
+        if response.status_code == 200:
+            print(f"  ✓ 更新封面成功")
+            return True
+        else:
+            print(f"  ✗ 更新封面失败: {response.text}")
+            return False
+
+    def add_covers_to_articles(
+        self,
+        keywords: Optional[str] = None,
+        limit: Optional[int] = None,
+        skip_existing: bool = True,
+    ):
+        """为文章批量添加封面"""
+        articles = self.get_articles(published_only=True, limit=limit or 100)
+
+        if not articles:
+            print("\n没有找到文章，退出。")
+            return
+
+        filtered_articles = articles
+        if skip_existing:
+            filtered_articles = [a for a in articles if not a.get("cover_image")]
+            print(f"跳过已有封面的文章，剩余 {len(filtered_articles)} 篇")
+
+        print("\n" + "=" * 60)
+        print(f"开始为 {len(filtered_articles)} 篇文章添加封面...")
+        print("=" * 60)
+
+        success_count = 0
+        fail_count = 0
+
+        for idx, article in enumerate(filtered_articles, 1):
+            print(f"\n[{idx}/{len(filtered_articles)}] 处理文章: {article['title'][:50]}")
+
+            article_keywords = keywords
+            if not article_keywords and article.get("content"):
+                content = article["content"][:200]
+                article_keywords = self._extract_keywords(content)
+
+            image_data = self.download_image(article_keywords)
+            if not image_data:
+                print("  跳过此文章")
+                fail_count += 1
+                continue
+
+            cover_url = self.upload_image(
+                image_data,
+                filename=f"cover_{article['id']}.jpg",
+                alt_text=article["title"],
+            )
+
+            if cover_url:
+                if self.update_article_cover(article["id"], cover_url):
+                    success_count += 1
+                else:
+                    fail_count += 1
+            else:
+                fail_count += 1
+
+            time.sleep(1)
+
+        print("\n" + "=" * 60)
+        print("处理完成！")
+        print(f"  成功: {success_count} 篇")
+        print(f"  失败: {fail_count} 篇")
+        print("=" * 60)
+
+    def _extract_keywords(self, text: str) -> Optional[str]:
+        """从文本中提取关键词（简化版）"""
+        keywords_map = {
+            "编程": "code",
+            "代码": "code",
+            "技术": "technology",
+            "开发": "development",
+            "前端": "web",
+            "后端": "server",
+            "数据库": "database",
+            "算法": "algorithm",
+            "设计": "design",
+            "测试": "testing",
+            "部署": "deployment",
+            "云": "cloud",
+            "AI": "artificial-intelligence",
+            "人工智能": "artificial-intelligence",
+            "机器学习": "machine-learning",
+            "Python": "python",
+            "JavaScript": "javascript",
+            "React": "react",
+            "Vue": "vue",
+            "Docker": "docker",
+            "Kubernetes": "kubernetes",
+            "Linux": "linux",
+        }
+
+        for zh, en in keywords_map.items():
+            if zh in text:
+                return en
+
+        return None
+
+
+def main():
+    """主函数"""
+    import argparse
+
+    parser = argparse.ArgumentParser(description="为文章添加封面图片")
+    parser.add_argument(
+        "--keywords",
+        "-k",
+        type=str,
+        help="图片关键词（如：technology, code, nature）",
+    )
+    parser.add_argument(
+        "--limit",
+        "-l",
+        type=int,
+        default=None,
+        help="处理文章数量限制",
+    )
+    parser.add_argument(
+        "--all",
+        "-a",
+        action="store_true",
+        help="包括已有封面的文章",
+    )
+    parser.add_argument(
+        "--base-url",
+        "-u",
+        type=str,
+        default="http://127.0.0.1:8989/api/v1",
+        help="API 基础 URL",
+    )
+
+    args = parser.parse_args()
+
+    uploader = ArticleCoverUploader(base_url=args.base_url)
+
+    if not uploader.login():
+        print("登录失败，请检查后端服务是否运行")
+        sys.exit(1)
+
+    try:
+        uploader.add_covers_to_articles(
+            keywords=args.keywords,
+            limit=args.limit,
+            skip_existing=not args.all,
+        )
+    except KeyboardInterrupt:
+        print("\n\n用户中断操作")
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

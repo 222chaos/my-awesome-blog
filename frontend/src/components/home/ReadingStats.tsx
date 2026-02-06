@@ -93,25 +93,25 @@ export default function ReadingStats() {
   ]
 
   return (
-    <GlassCard className="rounded-2xl p-6 sm:p-8" aria-label="阅读统计">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <GlassCard className="rounded-2xl p-5 sm:p-6 md:p-7" aria-label="阅读统计">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-tech-cyan to-tech-sky">
-            <BookOpen className="w-6 h-6 text-white" />
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-tech-cyan to-tech-sky">
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl sm:text-2xl font-bold text-foreground">阅读统计</h3>
-            <p className="text-sm text-muted-foreground">追踪你的阅读习惯</p>
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">阅读统计</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">追踪你的阅读习惯</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {periods.map((period) => (
             <button
               key={period.id}
               onClick={() => setSelectedPeriod(period.id)}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
+                'px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200',
                 selectedPeriod === period.id
                   ? 'bg-tech-cyan text-white shadow-lg shadow-tech-cyan/30'
                   : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
@@ -125,7 +125,7 @@ export default function ReadingStats() {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-5">
         <div className="flex items-center gap-2 border-b border-white/10">
           {tabs.map((tab) => {
             const Icon = tab.icon
@@ -134,7 +134,7 @@ export default function ReadingStats() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors relative',
+                  'flex items-center gap-2 px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium transition-colors relative',
                   activeTab === tab.id
                     ? 'text-tech-cyan'
                     : 'text-gray-400 hover:text-gray-200'
@@ -142,7 +142,7 @@ export default function ReadingStats() {
                 aria-label={`查看${tab.label}数据`}
                 aria-pressed={activeTab === tab.id}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {tab.label}
                 {activeTab === tab.id && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-tech-cyan rounded-full" />
@@ -154,28 +154,28 @@ export default function ReadingStats() {
       </div>
 
       {activeTab === 'overview' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {readingStats.map((stat) => {
               const Icon = stat.icon
               return (
                 <div
                   key={stat.label}
                   className={cn(
-                    'p-4 rounded-xl',
+                    'p-3 sm:p-4 rounded-xl',
                     'bg-gradient-to-br',
                     stat.color,
                     'text-white'
                   )}
                 >
-                  <Icon className="w-5 h-5 mb-2 opacity-80" />
-                  <div className="text-2xl sm:text-3xl font-bold mb-1">
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 mb-1.5 sm:mb-2 opacity-80" />
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-0.5 sm:mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-sm opacity-80">
+                  <div className="text-xs sm:text-sm opacity-80">
                     {stat.unit}
                   </div>
-                  <div className="text-xs mt-2 opacity-70">
+                  <div className="text-[10px] sm:text-xs mt-1.5 sm:mt-2 opacity-70">
                     {stat.label}
                   </div>
                 </div>
@@ -183,17 +183,17 @@ export default function ReadingStats() {
             })}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-glass/20 border border-glass-border">
-              <h4 className="text-sm font-semibold text-foreground mb-3">分类偏好</h4>
-              <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-glass/20 border border-glass-border">
+              <h4 className="text-xs sm:text-sm font-semibold text-foreground mb-3">分类偏好</h4>
+              <div className="space-y-2.5 sm:space-y-3">
                 {categoryPreferenceData.map((item) => (
                   <div key={item.category}>
-                    <div className="flex items-center justify-between text-xs mb-1">
+                    <div className="flex items-center justify-between text-[10px] sm:text-xs mb-1">
                       <span className="text-foreground">{item.category}</span>
                       <span className="text-muted-foreground">{item.hours}h ({item.percentage}%)</span>
                     </div>
-                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-gray-800 rounded-full h-1.5 sm:h-2 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
@@ -204,27 +204,27 @@ export default function ReadingStats() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-glass/20 border border-glass-border">
-              <h4 className="text-sm font-semibold text-foreground mb-3">本月目标</h4>
-              <div className="space-y-3">
+            <div className="p-3.5 sm:p-4 rounded-xl bg-glass/20 border border-glass-border">
+              <h4 className="text-xs sm:text-sm font-semibold text-foreground mb-3">本月目标</h4>
+              <div className="space-y-2.5 sm:space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Target className="w-4 h-4 text-tech-cyan" />
+                  <div className="flex items-center gap-2 text-xs sm:text-sm">
+                    <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
                     <span className="text-foreground">阅读文章</span>
                   </div>
-                  <span className="text-tech-cyan font-bold">18/20</span>
+                  <span className="text-tech-cyan font-bold text-xs sm:text-sm">18/20</span>
                 </div>
-                <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-gray-800 rounded-full h-1.5 sm:h-2 overflow-hidden">
                   <div className="h-full bg-tech-cyan rounded-full" style={{ width: '90%' }} />
                 </div>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="w-4 h-4 text-tech-cyan" />
+                <div className="flex items-center justify-between mt-2 sm:mt-3">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm">
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-tech-cyan" />
                     <span className="text-foreground">阅读时长</span>
                   </div>
-                  <span className="text-tech-cyan font-bold">45/60h</span>
+                  <span className="text-tech-cyan font-bold text-xs sm:text-sm">45/60h</span>
                 </div>
-                <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-gray-800 rounded-full h-1.5 sm:h-2 overflow-hidden">
                   <div className="h-full bg-tech-cyan rounded-full" style={{ width: '75%' }} />
                 </div>
               </div>
@@ -234,25 +234,25 @@ export default function ReadingStats() {
       )}
 
       {activeTab === 'heatmap' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-glass/20 border border-glass-border">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-semibold text-foreground">阅读热力图</h4>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-glass/20 border border-glass-border">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h4 className="text-xs sm:text-sm font-semibold text-foreground">阅读热力图</h4>
+              <div className="flex items-center gap-2 text-[10px] sm:text-xs text-muted-foreground">
                 <span>少</span>
                 <div className="flex gap-1">
-                  <div className="w-3 h-3 rounded-sm bg-tech-cyan/30" />
-                  <div className="w-3 h-3 rounded-sm bg-tech-cyan/60" />
-                  <div className="w-3 h-3 rounded-sm bg-tech-cyan/80" />
-                  <div className="w-3 h-3 rounded-sm bg-tech-cyan" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-tech-cyan/30" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-tech-cyan/60" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-tech-cyan/80" />
+                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-tech-cyan" />
                 </div>
                 <span>多</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
               {['日', '一', '二', '三', '四', '五', '六'].map((day) => (
-                <div key={day} className="text-xs text-center text-muted-foreground mb-2">
+                <div key={day} className="text-[10px] sm:text-xs text-center text-muted-foreground mb-1.5 sm:mb-2">
                   {day}
                 </div>
               ))}
@@ -266,11 +266,11 @@ export default function ReadingStats() {
       )}
 
       {activeTab === 'trends' && (
-        <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-glass/20 border border-glass-border">
-            <h4 className="text-sm font-semibold text-foreground mb-4">阅读趋势</h4>
+        <div className="space-y-3 sm:space-y-4">
+          <div className="p-3.5 sm:p-4 rounded-xl bg-glass/20 border border-glass-border">
+            <h4 className="text-xs sm:text-sm font-semibold text-foreground mb-3 sm:mb-4">阅读趋势</h4>
 
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={180}>
               <AreaChart data={readingTrendData}>
                 <defs>
                   <linearGradient id="colorArticles" x1="0" y1="0" x2="0" y2="1">
@@ -282,13 +282,13 @@ export default function ReadingStats() {
                 <XAxis
                   dataKey="month"
                   stroke="#9ca3af"
-                  fontSize={12}
+                  fontSize={11}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
                   stroke="#9ca3af"
-                  fontSize={12}
+                  fontSize={11}
                   tickLine={false}
                   axisLine={false}
                 />

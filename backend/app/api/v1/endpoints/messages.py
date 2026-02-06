@@ -88,12 +88,17 @@ def read_trending_messages(
     """
     Get trending messages (most liked)
     """
-    messages = crud.get_trending_messages(
-        db,
-        limit=limit,
-        with_relationships=True
-    )
-    return messages
+    try:
+        messages = crud.get_trending_messages(
+            db,
+            limit=limit,
+            with_relationships=True
+        )
+        return messages
+    except Exception as e:
+        from app.utils.logger import app_logger
+        app_logger.error(f"Error getting trending messages: {e}")
+        raise
 
 
 @router.get("/stats/activity", response_model=List[Dict[str, Any]])
@@ -104,11 +109,16 @@ def read_message_activity(
     """
     Get message activity statistics for the last N days
     """
-    stats = crud.get_message_activity(
-        db,
-        days=days
-    )
-    return stats
+    try:
+        stats = crud.get_message_activity(
+            db,
+            days=days
+        )
+        return stats
+    except Exception as e:
+        from app.utils.logger import app_logger
+        app_logger.error(f"Error getting message activity: {e}")
+        raise
 
 
 @router.get("/{message_id}", response_model=MessageWithAuthor)

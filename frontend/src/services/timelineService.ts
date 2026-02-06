@@ -35,7 +35,7 @@ export interface TimelineEventUpdate {
   sort_order?: number;
 }
 
-const API_URL = `/api/v1/timeline-events`;
+const API_URL = `/timeline-events`;
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
