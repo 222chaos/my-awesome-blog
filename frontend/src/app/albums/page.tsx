@@ -8,6 +8,8 @@ import AlbumCard from '@/components/albums/AlbumCard';
 import AlbumFilter, { FilterType, SortType, ViewMode } from '@/components/albums/AlbumFilter';
 import Lightbox, { LightboxImage } from '@/components/ui/Lightbox';
 import MasonryGallery, { MasonryImage } from '@/components/ui/MasonryGallery';
+import ImageTrail from '@/components/ui/ImageTrail';
+import { useThemedClasses } from '@/hooks/useThemedClasses';
 
 interface Album {
   id: string;
@@ -33,6 +35,7 @@ const AlbumsPage = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [lightboxImages, setLightboxImages] = useState<LightboxImage[]>([]);
+  const { themedClasses } = useThemedClasses();
 
   useEffect(() => {
     const fetchAlbums = async () => {
@@ -244,12 +247,19 @@ const AlbumsPage = () => {
           transition={{ duration: 0.5 }}
           className="mb-12"
         >
-          <div className="relative p-6 sm:p-10 rounded-3xl overflow-hidden">
+          <div className="relative p-6 sm:p-10 rounded-3xl overflow-hidden min-h-[450px]">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-tech-cyan/20 rounded-full blur-3xl" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20" />
             
-            <div className="relative z-10 text-center">
+            <div className="absolute inset-0 z-0 overflow-hidden h-full w-full">
+              <ImageTrail 
+                items={albums.map(album => album.coverImage)}
+                variant={3}
+              />
+            </div>
+            
+            <div className="relative z-20 text-center min-h-[400px] flex flex-col justify-center items-center">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -268,7 +278,7 @@ const AlbumsPage = () => {
                 <div className="h-px w-16 bg-gradient-to-l from-transparent to-tech-cyan/50" />
               </div>
               
-              <p className="text-base sm:text-lg max-w-2xl mx-auto font-light tracking-wide leading-relaxed text-white/70 mb-8">
+              <p className={cn("text-base sm:text-lg max-w-2xl mx-auto font-light tracking-wide leading-relaxed mb-8", themedClasses.mutedTextClass)}>
                 探索生活中的美好瞬间 · 用镜头记录难忘时刻
               </p>
 
@@ -293,11 +303,11 @@ const AlbumsPage = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-2xl font-bold tabular-nums text-white"
+                        className={cn("text-2xl font-bold tabular-nums", themedClasses.textClass)}
                       >
                         {albums.reduce((sum, album) => sum + album.images, 0)}
                       </motion.div>
-                      <div className="text-sm text-white/50">
+                      <div className={cn("text-sm", themedClasses.mutedTextClass)}>
                         张照片
                       </div>
                     </div>
@@ -323,11 +333,11 @@ const AlbumsPage = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.3 }}
-                        className="text-2xl font-bold tabular-nums text-white"
+                        className={cn("text-2xl font-bold tabular-nums", themedClasses.textClass)}
                       >
                         {albums.length}
                       </motion.div>
-                      <div className="text-sm text-white/50">
+                      <div className={cn("text-sm", themedClasses.mutedTextClass)}>
                         个相册
                       </div>
                     </div>
