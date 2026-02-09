@@ -66,8 +66,7 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
       opacity: 1,
       x: 0,
       transition: {
-        duration: 0.2,
-        ease: 'easeOut'
+        duration: 0.2
       }
     }
   };
@@ -78,8 +77,7 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
       opacity: 1,
       height: 'auto',
       transition: {
-        duration: 0.3,
-        ease: 'easeOut'
+        duration: 0.3
       }
     }
   };
@@ -161,44 +159,45 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
                 </Button>
               )}
 
-            <AnimatePresence>
-              {isReplying && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-3"
-                >
-                  <textarea
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
-                    placeholder="写下你的回复..."
-                    rows={3}
-                    className={cn(
-                      'w-full px-3 py-2 rounded-lg text-sm resize-none',
-                      getThemeClass(
-                        'bg-glass/20 border-glass-border text-foreground placeholder:text-foreground/50',
-                        'bg-white/80 border-gray-300 text-gray-800 placeholder:text-gray-500'
-                      ),
-                      'focus:outline-none focus:ring-2 focus:ring-tech-cyan'
-                    )}
-                  />
-                  <div className="flex justify-end gap-2 mt-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={toggleReplying}
-                      className="text-xs"
-                    >
-                      取消
-                    </Button>
-                    <Button size="sm" onClick={handleReply} className="text-xs">
-                      发送
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              <AnimatePresence>
+                {isReplying && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-3"
+                  >
+                    <textarea
+                      value={replyContent}
+                      onChange={(e) => setReplyContent(e.target.value)}
+                      placeholder="写下你的回复..."
+                      rows={3}
+                      className={cn(
+                        'w-full px-3 py-2 rounded-lg text-sm resize-none',
+                        getThemeClass(
+                          'bg-glass/20 border-glass-border text-foreground placeholder:text-foreground/50',
+                          'bg-white/80 border-gray-300 text-gray-800 placeholder:text-gray-500'
+                        ),
+                        'focus:outline-none focus:ring-2 focus:ring-tech-cyan'
+                      )}
+                    />
+                    <div className="flex justify-end gap-2 mt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={toggleReplying}
+                        className="text-xs"
+                      >
+                        取消
+                      </Button>
+                      <Button size="sm" onClick={handleReply} className="text-xs">
+                        发送
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </GlassCard>
@@ -225,7 +224,7 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div></div>
+    </motion.div>
   );
 }
 

@@ -26,6 +26,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'my-awesome-blog.oss-cn-hangzhou.aliyuncs.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,

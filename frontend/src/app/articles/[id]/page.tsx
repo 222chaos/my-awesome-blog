@@ -17,7 +17,8 @@ import PostCard from '@/components/ui/PostCard';
 import { Progress } from '@/components/ui/Progress';
 import MediaPlayer from '@/components/ui/MediaPlayer';
 import ReadingProgressBar from '@/components/articles/ReadingProgressBar';
-import CommentTree, { Comment } from '@/components/articles/CommentTree';
+import CommentTree from '@/components/articles/CommentTree';
+import { Comment } from '@/types';
 
 interface Article {
   id: string;

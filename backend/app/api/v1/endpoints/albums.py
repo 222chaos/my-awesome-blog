@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app import crud
 from app.schemas.portfolio import PortfolioItem
+from app.models.portfolio import Portfolio
 
 router = APIRouter()
 
@@ -18,10 +19,23 @@ def read_albums(
     Retrieve albums (transformed from portfolio items for frontend compatibility)
     Returns data in Album format expected by frontend
     """
-    portfolios = crud.get_portfolios(db, skip=skip, limit=limit, is_featured=None)
+    from sqlalchemy.orm import joinedload
+    from app.models.portfolio_image import PortfolioImage
+    
+    portfolios = (
+        db.query(Portfolio)
+        .options(joinedload(Portfolio.portfolio_images))
+        .order_by(Portfolio.sort_order.asc(), Portfolio.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
     
     albums = []
     for portfolio in portfolios:
+        # Count actual portfolio images
+        image_count = len(portfolio.portfolio_images) if portfolio.portfolio_images else 0
+        
         album = {
             "id": str(portfolio.id),
             "title": portfolio.title,
@@ -29,7 +43,7 @@ def read_albums(
             "coverImage": portfolio.cover_image or "/assets/placeholder.jpg",
             "date": portfolio.created_at.strftime("%Y-%m-%d") if portfolio.created_at else "",
             "featured": portfolio.is_featured or False,
-            "images": 12,
+            "images": image_count,
             "slug": portfolio.slug,
             "technologies": portfolio.technologies or [],
             "startDate": portfolio.start_date.strftime("%Y-%m-%d") if portfolio.start_date else None,
@@ -145,18 +159,20 @@ def read_album_images(
         )
     
     # Return portfolio images as album images
-    # If portfolio has images in a related table, fetch them
+    # Use CRUD function to fetch images from portfolio_images association table
+    images_data = crud.get_portfolio_images(db, portfolio_id=album_uuid, skip=skip, limit=limit)
+    
     images = []
-    if hasattr(portfolio, 'images') and portfolio.images:
-        for idx, img in enumerate(portfolio.images[skip:skip+limit]):
-            images.append({
-                "id": str(img.id) if hasattr(img, 'id') else f"{album_id}_{idx}",
-                "url": img.url if hasattr(img, 'url') else img,
-                "caption": img.caption if hasattr(img, 'caption') else None,
-                "sortOrder": img.sort_order if hasattr(img, 'sort_order') else idx,
-            })
-    else:
-        # Fallback: return the cover image as a single image
+    for idx, img in enumerate(images_data):
+        images.append({
+            "id": str(img.id),
+            "url": img.file_path,
+            "caption": img.alt_text or img.caption,
+            "sortOrder": img.created_at.timestamp() if img.created_at else idx,
+        })
+    
+    # If no images found, return the cover image as a single image
+    if not images and portfolio.cover_image:
         images = [{
             "id": f"{album_id}_0",
             "url": portfolio.cover_image or "/assets/placeholder.jpg",

@@ -30,11 +30,15 @@ export const getArticles = async (filters?: {
   category?: string;
   tag?: string;
   search?: string;
+  limit?: number;
+  offset?: number;
 }): Promise<Article[]> => {
   const params = new URLSearchParams();
   if (filters?.category) params.append('category_id', filters.category);
   if (filters?.tag) params.append('tag_id', filters.tag);
   if (filters?.search) params.append('search', filters.search);
+  if (filters?.limit) params.append('limit', filters.limit.toString());
+  if (filters?.offset) params.append('offset', filters.offset.toString());
 
   const queryString = params.toString();
   const endpoint = `/articles/${queryString ? `?${queryString}` : ''}`;

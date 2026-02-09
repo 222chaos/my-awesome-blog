@@ -1,0 +1,327 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --macos-animation-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --macos-animation-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --macos-animation-ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .scrollbar-thin-dark::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .scrollbar-thin-dark::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+}
+
+@keyframes soundWave {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 16px;
+  }
+}
+
+@keyframes soundWaveBar1 {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 12px;
+  }
+}
+
+@keyframes soundWaveBar2 {
+  0%, 100% {
+    height: 8px;
+  }
+  50% {
+    height: 16px;
+  }
+}
+
+@keyframes soundWaveBar3 {
+  0%, 100% {
+    height: 6px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+@keyframes soundWaveBar4 {
+  0%, 100% {
+    height: 10px;
+  }
+    50% {
+      height: 18px;
+    }
+}
+
+@layer utilities {
+  .animate-sound-wave {
+    animation: soundWave 0.8s ease-in-out infinite;
+  }
+  .animate-sound-wave-bar-1 {
+    animation: soundWaveBar1 0.8s ease-in-out infinite;
+  }
+  .animate-sound-wave-bar-2 {
+    animation: soundWaveBar2 0.8s ease-in-out infinite 0.2s;
+  }
+  .animate-sound-wave-bar-3 {
+    animation: soundWaveBar3 0.8s ease-in-out infinite 0.4s;
+  }
+  .animate-sound-wave-bar-4 {
+    animation: soundWaveBar4 0.8s ease-in-out infinite 0.6s;
+  }
+}
+
+@layer utilities {
+  .glass-card-hover {
+    transition: transform 0.2s var(--macos-animation-ease-out),
+                box-shadow 0.2s var(--macos-animation-ease-out);
+  }
+  .glass-card-hover:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@layer utilities {
+  .macos-range-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .macos-range-input::-webkit-slider-runnable-track {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+  .macos-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: -4px;
+    transition: transform 0.15s var(--macos-animation-spring);
+  }
+  .macos-range-input:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+  .macos-range-input::-moz-range-track {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+  .macos-range-input::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+
+  .dark .macos-range-input::-webkit-slider-runnable-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .dark .macos-range-input::-moz-range-track {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@layer utilities {
+  .macos-range-input-filled {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .macos-range-input-filled::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, #fa2d2f 0%, #fa2d2f var(--progress, 0%), rgba(0, 0, 0, 0.1) var(--progress, 0%), rgba(0, 0, 0, 0.1) 100%);
+    border-radius: 2px;
+  }
+  .macos-range-input-filled::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #fa2d2f;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(250, 45, 47, 0.4);
+    margin-top: -4px;
+    transition: transform 0.15s var(--macos-animation-spring);
+  }
+  .macos-range-input-filled:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+  .macos-range-input-filled::-moz-range-track {
+    height: 4px;
+    background: linear-gradient(to right, #fa2d2f 0%, #fa2d2f var(--progress, 0%), rgba(0, 0, 0, 0.1) var(--progress, 0%), rgba(0, 0, 0, 0.1) 100%);
+    border-radius: 2px;
+  }
+  .macos-range-input-filled::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #fa2d2f;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(250, 45, 47, 0.4);
+    cursor: pointer;
+  }
+
+  .dark .macos-range-input-filled::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #fa2d2f 0%, #fa2d2f var(--progress, 0%), rgba(255, 255, 255, 0.1) var(--progress, 0%), rgba(255, 255, 255, 0.1) 100%);
+  }
+  .dark .macos-range-input-filled::-moz-range-track {
+    background: linear-gradient(to right, #fa2d2f 0%, #fa2d2f var(--progress, 0%), rgba(255, 255, 255, 0.1) var(--progress, 0%), rgba(255, 255, 255, 0.1) 100%);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s var(--macos-animation-ease-out) forwards;
+  }
+  .animate-fade-in-scale {
+    animation: fadeInScale 0.3s var(--macos-animation-spring) forwards;
+  }
+}
+
+@layer utilities {
+  .macos-button {
+    transition: all 0.15s var(--macos-animation-ease-out);
+  }
+  .macos-button:active {
+    transform: scale(0.95);
+  }
+}
+
+@layer utilities {
+  .macos-input-focus {
+    transition: box-shadow 0.2s var(--macos-animation-ease-out);
+  }
+  .macos-input-focus:focus {
+    box-shadow: 0 0 0 3px rgba(250, 45, 47, 0.2);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .glass-blur {
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.3s var(--macos-animation-ease-out) forwards;
+  }
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.3s var(--macos-animation-ease-out) forwards;
+  }
+}

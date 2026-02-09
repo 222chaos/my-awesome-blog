@@ -156,7 +156,7 @@ function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   <div className="absolute top-4 left-4">
                     <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getThemeClass('bg-tech-cyan/90 text-white', 'bg-blue-600/90 text-white')}`}>
-                      {currentArticle.category.name}
+                      {currentArticle.category?.name || '未分类'}
                     </span>
                   </div>
                 </motion.div>

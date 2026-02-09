@@ -20,7 +20,7 @@ interface UserProfileMenuProps {
 }
 
 const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ mounted }) => {
-  const { resolvedTheme, themedClasses } = useThemedClasses();
+  const { themedClasses, isDark } = useThemedClasses();
   const [isOpen, setIsOpen] = useState(false);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,8 +44,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ mounted }) => {
       scale: 1,
       transition: {
         delay: i * 0.06,
-        duration: 0.25,
-        ease: "easeOut"
+        duration: 0.25
       }
     })
   };
@@ -109,7 +108,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ mounted }) => {
             className="space-y-1"
           >
             <DropdownMenuLabel 
-              className={`text-xs font-semibold py-3 px-3 tracking-wide ${mounted && resolvedTheme === 'dark' ? 'text-foreground/70' : 'text-gray-500'}`}
+              className={`text-xs font-semibold py-3 px-3 tracking-wide ${mounted && isDark ? 'text-foreground/70' : 'text-gray-500'}`}
             >
               我的账户
             </DropdownMenuLabel>
@@ -175,7 +174,7 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ mounted }) => {
             
             <DropdownMenuItem 
               className={`group cursor-pointer py-2.5 px-3 rounded-lg ${
-                mounted && resolvedTheme === 'dark' 
+                mounted && isDark 
                   ? 'focus:bg-red-500/15 hover:bg-red-500/20 transition-all duration-200' 
                   : 'focus:bg-red-50 hover:bg-red-50 transition-all duration-200'
               }`}
@@ -188,10 +187,10 @@ const UserProfileMenu: React.FC<UserProfileMenuProps> = ({ mounted }) => {
                 className="flex items-center w-full"
               >
                 <LogOut className={`h-4 w-4 mr-3 ${
-                  mounted && resolvedTheme === 'dark' ? 'text-red-400' : 'text-red-500'
+                  mounted && isDark ? 'text-red-400' : 'text-red-500'
                 } group-hover:scale-110 transition-transform duration-200 group-hover:text-red-600`} />
                 <span className={`${
-                  mounted && resolvedTheme === 'dark' ? 'text-foreground/80' : 'text-gray-800'
+                  mounted && isDark ? 'text-foreground/80' : 'text-gray-800'
                 } group-hover:text-red-600 transition-colors duration-200`}>退出登录</span>
               </motion.div>
             </DropdownMenuItem>

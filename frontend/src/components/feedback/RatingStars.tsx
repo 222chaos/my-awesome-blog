@@ -68,7 +68,6 @@ export default forwardRef<HTMLDivElement, RatingStarsProps>(function RatingStars
     return (
       <motion.button
         key={index}
-        ref={index === max ? ref : undefined}
         type="button"
         disabled={readonly}
         onClick={() => handleClick(index)}

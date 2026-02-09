@@ -6,7 +6,7 @@ import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { loginApi } from '@/lib/api/auth';
 import { useLoading } from '@/context/loading-context';
-import './form-styles.css';
+import '@/styles/components/login-form.css';
 
 export default function LoginPageContent() {
   const [username, setUsername] = useState('');

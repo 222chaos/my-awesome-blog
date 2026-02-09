@@ -120,6 +120,11 @@ export interface Reply {
   };
   created_at: string;
   likes?: number;
+  parent_id?: string; // 父回复ID，用于多级回复
+  replies?: Reply[]; // 嵌套回复
+  isEdited?: boolean;
+  editedAt?: string;
+  mentionedUsers?: string[]; // @的用户列表
 }
 
 // 留言/弹幕消息类型
@@ -132,11 +137,20 @@ export interface Message {
     avatar?: string;
   };
   created_at: string;
+  updated_at?: string; // 更新时间（编辑后）
   color?: string; // 弹幕颜色
   isDanmaku?: boolean; // 是否以弹幕形式显示
   likes?: number; // 点赞数
-  replies?: Reply[]; // 回复列表
+  replies?: Reply[]; // 回复列表（楼中楼）
+  parent_id?: string; // 父留言ID，用于多级回复
+  reply_count?: number; // 回复总数（包括嵌套回复）
   level?: number; // 用户等级
+  isEdited?: boolean; // 是否已编辑
+  editedAt?: string; // 编辑时间
+  tags?: string[]; // 标签
+  isPinned?: boolean; // 是否置顶
+  isFeatured?: boolean; // 是否精华
+  mentionedUsers?: string[]; // @的用户列表
 }
 
 // 创建留言请求类型
@@ -153,14 +167,24 @@ export interface Album {
   description: string;
   coverImage: string;
   date: string;
-  featured: boolean;
+  featured?: boolean;
   images: number;
+  category?: string;
+  likes?: number;
+  views?: number;
   slug?: string;
   technologies?: string[];
   startDate?: string;
   endDate?: string;
   status?: string;
   sortOrder?: number;
+}
+
+// 相册过滤器类型
+export interface AlbumFilters {
+  filter: 'all' | 'featured' | 'recent' | 'popular';
+  sort: 'date-desc' | 'date-asc' | 'title-asc' | 'title-desc';
+  viewMode: 'grid' | 'list' | 'masonry';
 }
 
 // 后端文章类型（带作者信息）

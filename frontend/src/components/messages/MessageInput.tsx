@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { createMessage, DANMAKU_COLORS, validateMessage } from '@/services/messageService';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { Send, Palette, MessageSquare, Sparkles, Smile, Bold, Italic, Link, AtSign } from 'lucide-react';
+import { Send, Palette, MessageSquare, Sparkles, Smile } from 'lucide-react';
 import { Message } from '@/types';
 
 interface MessageInputProps {

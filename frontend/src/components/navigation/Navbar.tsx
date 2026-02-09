@@ -4,23 +4,38 @@ import Link from 'next/link';
 import AnimatedLogo from './AnimatedLogo';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, Search, X, Menu } from 'lucide-react';
+import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, Search, X, Menu, Music, Image, Film, Gamepad2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { RopeThemeToggler } from '@/components/ui/rope-theme-toggler';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import UserProfileMenu from './UserProfileMenu';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { LucideIcon } from 'lucide-react';
+
+interface NavLinkChild {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+interface NavLink {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  children?: NavLinkChild[];
+}
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { resolvedTheme } = useThemedClasses();
   const [scrolled, setScrolled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [homeDropdownOpen, setHomeDropdownOpen] = useState(false);
+  const homeDropdownRef = useRef<HTMLDivElement>(null);
   const navbarRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -83,7 +98,17 @@ export default function Navbar() {
 
   const navLinks: NavLink[] = [
     { href: '/', label: '首页', icon: Home },
-    { href: '/home', label: '家', icon: Home },
+    {
+      href: '/home',
+      label: '家',
+      icon: Home,
+      children: [
+        { href: '/music', label: '音乐馆', icon: Music },
+        { href: '/gallery', label: '画廊', icon: Image },
+        { href: '/videos', label: '视频', icon: Film },
+        { href: '/games', label: '游戏', icon: Gamepad2 },
+      ]
+    },
     { href: '/articles', label: '文章', icon: BookOpen },
     { href: '/albums', label: '相册', icon: Camera },
     { href: '/tools', label: '百宝箱', icon: Wrench },
@@ -98,8 +123,7 @@ export default function Navbar() {
       y: 0,
       transition: {
         delay: i * 0.05,
-        duration: 0.3,
-        ease: "easeOut"
+        duration: 0.3
       }
     })
   };
@@ -109,16 +133,14 @@ export default function Navbar() {
       opacity: 0,
       x: '100%',
       transition: {
-        duration: 0.3,
-        ease: "easeInOut"
+        duration: 0.3
       }
     },
     visible: {
       opacity: 1,
       x: 0,
       transition: {
-        duration: 0.3,
-        ease: "easeInOut"
+        duration: 0.3
       }
     }
   };
@@ -142,7 +164,7 @@ export default function Navbar() {
         <div className="w-full h-16 flex items-center justify-between px-4 md:px-6 lg:px-8">
           <div className="flex items-center flex-shrink-0">
             <div className="flex items-center group">
-              <AnimatedLogo className="transition-transform duration-300 group-hover:scale-110" />
+              <AnimatedLogo />
             </div>
           </div>
 
@@ -151,6 +173,85 @@ export default function Navbar() {
               <div className="flex items-center space-x-4 lg:space-x-6 text-sm font-medium">
                 {navLinks.map((link, index) => {
                   const IconComponent = link.icon;
+                  const hasChildren = link.children && link.children.length > 0;
+                  const isHomeDropdown = link.href === '/home';
+                  
+                  if (isHomeDropdown && hasChildren) {
+                    return (
+                      <motion.div
+                        key={link.href}
+                        initial="hidden"
+                        animate="visible"
+                        custom={index}
+                        variants={navItemVariants}
+                        className="relative"
+                        ref={homeDropdownRef}
+                        onMouseEnter={() => setHomeDropdownOpen(true)}
+                        onMouseLeave={() => setHomeDropdownOpen(false)}
+                      >
+                        <button
+                          className={cn(
+                            'nav-link relative text-sm font-medium transition-colors flex items-center py-2 px-3 space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-tech-cyan rounded-lg overflow-hidden group',
+                            pathname === link.href
+                              ? "text-tech-cyan"
+                              : "text-foreground/80 hover:text-tech-cyan"
+                          )}
+                          aria-expanded={homeDropdownOpen}
+                          aria-haspopup="true"
+                        >
+                          <IconComponent className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                          <span className="relative">
+                            {link.label}
+                            <span className={cn(
+                              "absolute bottom-0 left-0 h-0.5 bg-tech-cyan transform scale-x-0 transition-transform duration-300 origin-left",
+                              "group-hover:scale-x-100"
+                            )} />
+                          </span>
+                          <ChevronDown className={cn(
+                            "h-3 w-3 ml-1 transition-transform duration-200",
+                            homeDropdownOpen && "rotate-180"
+                          )} />
+                        </button>
+                        
+                        {/* 下拉菜单 */}
+                        <AnimatePresence>
+                          {homeDropdownOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              transition={{ duration: 0.2 }}
+                              className="absolute top-full left-0 mt-2 w-48 py-2 bg-glass backdrop-blur-3xl rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50"
+                            >
+                              <div className="px-3 py-2 border-b border-white/10 mb-1">
+                                <span className="text-xs font-medium text-white/50 uppercase tracking-wider">探索</span>
+                              </div>
+                              {link.children?.map((child) => {
+                                const ChildIcon = child.icon;
+                                return (
+                                  <Link
+                                    key={child.href}
+                                    href={child.href as any}
+                                    className={cn(
+                                      'flex items-center space-x-3 px-4 py-2.5 text-sm transition-colors hover:bg-white/5',
+                                      pathname === child.href
+                                        ? "text-tech-cyan bg-tech-cyan/10"
+                                        : "text-foreground/80 hover:text-tech-cyan"
+                                    )}
+                                    onClick={() => setHomeDropdownOpen(false)}
+                                  >
+                                    <ChildIcon className="h-4 w-4" />
+                                    <span>{child.label}</span>
+                                  </Link>
+                                );
+                              })}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  }
+                  
                   return (
                     <motion.div
                       key={link.href}
@@ -264,6 +365,8 @@ export default function Navbar() {
               <nav role="navigation" aria-label="移动端导航" className="py-4 px-4 space-y-2">
                 {navLinks.map((link, index) => {
                   const IconComponent = link.icon;
+                  const hasChildren = link.children && link.children.length > 0;
+                  
                   return (
                     <motion.div
                       key={link.href}
@@ -285,6 +388,31 @@ export default function Navbar() {
                         <IconComponent className="h-5 w-5" />
                         <span className="text-base font-medium">{link.label}</span>
                       </Link>
+                      
+                      {/* 移动端子菜单 */}
+                      {hasChildren && (
+                        <div className="ml-4 mt-1 space-y-1 border-l-2 border-white/10 pl-4">
+                          {link.children?.map((child) => {
+                            const ChildIcon = child.icon;
+                            return (
+                              <Link
+                                key={child.href}
+                                href={child.href as any}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={cn(
+                                  'flex items-center space-x-3 py-2 px-3 rounded-lg transition-colors text-sm',
+                                  pathname === child.href
+                                    ? "text-tech-cyan bg-tech-cyan/10"
+                                    : "text-foreground/60 hover:text-tech-cyan hover:bg-white/5"
+                                )}
+                              >
+                                <ChildIcon className="h-4 w-4" />
+                                <span>{child.label}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
                     </motion.div>
                   );
                 })}

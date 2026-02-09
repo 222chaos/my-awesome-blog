@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ThumbsUp, ThumbsDown, Flame, Laugh, Rocket, Sparkles } from 'lucide-react';
+import { Flame, Rocket, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Reaction {

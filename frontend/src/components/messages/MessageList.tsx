@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Message, Reply } from '@/types';
 import { formatDistanceToNow } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { Trash2, MessageSquare, Heart, Reply as ReplyIcon, ThumbsUp, ThumbsDown, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, MessageSquare, Heart, Reply as ReplyIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { deleteMessage, likeMessage, replyToMessage } from '@/services/messageService';
 import { useThemedClasses } from '@/hooks/useThemedClasses';

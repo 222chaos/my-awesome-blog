@@ -69,7 +69,7 @@ export const getMessages = async (): Promise<Message[]> => {
  * 获取弹幕列表（仅返回设置为弹幕的消息）
  * @returns 弹幕消息列表
  */
-export const getDanmakuMessages = async (): Promise<Message[]> => {
+export const getDanmakuMessages = async (): Promise<DanmakuMessage[]> => {
   try {
     const messages = await apiRequest('/messages/danmaku');
     // 转换后端格式到前端格式并随机排序
@@ -84,10 +84,9 @@ export const getDanmakuMessages = async (): Promise<Message[]> => {
         },
         created_at: msg.created_at,
         color: msg.color || '#00D9FF',
-        isDanmaku: true,
-        likes: msg.likes || 0,
-        replies: [],
-        level: msg.level || 1,
+        speed: msg.speed || Math.random() * 3 + 2,
+        y: msg.y || Math.random() * 80 + 10,
+        layer: msg.layer || Math.floor(Math.random() * 3) + 1,
       }))
       .sort(() => Math.random() - 0.5);
   } catch (error) {
@@ -236,6 +235,52 @@ export const getMessageReplies = async (messageId: string): Promise<Message[]> =
 };
 
 /**
+ * 编辑留言
+ * @param messageId 留言ID
+ * @param content 新内容
+ * @returns 更新后的留言
+ */
+export const editMessage = async (messageId: string, content: string): Promise<Message> => {
+  const response = await apiRequest(`/messages/${messageId}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      content,
+    }),
+  });
+
+  return {
+    id: response.id,
+    content: response.content,
+    author: {
+      id: response.author?.id || '',
+      username: response.author?.username || '匿名用户',
+      avatar: response.author?.avatar,
+    },
+    created_at: response.created_at,
+    updated_at: response.updated_at,
+    color: response.color || '#00D9FF',
+    isDanmaku: response.is_danmaku ?? true,
+    likes: response.likes || 0,
+    replies: [],
+    level: response.level || 1,
+    isEdited: true,
+    editedAt: response.updated_at,
+  };
+};
+
+/**
+ * 检查留言是否可编辑（5分钟内）
+ * @param createdAt 创建时间
+ * @returns 是否可编辑
+ */
+export const canEditMessage = (createdAt: string): boolean => {
+  const created = new Date(createdAt).getTime();
+  const now = Date.now();
+  const fiveMinutes = 5 * 60 * 1000;
+  return now - created <= fiveMinutes;
+};
+
+/**
  * 验证留言内容
  * @param content 留言内容
  * @returns 验证结果
@@ -292,5 +337,135 @@ export const getMessageActivity = async (days: number = 7): Promise<{date: strin
   } catch (error) {
     console.error('获取活跃度失败:', error);
     return [];
+  }
+};
+
+/**
+ * 点赞回复
+ * @param replyId 回复ID
+ * @returns 是否成功
+ */
+export const likeReplyMessage = async (replyId: string): Promise<boolean> => {
+  try {
+    await apiRequest(`/messages/replies/${replyId}/like`, {
+      method: 'POST',
+    });
+    return true;
+  } catch (error) {
+    console.error('点赞回复失败:', error);
+    throw error;
+  }
+};
+
+/**
+ * 删除回复
+ * @param replyId 回复ID
+ * @returns 是否成功
+ */
+export const deleteReplyMessage = async (replyId: string): Promise<boolean> => {
+  try {
+    await apiRequest(`/messages/replies/${replyId}`, {
+      method: 'DELETE',
+    });
+    return true;
+  } catch (error) {
+    console.error('删除回复失败:', error);
+    throw error;
+  }
+};
+
+/**
+ * 回复留言（楼中楼）
+ * @param messageId 留言ID
+ * @param content 回复内容
+ * @param parentReplyId 父回复ID（可选，用于多级回复）
+ * @returns 更新后的留言
+ */
+export const replyToMessageWithParent = async (
+  messageId: string,
+  content: string,
+  parentReplyId?: string
+): Promise<Message> => {
+  const response = await apiRequest('/messages/', {
+    method: 'POST',
+    body: JSON.stringify({
+      content,
+      parent_id: messageId,
+      parent_reply_id: parentReplyId,
+      is_danmaku: false,
+    }),
+  });
+
+  return {
+    id: response.id,
+    content: response.content,
+    author: {
+      id: response.author?.id || '',
+      username: response.author?.username || '匿名用户',
+      avatar: response.author?.avatar,
+    },
+    created_at: response.created_at,
+    color: response.color || '#00D9FF',
+    isDanmaku: false,
+    likes: 0,
+    replies: [],
+    level: response.level || 1,
+  };
+};
+
+/**
+ * 置顶留言
+ * @param messageId 留言ID
+ * @param isPinned 是否置顶
+ * @returns 是否成功
+ */
+export const pinMessage = async (messageId: string, isPinned: boolean): Promise<boolean> => {
+  try {
+    await apiRequest(`/messages/${messageId}/pin`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_pinned: isPinned }),
+    });
+    return true;
+  } catch (error) {
+    console.error('置顶留言失败:', error);
+    throw error;
+  }
+};
+
+/**
+ * 设为精华留言
+ * @param messageId 留言ID
+ * @param isFeatured 是否精华
+ * @returns 是否成功
+ */
+export const featureMessage = async (messageId: string, isFeatured: boolean): Promise<boolean> => {
+  try {
+    await apiRequest(`/messages/${messageId}/feature`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_featured: isFeatured }),
+    });
+    return true;
+  } catch (error) {
+    console.error('设置精华失败:', error);
+    throw error;
+  }
+};
+
+/**
+ * 给留言添加/移除标签
+ * @param messageId 留言ID
+ * @param tags 标签列表
+ * @returns 是否成功
+ */
+export const updateMessageTags = async (messageId: string, tags: string[]): Promise<boolean> => {
+  try {
+    await apiRequest(`/messages/${messageId}/tags`, {
+      method: 'PATCH',
+      body: JSON.stringify({ tags }),
+    });
+    return true;
+  } catch (error) {
+    console.error('更新标签失败:', error);
+    throw error;
   }
 };

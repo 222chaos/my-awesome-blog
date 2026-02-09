@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import useThrottle from '@/hooks/useThrottle';
 
-interface HoloCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface HoloCardProps {
   children: React.ReactNode;
   variant?: 'cyan' | 'purple' | 'pink' | 'blue' | 'green';
   tiltStrength?: number;
   glowIntensity?: number;
   scanline?: boolean;
+  className?: string;
 }
 
 const HoloCard = ({
@@ -19,8 +19,7 @@ const HoloCard = ({
   tiltStrength = 5,
   glowIntensity = 0.3,
   scanline = true,
-  className,
-  ...props
+  className
 }: HoloCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -28,7 +27,7 @@ const HoloCard = ({
 
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
-  const scale = useTransform([rotateX, rotateY], (x, y) => isHovered ? 1.02 : 1);
+  const [scale, setScale] = useState(1);
 
   const springConfig = { damping: 25, stiffness: 300 };
   const springRotateX = useSpring(rotateX, springConfig);
@@ -73,7 +72,7 @@ const HoloCard = ({
 
   const colors = variantColors[variant];
 
-  const handleMouseMoveInternal = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
@@ -90,16 +89,16 @@ const HoloCard = ({
     rotateY.set(rotateYVal);
   };
 
-  const handleMouseMove = useThrottle(handleMouseMoveInternal, 16);
-
   const handleMouseLeave = () => {
     setIsHovered(false);
     rotateX.set(0);
     rotateY.set(0);
+    setScale(1);
   };
 
   const handleMouseEnter = () => {
     setIsHovered(true);
+    setScale(1.02);
   };
 
   return (
@@ -122,7 +121,6 @@ const HoloCard = ({
       onMouseMove={!isMobile ? handleMouseMove : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      {...props}
     >
       {scanline && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">

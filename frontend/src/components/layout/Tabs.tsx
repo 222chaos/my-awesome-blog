@@ -195,16 +195,22 @@ export default function Tabs({
       {renderTabs()}
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={animated ? { opacity: 0, x: isVertical ? -10 : 0, y: isVertical ? 0 : 10 } : false}
-          animate={{ opacity: 1, x: 0, y: 0 }}
-          exit={animated ? { opacity: 0, x: isVertical ? 10 : 0, y: isVertical ? 0 : -10 } : false}
-          transition={{ duration: 0.2 }}
-          className={contentClassName}
-        >
-          {activeTabData?.content}
-        </motion.div>
+        {animated ? (
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: isVertical ? -10 : 0, y: isVertical ? 0 : 10 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            exit={{ opacity: 0, x: isVertical ? 10 : 0, y: isVertical ? 0 : -10 }}
+            transition={{ duration: 0.2 }}
+            className={contentClassName}
+          >
+            {activeTabData?.content}
+          </motion.div>
+        ) : (
+          <div key={activeTab} className={contentClassName}>
+            {activeTabData?.content}
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );

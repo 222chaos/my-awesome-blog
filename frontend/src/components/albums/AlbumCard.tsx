@@ -7,23 +7,11 @@ import { cn } from '@/lib/utils';
 import GlassCard from '@/components/ui/GlassCard';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import useThrottle from '@/hooks/useThrottle';
-
-export interface AlbumData {
-  id: string;
-  title: string;
-  description: string;
-  coverImage: string;
-  date: string;
-  featured?: boolean;
-  images: number;
-  category?: string;
-  likes?: number;
-  views?: number;
-}
+import { Album } from '@/types';
 
 interface AlbumCardProps {
-  album: AlbumData;
-  onClick?: (album: AlbumData) => void;
+  album: Album;
+  onClick?: (album: Album) => void;
   className?: string;
   showOverlay?: boolean;
   enableHoverEffect?: boolean;

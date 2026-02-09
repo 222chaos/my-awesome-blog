@@ -1,0 +1,32 @@
+---
+description: 
+alwaysApply: true
+enabled: true
+updatedAt: 2026-02-09T10:35:42.031Z
+provider: 
+---
+
+# 代码质量标准
+
+## 1. 无重复导入
+- 检查并删除重复的 import 语句
+- 确保每个模块只被导入一次
+
+## 2. 无未使用变量
+- 删除未使用的变量、函数、接口
+- 移除仅用于调试的 console.log
+
+## 3. TypeScript 严格模式
+- 所有函数必须有返回类型
+- Props 接口必须完整定义
+- 避免使用 any 类型
+
+## 4. 组件优化
+- 使用 React.memo 优化列表项
+- 合理使用 useMemo 和 useCallback
+- 避免不必要的重渲染
+
+## 5. 代码组织
+- 导入顺序：React -> 第三方 -> 本地 -> 类型
+- 组件文件不超过 300 行
+- 复杂逻辑拆分为自定义 hooks

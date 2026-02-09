@@ -10,19 +10,7 @@ import Lightbox, { LightboxImage } from '@/components/ui/Lightbox';
 import MasonryGallery, { MasonryImage } from '@/components/ui/MasonryGallery';
 import ImageTrail from '@/components/ui/ImageTrail';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-
-interface Album {
-  id: string;
-  title: string;
-  description: string;
-  coverImage: string;
-  date: string;
-  featured?: boolean;
-  images: number;
-  category?: string;
-  likes?: number;
-  views?: number;
-}
+import { Album } from '@/types';
 
 const AlbumsPage = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
