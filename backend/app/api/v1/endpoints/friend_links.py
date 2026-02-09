@@ -135,3 +135,34 @@ def delete_friend_link(
         )
     
     return {"message": "Friend link deleted successfully"}
+
+
+@router.post("/{friend_link_id}/click", response_model=dict)
+def track_friend_link_click(
+    friend_link_id: str,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Track click on a friend link and increment click count
+    """
+    from uuid import UUID
+    try:
+        friend_link_uuid = UUID(friend_link_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend link ID format",
+        )
+    
+    friend_link = crud.get_friend_link(db, friend_link_id=friend_link_uuid)
+    if not friend_link:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Friend link not found",
+        )
+    
+    # Increment click count
+    friend_link.click_count = (friend_link.click_count or 0) + 1
+    db.commit()
+    
+    return {"message": "Click tracked successfully", "click_count": friend_link.click_count}

@@ -19,7 +19,8 @@ class UserBase(BaseModel):
 
 # Create schemas
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=6, max_length=128, description="Password")
+    # 密码最大长度72字节（bcrypt的限制），这里限制字符数为72
+    password: str = Field(..., min_length=8, max_length=72, description="Password (8-72 characters, bcrypt limit)")
 
 
 class UserCreateAdmin(UserCreate):
@@ -30,7 +31,8 @@ class UserCreateAdmin(UserCreate):
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = Field(None, description="User email")
     full_name: Optional[str] = Field(None, max_length=100, description="Full name")
-    password: Optional[str] = Field(None, min_length=6, max_length=128, description="Password")
+    # 密码最大长度72字节（bcrypt的限制）
+    password: Optional[str] = Field(None, min_length=8, max_length=72, description="Password (8-72 characters)")
     avatar: Optional[str] = Field(None, max_length=500, description="Avatar URL")
     bio: Optional[str] = Field(None, description="User bio")
     website: Optional[str] = Field(None, max_length=200, description="Website URL")
@@ -78,5 +80,6 @@ class AvatarResponse(BaseModel):
 
 # Password update schema
 class PasswordUpdate(BaseModel):
-    old_password: str = Field(..., min_length=6, max_length=128, description="旧密码")
-    new_password: str = Field(..., min_length=6, max_length=128, description="新密码")
+    # 密码最大长度72字节（bcrypt的限制）
+    old_password: str = Field(..., min_length=8, max_length=72, description="旧密码 (8-72 characters)")
+    new_password: str = Field(..., min_length=8, max_length=72, description="新密码 (8-72 characters)")

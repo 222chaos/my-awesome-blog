@@ -24,12 +24,23 @@ loguru==0.7.2
 # Environment configuration
 python-dotenv==1.0.0
 
+# Rate limiting
+slowapi==0.1.9
+
+# Monitoring and system info
+psutil==5.9.5
+gputil==1.4.0
+
 # CORS support (built into FastAPI)
 # Optional: SQLite support (built-in, no extra package needed)
 # For development only - production should use PostgreSQL
 
 # Image processing
 Pillow==10.0.1
+
+# File validation and async file operations
+python-magic-bin==0.4.14
+aiofiles==23.2.1
 
 # Redis support
 redis==5.0.1

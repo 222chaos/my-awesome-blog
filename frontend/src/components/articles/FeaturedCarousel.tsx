@@ -1,40 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { ArrowRight, Clock, Eye, Heart } from 'lucide-react';
-
-interface Article {
-  id: string;
-  title: string;
-  excerpt: string;
-  cover_image?: string;
-  view_count: number;
-  likes_count: number;
-  read_time: number;
-  published_at: string;
-  author: {
-    username: string;
-    avatar?: string;
-  };
-  category: {
-    name: string;
-    slug: string;
-  };
-}
+import type { Article } from '@/types';
 
 interface FeaturedCarouselProps {
   articles: Article[];
 }
 
-export default function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
+function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const { getThemeClass } = useThemedClasses();
 
-  const paginate = (newDirection: number) => {
+  const paginate = useCallback((newDirection: number) => {
     setDirection(newDirection);
     setCurrentIndex((prevIndex) => {
       if (newDirection === 1) {
@@ -43,7 +25,12 @@ export default function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
         return prevIndex === 0 ? articles.length - 1 : prevIndex - 1;
       }
     });
-  };
+  }, [articles.length]);
+
+  const handleDotClick = useCallback((index: number) => {
+    setDirection(index > currentIndex ? 1 : -1);
+    setCurrentIndex(index);
+  }, [currentIndex]);
 
   const currentArticle = articles[currentIndex];
 
@@ -191,10 +178,7 @@ export default function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
         {articles.map((_, index) => (
           <button
             key={index}
-            onClick={() => {
-              setDirection(index > currentIndex ? 1 : -1);
-              setCurrentIndex(index);
-            }}
+            onClick={() => handleDotClick(index)}
             className={`w-3 h-3 rounded-full transition-all ${
               index === currentIndex 
                 ? 'bg-tech-cyan w-8' 
@@ -213,3 +197,8 @@ export default function FeaturedCarousel({ articles }: FeaturedCarouselProps) {
     </section>
   );
 }
+
+const FeaturedCarouselWithMemo = memo(FeaturedCarousel);
+FeaturedCarouselWithMemo.displayName = 'FeaturedCarousel';
+
+export default FeaturedCarouselWithMemo;

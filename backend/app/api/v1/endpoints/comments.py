@@ -6,6 +6,7 @@ from app.core.dependencies import get_current_active_user, get_current_superuser
 from app import crud
 from app.schemas.comment import Comment, CommentCreate, CommentUpdate, CommentWithAuthor
 from app.models.user import User
+from app.utils.permission_helpers import check_edit_permission, check_comment_delete_permission
 
 router = APIRouter()
 
@@ -122,12 +123,8 @@ def update_comment(
             detail="Comment not found",
         )
 
-    # Check permission: only author or superuser can update
-    if comment.author_id != current_user.id and not current_user.is_superuser:  # type: ignore
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to update this comment",
-        )
+    # 使用统一的权限检查
+    check_edit_permission(comment, current_user, superuser_bypass=True, resource_name="评论")
 
     comment = crud.update_comment(db, comment_id=comment_uuid, comment_update=comment_in)
     return comment
@@ -156,14 +153,8 @@ def delete_comment(
             detail="Comment not found",
         )
 
-    # Check permission: only author, article author, or superuser can delete
-    if (comment.author_id != current_user.id and
-        comment.article.author_id != current_user.id and
-        not current_user.is_superuser):  # type: ignore
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to delete this comment",
-        )
+    # 使用统一的权限检查（评论作者或文章作者可以删除）
+    check_comment_delete_permission(comment, comment.article, current_user, resource_name="评论")
 
     deleted = crud.delete_comment(db, comment_id=comment_uuid)
     if not deleted:
@@ -184,6 +175,7 @@ def approve_comment(
 ) -> Any:
     """
     Approve a comment (admin or article author only)
+    只能对已发布的文章批准评论
     """
     from sqlalchemy.orm import joinedload
     from uuid import UUID
@@ -198,11 +190,15 @@ def approve_comment(
             detail="Comment not found",
         )
 
-    # Check permission: only article author or superuser can approve
-    if comment.article.author_id != current_user.id and not current_user.is_superuser:  # type: ignore
+    # 使用统一的权限检查（文章作者或超级用户可以批准）
+    from app.utils.permission_helpers import check_approve_permission
+    check_approve_permission(comment.article, current_user, resource_name="评论")
+
+    # 检查文章是否已发布 - 未发布的文章不能批准评论
+    if not comment.article.is_published:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to approve this comment",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot approve comments on unpublished articles",
         )
 
     # Now approve the comment

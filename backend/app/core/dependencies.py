@@ -9,6 +9,8 @@ from app.core.database import get_db
 from app import crud
 import app.models  # Import all models to ensure proper initialization
 from app.models.user import User
+from app.services.cache_service import cache_service
+from app.utils.logger import app_logger
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -22,6 +24,20 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    # 检查令牌是否在黑名单中
+    try:
+        is_blacklisted = await cache_service.exists(f"blacklist:token:{token}")
+        if is_blacklisted:
+            app_logger.warning(f"Attempt to use blacklisted token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except Exception as e:
+        # 如果缓存服务出错，记录但不阻止认证（降级处理）
+        app_logger.error(f"Error checking token blacklist: {str(e)}")
     
     try:
         payload = security.verify_token(token)

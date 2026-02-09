@@ -11,6 +11,14 @@ from app.utils.logger import app_logger
 from app.utils.middleware import RequestLoggingMiddleware
 from app.core.exception_handler import add_exception_handlers
 from app.services.cache_service import cache_service
+from app.utils.rate_limit import add_rate_limit_middleware
+from app.utils.perf_monitor import PerformanceMonitoringMiddleware
+from app.utils.api_docs import customize_openapi
+from app.utils.config_validator import validate_and_log_config
+from app.middleware.request_size_limit import RequestSizeLimitMiddleware
+
+# Validate configuration on startup
+validate_and_log_config()
 
 # Create FastAPI app
 app = FastAPI(
@@ -21,17 +29,31 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# Customize API documentation
+customize_openapi(app)
+
+# Add rate limiting middleware
+add_rate_limit_middleware(app)
+
+# Add performance monitoring middleware
+app.add_middleware(PerformanceMonitoringMiddleware)
+
+# Add request size limit middleware (防止大请求体DoS攻击)
+app.add_middleware(RequestSizeLimitMiddleware)
+
 # Add custom middleware for request logging
 app.add_middleware(RequestLoggingMiddleware)
 
-# Set up CORS
+# Set up CORS - 限制允许的HTTP方法和头部
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.BACKEND_CORS_ORIGINS,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],  # 明确列出允许的HTTP方法
+        allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],  # 限制允许的头部
+        expose_headers=["X-Request-ID"],  # 暴露给客户端的头部
+        max_age=600,  # 预检请求缓存时间（秒）
     )
 
 # Include API router

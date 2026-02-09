@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Grid, List, Sparkles, X } from 'lucide-react';
+import { Search, Filter, Grid, List, Sparkles, X, Keyboard } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 
@@ -17,7 +17,7 @@ interface CommandBarProps {
   onOpenDrawer: () => void;
 }
 
-export default function CommandBar({
+function CommandBar({
   categories,
   tags,
   onCategoryChange,
@@ -33,21 +33,57 @@ export default function CommandBar({
   const searchParams = useSearchParams();
   const { getThemeClass } = useThemedClasses();
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
     onSearchChange(query);
-  };
+  }, [onSearchChange]);
 
-  const handleCategoryClick = (categoryId: string | null) => {
+  const handleCategoryClick = useCallback((categoryId: string | null) => {
     onCategoryChange(categoryId);
     setFilterOpen(false);
-  };
+  }, [onCategoryChange]);
 
-  const handleTagClick = (tagId: string | null) => {
+  const handleTagClick = useCallback((tagId: string | null) => {
     onTagChange(tagId);
     setFilterOpen(false);
-  };
+  }, [onTagChange]);
+
+  const clearFilters = useCallback(() => {
+    handleCategoryClick(null);
+    handleTagClick(null);
+  }, [handleCategoryClick, handleTagClick]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        setFilterOpen(true);
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
+        e.preventDefault();
+        onViewToggle(currentView === 'grid' ? 'list' : 'grid');
+      }
+
+      if (e.key === 'Escape') {
+        if (searchOpen) {
+          setSearchOpen(false);
+        }
+        if (filterOpen) {
+          setFilterOpen(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen, filterOpen, currentView, onViewToggle]);
 
   const activeCategory = categories.find(c => c.id === searchParams?.get('category'));
   const activeTag = tags.find(t => t.id === searchParams?.get('tag'));
@@ -67,11 +103,14 @@ export default function CommandBar({
               'bg-white/90'
             )}
           `}
+          role="toolbar"
+          aria-label="文章操作工具栏"
         >
           <button
             onClick={() => setSearchOpen(true)}
             className="p-2 rounded-full hover:bg-white/10 transition-all active:scale-95"
-            aria-label="搜索"
+            aria-label="搜索文章 (Ctrl+K)"
+            title="搜索文章 (Ctrl+K)"
           >
             <Search className={`w-5 h-5 ${getThemeClass('text-white', 'text-gray-800')}`} />
           </button>
@@ -79,9 +118,10 @@ export default function CommandBar({
           <div className="h-6 w-px bg-white/20" />
 
           <button
-            onClick={() => setFilterOpen(!filterOpen)}
+            onClick={() => setFilterOpen(true)}
             className="p-2 rounded-full hover:bg-white/10 transition-all active:scale-95"
-            aria-label="筛选"
+            aria-label="筛选文章 (Ctrl+F)"
+            title="筛选文章 (Ctrl+F)"
           >
             <Filter className={`w-5 h-5 ${getThemeClass('text-white', 'text-gray-800')}`} />
           </button>
@@ -91,7 +131,8 @@ export default function CommandBar({
           <button
             onClick={() => onViewToggle(currentView === 'grid' ? 'list' : 'grid')}
             className="p-2 rounded-full hover:bg-white/10 transition-all active:scale-95"
-            aria-label="切换视图"
+            aria-label={`切换视图模式，当前为${currentView === 'grid' ? '网格' : '列表'} (Ctrl+V)`}
+            title={`切换视图模式 (Ctrl+V)`}
           >
             {currentView === 'grid' ? (
               <List className={`w-5 h-5 ${getThemeClass('text-white', 'text-gray-800')}`} />
@@ -108,10 +149,7 @@ export default function CommandBar({
                   {activeCategory?.name || activeTag?.name}
                 </span>
                 <button
-                  onClick={() => {
-                    activeCategory && handleCategoryClick(null);
-                    activeTag && handleTagClick(null);
-                  }}
+                  onClick={clearFilters}
                   className="p-1 rounded-full hover:bg-white/10 transition-all"
                   aria-label="清除筛选"
                 >
@@ -124,7 +162,7 @@ export default function CommandBar({
           <button
             onClick={onOpenDrawer}
             className="p-2 rounded-full bg-[#EC4899] hover:bg-[#EC4899]/90 transition-all active:scale-95 shadow-[0_0_15px_rgba(236,72,153,0.5)]"
-            aria-label="探索更多"
+            aria-label="打开侧边栏查看更多选项"
           >
             <Sparkles className="w-5 h-5 text-white" />
           </button>
@@ -139,6 +177,9 @@ export default function CommandBar({
             exit={{ opacity: 0, scale: 0.9 }}
             onClick={() => setSearchOpen(false)}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] flex items-start justify-center pt-24"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="search-title"
           >
             <motion.div
               onClick={e => e.stopPropagation()}
@@ -155,12 +196,19 @@ export default function CommandBar({
               `}
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className={`text-xl font-bold ${getThemeClass('text-white', 'text-gray-900')}`}>
-                  搜索文章
-                </h2>
+                <div className="flex items-center gap-3">
+                  <h2 id="search-title" className={`text-xl font-bold ${getThemeClass('text-white', 'text-gray-900')}`}>
+                    搜索文章
+                  </h2>
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <Keyboard className="w-4 h-4" />
+                    <kbd className="px-2 py-1 rounded bg-white/20 font-mono">Ctrl+K</kbd>
+                  </div>
+                </div>
                 <button
                   onClick={() => setSearchOpen(false)}
                   className="p-2 rounded-full hover:bg-white/10 transition-all"
+                  aria-label="关闭搜索"
                 >
                   <X className={`w-5 h-5 ${getThemeClass('text-white', 'text-gray-800')}`} />
                 </button>
@@ -181,6 +229,8 @@ export default function CommandBar({
                     )}
                     focus:outline-none focus:ring-2 focus:ring-[#EC4899]
                   `}
+                  aria-label="搜索输入框"
+                  id="search-input"
                 />
                 <Search className={`absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 ${getThemeClass('text-white/50', 'text-gray-500')}`} />
               </div>
@@ -209,6 +259,9 @@ export default function CommandBar({
             exit={{ opacity: 0, x: 400 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             className="fixed right-0 top-0 h-full w-full md:w-[400px] z-[110]"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="filter-title"
           >
             <div className={`
               h-full w-full backdrop-blur-xl
@@ -219,12 +272,19 @@ export default function CommandBar({
             `}>
               <div className="p-6 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className={`text-2xl font-bold ${getThemeClass('text-white', 'text-gray-900')}`}>
-                    筛选
-                  </h2>
+                  <div className="flex items-center gap-3">
+                    <h2 id="filter-title" className={`text-2xl font-bold ${getThemeClass('text-white', 'text-gray-900')}`}>
+                      筛选
+                    </h2>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <Keyboard className="w-4 h-4" />
+                      <kbd className="px-2 py-1 rounded bg-white/20 font-mono">Ctrl+F</kbd>
+                    </div>
+                  </div>
                   <button
                     onClick={() => setFilterOpen(false)}
                     className="p-2 rounded-full hover:bg-white/10 transition-all"
+                    aria-label="关闭筛选"
                   >
                     <X className={`w-5 h-5 ${getThemeClass('text-white', 'text-gray-800')}`} />
                   </button>
@@ -235,7 +295,7 @@ export default function CommandBar({
                     <h3 className={`text-sm font-semibold mb-4 uppercase tracking-wider ${getThemeClass('text-[#EC4899]', 'text-pink-600')}`}>
                       分类
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-2" role="radiogroup" aria-label="文章分类">
                       <button
                         onClick={() => handleCategoryClick(null)}
                         className={`
@@ -245,6 +305,9 @@ export default function CommandBar({
                             : getThemeClass('hover:bg-white/10 text-white', 'hover:bg-gray-200 text-gray-800')
                           }
                         `}
+                        role="radio"
+                        aria-checked={!activeCategory}
+                        aria-label="全部分类"
                       >
                         全部分类
                       </button>
@@ -259,6 +322,9 @@ export default function CommandBar({
                               : getThemeClass('hover:bg-white/10 text-white', 'hover:bg-gray-200 text-gray-800')
                             }
                           `}
+                          role="radio"
+                          aria-checked={activeCategory?.id === category.id}
+                          aria-label={`分类: ${category.name}`}
                         >
                           {category.name}
                         </button>
@@ -270,7 +336,7 @@ export default function CommandBar({
                     <h3 className={`text-sm font-semibold mb-4 uppercase tracking-wider ${getThemeClass('text-[#EC4899]', 'text-pink-600')}`}>
                       热门标签
                     </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2" role="group" aria-label="文章标签">
                       {tags.slice(0, 10).map(tag => (
                         <button
                           key={tag.id}
@@ -285,6 +351,9 @@ export default function CommandBar({
                                 )
                             }
                           `}
+                          role="checkbox"
+                          aria-checked={activeTag?.id === tag.id}
+                          aria-label={`标签: ${tag.name}`}
                         >
                           {tag.name}
                         </button>
@@ -299,6 +368,7 @@ export default function CommandBar({
                     handleTagClick(null);
                   }}
                   className="w-full py-3 rounded-lg border border-white/20 hover:bg-white/10 transition-all"
+                  aria-label="清除所有筛选条件"
                 >
                   清除所有筛选
                 </button>
@@ -310,3 +380,8 @@ export default function CommandBar({
     </>
   );
 }
+
+const CommandBarWithMemo = memo(CommandBar);
+CommandBarWithMemo.displayName = 'CommandBar';
+
+export default CommandBarWithMemo;

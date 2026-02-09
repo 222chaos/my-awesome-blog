@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, Heart, MessageSquare, BarChart2,
@@ -30,6 +30,17 @@ import ReportDialog from '@/components/messages/ReportDialog';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
+
+const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): ((...args: Parameters<T>) => void) => {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
 
 type FilterType = 'all' | 'danmaku' | 'latest' | 'popular';
 type SortType = 'time' | 'likes';
@@ -104,8 +115,12 @@ export default function MessagesPage() {
   };
 
   // Filter and sort messages
-  const filteredMessages = useCallback(() => {
+  const filteredMessages = useMemo(() => {
     let filtered = [...messages];
+
+    if (filterType === 'popular') {
+      return trendingMessages;
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -126,24 +141,20 @@ export default function MessagesPage() {
       filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
 
-    if (filterType === 'popular') {
-      filtered = trendingMessages;
-    }
-
     return filtered;
   }, [messages, filterType, sortType, trendingMessages, searchQuery]);
 
   // Pagination
-  const paginatedMessages = useCallback(() => {
+  const paginatedMessages = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return filteredMessages().slice(startIndex, endIndex);
+    return filteredMessages.slice(startIndex, endIndex);
   }, [filteredMessages, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(filteredMessages().length / itemsPerPage);
+  const totalPages = Math.ceil(filteredMessages.length / itemsPerPage);
 
   // Convert messages to danmaku format
-  const danmakuMessages = useCallback(() => {
+  const danmakuMessages = useMemo(() => {
     return messages
       .filter(m => m.isDanmaku)
       .map(m => ({
@@ -278,10 +289,10 @@ export default function MessagesPage() {
   };
 
   // Search handler
-  const handleSearch = (query: string) => {
+  const handleSearch = debounce((query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
-  };
+  }, 300);
 
   const handleMessageChange = (value: string) => {
     setNewMessage(value);

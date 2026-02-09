@@ -1,4 +1,7 @@
-// API基础URL配置
-// 开发环境默认使用本地后端服务
-// 后端端口固定为 8989，请勿修改
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8989/api/v1';
+import { env } from '@/lib/env';
+
+export const API_BASE_URL = env.NEXT_PUBLIC_API_URL || env.NEXT_PUBLIC_API_BASE_URL;
+export const SITE_URL = env.NEXT_PUBLIC_SITE_URL;
+export const IS_DEVELOPMENT = env.NODE_ENV === 'development';
+export const IS_PRODUCTION = env.NODE_ENV === 'production';
+export const POSTS_PER_PAGE = parseInt(env.NEXT_PUBLIC_POSTS_PER_PAGE, 10);

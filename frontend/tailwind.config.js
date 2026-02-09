@@ -123,6 +123,10 @@ export default {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: 0 },
         },
+        'rainbow-hue': {
+          '0%, 100%': { '--rainbow-hue': '0deg' },
+          '100%': { '--rainbow-hue': '360deg' },
+        },
         'glass-float': {
           '0%, 100%': { transform: 'translateY(0)', 'will-change': 'transform' },
           '50%': { transform: 'translateY(-10px)', 'will-change': 'transform' },
@@ -206,6 +210,10 @@ export default {
           '0%': { filter: 'hue-rotate(0deg)', 'will-change': 'filter' },
           '100%': { filter: 'hue-rotate(360deg)', 'will-change': 'filter' },
         },
+        'rainbow-hue': {
+          '0%, 100%': { '--rainbow-hue': '0deg' },
+          '100%': { '--rainbow-hue': '360deg' },
+        },
         'level-glow': {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(255,255,255,0)', 'will-change': 'box-shadow' },
           '50%': { boxShadow: '0 0 0 8px rgba(255,255,255,0.3)', 'will-change': 'box-shadow' },
@@ -237,6 +245,7 @@ export default {
         'particle-explode': 'particle-explode 0.8s ease-out forwards',
         'tech-border': 'tech-border 2s ease-in-out infinite',
         'rainbow-shift': 'rainbow-shift 3s linear infinite',
+        'rainbow-hue': 'rainbow-hue 3s linear infinite',
         'level-glow': 'level-glow 2s ease-in-out infinite',
       },
       transitionProperty: {

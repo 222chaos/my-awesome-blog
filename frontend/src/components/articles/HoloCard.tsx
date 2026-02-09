@@ -1,31 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { Eye, Heart, Clock, BookOpen, ArrowRight } from 'lucide-react';
+import { Eye, Heart, Clock, ArrowRight } from 'lucide-react';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-
-interface Article {
-  id: string;
-  title: string;
-  excerpt: string;
-  cover_image?: string;
-  view_count: number;
-  likes_count: number;
-  comments_count: number;
-  read_time: number;
-  published_at: string;
-  author: {
-    username: string;
-    avatar?: string;
-  };
-  categories?: Array<{
-    id: string;
-    name: string;
-  }>;
-  tags?: Array<{ id: string; name: string }>;
-}
+import type { Article } from '@/types';
 
 interface HoloCardProps {
   article: Article;
@@ -33,11 +13,19 @@ interface HoloCardProps {
   className?: string;
 }
 
-export default function HoloCard({ article, isFeatured = false, className }: HoloCardProps) {
+function HoloCard({ article, isFeatured = false, className }: HoloCardProps) {
   const { getThemeClass } = useThemedClasses();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const cardSize = isFeatured ? 'lg:col-span-2 lg:row-span-2' : '';
+
+  const handleExpand = useCallback(() => {
+    setIsExpanded(true);
+  }, []);
+
+  const handleCollapse = useCallback(() => {
+    setIsExpanded(false);
+  }, []);
 
   return (
     <>
@@ -130,7 +118,7 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
               <button
                 onClick={e => {
                   e.preventDefault();
-                  setIsExpanded(true);
+                  handleExpand();
                 }}
                 className="p-2 rounded-full bg-white/20 hover:bg-white/30 hover:scale-110 active:scale-95 backdrop-blur-sm transition-all duration-200"
               >
@@ -147,7 +135,7 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsExpanded(false)}
+            onClick={handleCollapse}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
             <motion.div
@@ -183,7 +171,7 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
                     </div>
                   </div>
                   <button
-                    onClick={() => setIsExpanded(false)}
+                    onClick={handleCollapse}
                     className="p-2 rounded-full hover:bg-white/10 transition-all"
                   >
                     <svg className={`w-6 h-6 ${getThemeClass('text-white', 'text-gray-800')}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -257,3 +245,8 @@ export default function HoloCard({ article, isFeatured = false, className }: Hol
     </>
   );
 }
+
+const HoloCardWithMemo = memo(HoloCard);
+HoloCardWithMemo.displayName = 'HoloCard';
+
+export default HoloCardWithMemo;

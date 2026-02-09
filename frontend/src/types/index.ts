@@ -11,27 +11,6 @@ export interface Post {
   comments?: number;
 }
 
-// 分类类型
-export interface Category {
-  name: string;
-  count: number;
-}
-
-// 后端分类类型（带文章数）
-export interface BackendCategoryWithCount {
-  id: string;
-  name: string;
-  article_count: number;
-  is_active: boolean;
-  description?: string;
-}
-
-// 标签类型
-export interface Tag {
-  name: string;
-  count: number;
-}
-
 // 友情链接类型
 export interface FriendLink {
   id: string;
@@ -206,4 +185,93 @@ export interface BackendArticleWithAuthor {
     username: string;
     avatar?: string;
   };
+}
+
+// 文章数据类型
+export interface Article {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  is_published: boolean;
+  view_count: number;
+  created_at: string;
+  updated_at: string;
+  published_at: string;
+  author_id: string;
+  category_id?: string;
+  cover_image?: string;
+  read_time: number;
+  likes_count: number;
+  comments_count: number;
+  shares_count: number;
+  author: {
+    id: string;
+    username: string;
+    email: string;
+    avatar?: string;
+    bio?: string;
+    reputation?: number;
+    followers_count?: number;
+  };
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+  };
+  categories?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+  }>;
+  tags: Array<{
+    id: string;
+    name: string;
+    slug: string;
+  }>;
+}
+
+// 分类类型
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  article_count: number;
+}
+
+// 标签类型
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  article_count: number;
+}
+
+// 评论类型
+export interface Comment {
+  id: string;
+  content: string;
+  author: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
+  createdAt: string;
+  likes: number;
+  replies?: Comment[];
+}
+
+// 相关文章类型
+export interface RelatedArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  published_at: string;
+  category: {
+    name: string;
+  };
+  view_count: number;
 }

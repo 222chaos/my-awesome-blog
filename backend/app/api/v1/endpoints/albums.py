@@ -116,3 +116,52 @@ def read_featured_albums(
         albums.append(album)
     
     return albums
+
+
+@router.get("/{album_id}/images", response_model=List[dict])
+def read_album_images(
+    album_id: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get images for a specific album
+    """
+    from uuid import UUID
+    try:
+        album_uuid = UUID(album_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid album ID format",
+        )
+    
+    portfolio = crud.get_portfolio(db, portfolio_id=album_uuid)
+    if not portfolio:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Album not found",
+        )
+    
+    # Return portfolio images as album images
+    # If portfolio has images in a related table, fetch them
+    images = []
+    if hasattr(portfolio, 'images') and portfolio.images:
+        for idx, img in enumerate(portfolio.images[skip:skip+limit]):
+            images.append({
+                "id": str(img.id) if hasattr(img, 'id') else f"{album_id}_{idx}",
+                "url": img.url if hasattr(img, 'url') else img,
+                "caption": img.caption if hasattr(img, 'caption') else None,
+                "sortOrder": img.sort_order if hasattr(img, 'sort_order') else idx,
+            })
+    else:
+        # Fallback: return the cover image as a single image
+        images = [{
+            "id": f"{album_id}_0",
+            "url": portfolio.cover_image or "/assets/placeholder.jpg",
+            "caption": portfolio.title,
+            "sortOrder": 0,
+        }]
+    
+    return images

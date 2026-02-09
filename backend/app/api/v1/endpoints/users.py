@@ -1,14 +1,19 @@
 from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile
 from sqlalchemy.orm import Session
-import os
 from app.core.database import get_db
-from app.core.dependencies import get_current_active_user
+from app.core.dependencies import get_current_active_user, get_current_superuser
 from app import crud
 from app.crud.user import get_user_stats
 from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse, PasswordUpdate
 from app.models.user import User as UserModel
 from app.services.oss_service import oss_service
+from app.utils.file_validation import (
+    save_upload_file_temp, 
+    cleanup_temp_file, 
+    FileValidationError
+)
+from app.utils.logger import app_logger
 
 try:
     from app.services.image_service import ImageService
@@ -21,11 +26,13 @@ router = APIRouter()
 
 @router.get("/admin", response_model=User)
 def get_admin_user(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)  # 添加认证要求
 ) -> Any:
     """
     Get admin/superuser information for public display
     Returns the first superuser found
+    Requires authentication
     """
     from sqlalchemy.orm import Session
 
@@ -42,10 +49,11 @@ def get_admin_user(
 def read_users(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_superuser)  # 添加管理员权限要求
 ) -> Any:
     """
-    Retrieve users
+    Retrieve users (admin only)
     """
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
@@ -55,7 +63,8 @@ def read_users(
 def create_user(
     *,
     db: Session = Depends(get_db),
-    user_in: UserCreate
+    user_in: UserCreate,
+    current_user: UserModel = Depends(get_current_superuser)  # 添加管理员权限要求
 ) -> Any:
     """
     Create new user (admin only)
@@ -76,6 +85,7 @@ def create_user(
         )
 
     user = crud.create_user(db, user=user_in)
+    app_logger.info(f"Admin created new user: {user.username} (ID: {user.id})")
     return user
 
 
@@ -103,11 +113,12 @@ def update_current_user(
     Update current user's profile
     """
     user = crud.update_user(db, user_id=current_user.id, user_update=user_in)
+    app_logger.info(f"User updated profile: {current_user.username} (ID: {current_user.id})")
     return user
 
 
 @router.post("/me/avatar", response_model=AvatarResponse)
-def upload_current_user_avatar(
+async def upload_current_user_avatar(
     *,
     db: Session = Depends(get_db),
     file: UploadFile = File(...),
@@ -115,9 +126,8 @@ def upload_current_user_avatar(
 ) -> Any:
     """
     Upload current user's avatar
+    使用安全的文件验证流程
     """
-    from app.utils.logger import app_logger
-    
     app_logger.info(f"Starting avatar upload for user: {current_user.id}, file: {file.filename}")
     
     # Check if ImageService is available
@@ -127,40 +137,21 @@ def upload_current_user_avatar(
             detail="Avatar upload is currently unavailable due to missing image processing library. Please contact administrator."
         )
     
-    # Check if file is an allowed image type
-    allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
-    file_extension = os.path.splitext(file.filename)[1].lower()
-    if file_extension not in allowed_extensions:
-        app_logger.error(f"File type {file_extension} not allowed for user {current_user.id}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"File type {file_extension} not allowed. Allowed types: {allowed_extensions}"
-        )
-    
-    # Use ImageService to process avatar
-    image_service = ImageService()
-
-    # Save uploaded file temporarily
-    temp_file_path = f"temp_avatar_{file.filename}"
+    temp_file_path = None
     try:
-        with open(temp_file_path, "wb") as buffer:
-            # Read file content in chunks to handle large files
-            while content := file.file.read(1024 * 1024):  # 1MB chunks
-                buffer.write(content)
-    except Exception as e:
-        app_logger.error(f"Error saving temporary file: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error saving uploaded file"
-        )
-
-    try:
+        # 使用安全的文件验证保存
+        temp_file_path = await save_upload_file_temp(file)
+        app_logger.info(f"File saved temporarily: {temp_file_path}")
+        
+        # Use ImageService to process avatar
+        image_service = ImageService()
+        
         # Validate image format
         if not image_service.validate_image_format(temp_file_path):
             app_logger.error(f"Invalid image format for user {current_user.id}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid image format. Supported formats: JPEG, PNG, WEBP, GIF"
+                detail="Invalid image format. Supported formats: JPEG, PNG, WEBP, GIF"
             )
         
         # Get image info
@@ -189,27 +180,31 @@ def upload_current_user_avatar(
                 detail="Failed to update user avatar in database"
             )
 
-        # Clean up temporary file
-        os.remove(temp_file_path)
-        
         app_logger.info(f"Avatar uploaded successfully for user {current_user.id}, URL: {avatar_url}")
 
         return AvatarResponse(
             avatar_url=avatar_url,
             message="Avatar uploaded successfully"
         )
+        
+    except FileValidationError as e:
+        app_logger.error(f"File validation error for user {current_user.id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e.detail)
+        )
     except HTTPException:
-        # Re-raise HTTP exceptions as-is
         raise
     except Exception as e:
         app_logger.error(f"Unexpected error processing avatar for user {current_user.id}: {str(e)}")
-        # Clean up temporary file in case of error
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing avatar: {str(e)}"
         )
+    finally:
+        # 确保临时文件被清理
+        if temp_file_path:
+            cleanup_temp_file(temp_file_path)
 
 
 @router.get("/me/stats", response_model=UserStats)
@@ -255,16 +250,19 @@ def update_password(
             detail="旧密码错误或密码更新失败"
         )
     
+    app_logger.info(f"User updated password: {current_user.username} (ID: {current_user.id})")
     return {"message": "密码更新成功"}
 
 
 @router.get("/{user_id}", response_model=User)
 def read_user_by_id(
     user_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)  # 添加认证要求
 ) -> Any:
     """
     Get a specific user by id
+    Requires authentication
     """
     from uuid import UUID
     user_uuid = UUID(user_id)
@@ -282,10 +280,11 @@ def update_user(
     *,
     db: Session = Depends(get_db),
     user_id: str,
-    user_in: UserUpdate
+    user_in: UserUpdate,
+    current_user: UserModel = Depends(get_current_superuser)  # 添加管理员权限要求
 ) -> Any:
     """
-    Update a user
+    Update a user (admin only)
     """
     from uuid import UUID
     user_uuid = UUID(user_id)
@@ -297,6 +296,7 @@ def update_user(
         )
 
     user = crud.update_user(db, user_id=user_uuid, user_update=user_in)
+    app_logger.info(f"Admin updated user: {user.username} (ID: {user.id})")
     return user
 
 
@@ -304,13 +304,29 @@ def update_user(
 def delete_user(
     *,
     db: Session = Depends(get_db),
-    user_id: str
+    user_id: str,
+    current_user: UserModel = Depends(get_current_superuser)  # 添加管理员权限要求
 ) -> Any:
     """
-    Delete a user
+    Delete a user (admin only)
     """
     from uuid import UUID
     user_uuid = UUID(user_id)
+    
+    # 防止删除自己
+    if str(current_user.id) == user_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete your own account"
+        )
+    
+    user = crud.get_user(db, user_id=user_uuid)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    
     deleted = crud.delete_user(db, user_id=user_uuid)
     if not deleted:
         raise HTTPException(
@@ -318,4 +334,5 @@ def delete_user(
             detail="User not found",
         )
 
+    app_logger.info(f"Admin deleted user: {user.username} (ID: {user.id})")
     return {"message": "User deleted successfully"}

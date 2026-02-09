@@ -247,19 +247,19 @@ const AlbumsPage = () => {
           transition={{ duration: 0.5 }}
           className="mb-12"
         >
-          <div className="relative p-6 sm:p-10 rounded-3xl overflow-hidden min-h-[450px]">
+          <div className="relative p-6 sm:p-10 rounded-3xl min-h-[450px]">
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-tech-cyan/20 rounded-full blur-3xl" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20" />
-            
-            <div className="absolute inset-0 z-0 overflow-hidden h-full w-full">
-              <ImageTrail 
+
+            <div className="absolute inset-0 z-0 overflow-visible min-h-[450px] w-full">
+              <ImageTrail
                 items={albums.map(album => album.coverImage)}
                 variant={3}
               />
             </div>
             
-            <div className="relative z-20 text-center min-h-[400px] flex flex-col justify-center items-center">
+            <div className="relative z-10 text-center min-h-[400px] flex flex-col justify-center items-center">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}

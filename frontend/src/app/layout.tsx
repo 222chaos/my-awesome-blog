@@ -7,6 +7,8 @@ import ThemeWrapper from '@/components/theme-wrapper';
 import { LoadingProvider } from '@/context/loading-context';
 import LoadingHandler from '@/components/loading/LoadingHandler';
 import { Toaster } from '@/components/ui/toaster';
+import { env } from '@/lib/env';
+import ErrorBoundary from '@/components/error/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' });
@@ -15,21 +17,24 @@ const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
 export const metadata: Metadata = {
   title: '我的优秀博客',
   description: '一个现代的企业级个人博客',
+  generator: 'Next.js',
+  metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
 };
 
-// 创建一个客户端包装组件来处理加载状态显示
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <LoadingProvider>
-      <ThemeWrapper>
-        <Navbar />
-        <main className="bg-background min-h-screen">
-          <LoadingHandler>{children}</LoadingHandler>
-        </main>
-        <Footer />
-        <Toaster />
-      </ThemeWrapper>
-    </LoadingProvider>
+    <ErrorBoundary>
+      <LoadingProvider>
+        <ThemeWrapper>
+          <Navbar />
+          <main className="bg-background min-h-screen">
+            <LoadingHandler>{children}</LoadingHandler>
+          </main>
+          <Footer />
+          <Toaster />
+        </ThemeWrapper>
+      </LoadingProvider>
+    </ErrorBoundary>
   );
 };
 
@@ -39,7 +44,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme') || 'auto';
+                  const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {
+                  console.error('Error setting initial theme:', e);
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={`${inter.variable} ${syne.variable} ${manrope.variable} font-sans bg-background`}>
         <ClientLayout>{children}</ClientLayout>
       </body>

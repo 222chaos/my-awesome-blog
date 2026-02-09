@@ -77,6 +77,17 @@ def unsubscribe(
     return {"message": "取消订阅成功"}
 
 
+@router.get("/count", response_model=int)
+def get_subscribers_count(
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Get total number of subscribers
+    """
+    count = crud.get_subscribers_count(db)
+    return count
+
+
 @router.get("/{subscription_id}", response_model=Subscription)
 def read_subscription_by_id(
     subscription_id: str,
@@ -173,14 +184,3 @@ def delete_subscription(
         )
     
     return {"message": "Subscription deleted successfully"}
-
-
-@router.get("/count", response_model=int)
-def get_subscribers_count(
-    db: Session = Depends(get_db)
-) -> Any:
-    """
-    Get total number of subscribers
-    """
-    count = crud.get_subscribers_count(db)
-    return count

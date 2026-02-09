@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import useThrottle from '@/hooks/useThrottle';
 
 interface HoloCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ interface HoloCardProps extends React.HTMLAttributes<HTMLDivElement> {
 const HoloCard = ({
   children,
   variant = 'cyan',
-  tiltStrength = 10,
+  tiltStrength = 5,
   glowIntensity = 0.3,
   scanline = true,
   className,
@@ -23,6 +24,7 @@ const HoloCard = ({
 }: HoloCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
@@ -31,6 +33,15 @@ const HoloCard = ({
   const springConfig = { damping: 25, stiffness: 300 };
   const springRotateX = useSpring(rotateX, springConfig);
   const springRotateY = useSpring(rotateY, springConfig);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const variantColors = {
     cyan: {
@@ -62,7 +73,7 @@ const HoloCard = ({
 
   const colors = variantColors[variant];
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMoveInternal = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
@@ -78,6 +89,8 @@ const HoloCard = ({
     rotateX.set(rotateXVal);
     rotateY.set(rotateYVal);
   };
+
+  const handleMouseMove = useThrottle(handleMouseMoveInternal, 16);
 
   const handleMouseLeave = () => {
     setIsHovered(false);
@@ -97,16 +110,16 @@ const HoloCard = ({
         colors.border,
         colors.bg,
         colors.glow,
-        className
+        !isMobile && "will-change-transform"
       )}
       style={{
-        rotateX: springRotateX,
-        rotateY: springRotateY,
-        scale,
-        transformStyle: 'preserve-3d',
-        perspective: 1000
+        rotateX: !isMobile ? springRotateX : 0,
+        rotateY: !isMobile ? springRotateY : 0,
+        scale: isMobile ? 1 : scale,
+        transformStyle: isMobile ? undefined : 'preserve-3d',
+        perspective: isMobile ? undefined : 1000
       }}
-      onMouseMove={handleMouseMove}
+      onMouseMove={!isMobile ? handleMouseMove : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}

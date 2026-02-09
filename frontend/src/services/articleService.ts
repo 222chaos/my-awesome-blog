@@ -1,75 +1,6 @@
 import { API_BASE_URL } from '@/config/api';
-
-// 文章数据类型
-export interface Article {
-  id: string;
-  title: string;
-  content: string;
-  excerpt: string;
-  is_published: boolean;
-  view_count: number;
-  created_at: string;
-  updated_at: string;
-  published_at: string | null;
-  author_id: string;
-  cover_image?: string;
-  read_time: number; // 阅读时间（分钟）
-  likes_count: number; // 点赞数
-  comments_count: number; // 评论数
-  shares_count: number; // 分享数
-  author: {
-    id: string;
-    username: string;
-    email: string;
-    avatar?: string;
-    bio?: string;
-    reputation?: number; // 声誉分数
-    followers_count?: number; // 关注者数量
-  };
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-  };
-  categories?: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-  }>;
-  tags: Array<{
-    id: string;
-    name: string;
-    slug: string;
-  }>;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  article_count: number; // 分类文章数量
-}
-
-export interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  article_count: number; // 标签文章数量
-}
-
-export interface RelatedArticle {
-  id: string;
-  title: string;
-  excerpt: string;
-  published_at: string;
-  category: {
-    name: string;
-  };
-  view_count: number;
-}
+import logger from '@/utils/logger';
+export type { Article, Category, Tag, RelatedArticle } from '@/types';
 
 // 通用请求函数
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
@@ -100,7 +31,6 @@ export const getArticles = async (filters?: {
   tag?: string;
   search?: string;
 }): Promise<Article[]> => {
-  // 构建查询参数
   const params = new URLSearchParams();
   if (filters?.category) params.append('category_id', filters.category);
   if (filters?.tag) params.append('tag_id', filters.tag);
@@ -117,7 +47,7 @@ export const getArticleById = async (id: string): Promise<Article | null> => {
   try {
     return await apiRequest(`/articles/${id}`);
   } catch (error) {
-    console.error(`获取文章 ${id} 失败:`, error);
+    logger.error(`获取文章 ${id} 失败:`, error);
     return null;
   }
 };
@@ -127,7 +57,7 @@ export const getArticleBySlug = async (slug: string): Promise<Article | null> =>
   try {
     return await apiRequest(`/articles/slug/${slug}`);
   } catch (error) {
-    console.error(`获取文章 ${slug} 失败:`, error);
+    logger.error(`获取文章 ${slug} 失败:`, error);
     return null;
   }
 };
@@ -137,7 +67,7 @@ export const getRelatedArticles = async (articleId: string): Promise<RelatedArti
   try {
     return await apiRequest(`/articles/related/${articleId}`);
   } catch (error) {
-    console.error('获取相关文章失败:', error);
+    logger.error('获取相关文章失败:', error);
     return [];
   }
 };
@@ -147,7 +77,7 @@ export const getCategories = async (): Promise<Category[]> => {
   try {
     return await apiRequest('/categories/');
   } catch (error) {
-    console.error('获取分类列表失败:', error);
+    logger.error('获取分类列表失败:', error);
     return [];
   }
 };
@@ -157,7 +87,7 @@ export const getTags = async (): Promise<Tag[]> => {
   try {
     return await apiRequest('/tags/');
   } catch (error) {
-    console.error('获取标签列表失败:', error);
+    logger.error('获取标签列表失败:', error);
     return [];
   }
 };
@@ -167,7 +97,7 @@ export const getFeaturedArticles = async (limit: number = 5): Promise<Article[]>
   try {
     return await apiRequest(`/articles/featured?limit=${limit}`);
   } catch (error) {
-    console.error('获取精选文章失败:', error);
+    logger.error('获取精选文章失败:', error);
     return [];
   }
 };
@@ -177,7 +107,7 @@ export const getPopularArticles = async (limit: number = 10): Promise<Article[]>
   try {
     return await apiRequest(`/articles/popular?limit=${limit}`);
   } catch (error) {
-    console.error('获取热门文章失败:', error);
+    logger.error('获取热门文章失败:', error);
     return [];
   }
 };
@@ -195,7 +125,7 @@ export const searchArticles = async (query: string, filters?: {
 
     return await apiRequest(`/articles/search?${params.toString()}`);
   } catch (error) {
-    console.error('搜索文章失败:', error);
+    logger.error('搜索文章失败:', error);
     return [];
   }
 };

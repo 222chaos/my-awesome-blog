@@ -1,31 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, TrendingUp, Users, Tag, X, Clock } from 'lucide-react';
+import { Calendar, TrendingUp, Users, X, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  article_count: number;
-}
-
-interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  article_count: number;
-}
-
-interface Article {
-  id: string;
-  title: string;
-  view_count: number;
-  published_at: string;
-}
+import type { Category, Tag, Article } from '@/types';
+import { getTotalArticleCount } from '@/utils/articleHelpers';
+import { formatMonthYear } from '@/utils/dateFormat';
 
 interface ArchiveDrawerProps {
   isOpen: boolean;
@@ -37,7 +19,7 @@ interface ArchiveDrawerProps {
   onTagSelect: (tagId: string | null) => void;
 }
 
-export default function ArchiveDrawer({
+function ArchiveDrawer({
   isOpen,
   onClose,
   categories,
@@ -49,15 +31,19 @@ export default function ArchiveDrawer({
   const { getThemeClass } = useThemedClasses();
   const [activeTab, setActiveTab] = useState<'categories' | 'tags' | 'timeline'>('categories');
 
-  const groupedArticles = hotArticles.reduce((acc, article) => {
-    const month = new Date(article.published_at).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' });
-    if (!acc[month]) acc[month] = [];
-    acc[month].push(article);
-    return acc;
-  }, {} as Record<string, Article[]>);
+  const groupedArticles = useMemo(() => {
+    return hotArticles.reduce((acc, article) => {
+      const month = formatMonthYear(article.published_at);
+      if (!acc[month]) acc[month] = [];
+      acc[month].push(article);
+      return acc;
+    }, {} as Record<string, Article[]>);
+  }, [hotArticles]);
 
-  const sortedTags = [...tags].sort((a, b) => b.article_count - a.article_count);
-  const topTags = sortedTags.slice(0, 15);
+  const sortedTags = useMemo(() => [...tags].sort((a, b) => b.article_count - a.article_count), [tags]);
+  const topTags = useMemo(() => sortedTags.slice(0, 15), [sortedTags]);
+
+  const totalArticleCount = useMemo(() => getTotalArticleCount(categories), [categories]);
 
   return (
     <AnimatePresence>
@@ -262,7 +248,7 @@ export default function ArchiveDrawer({
                       </span>
                     </div>
                     <p className={`text-2xl font-bold ${getThemeClass('text-white', 'text-gray-900')}`}>
-                      {categories.reduce((sum, c) => sum + c.article_count, 0)}
+                      {totalArticleCount}
                     </p>
                   </div>
 
@@ -332,3 +318,8 @@ export default function ArchiveDrawer({
     </AnimatePresence>
   );
 }
+
+const ArchiveDrawerWithMemo = memo(ArchiveDrawer);
+ArchiveDrawerWithMemo.displayName = 'ArchiveDrawer';
+
+export default ArchiveDrawerWithMemo;

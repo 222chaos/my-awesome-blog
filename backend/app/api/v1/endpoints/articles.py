@@ -9,6 +9,9 @@ from app.models.user import User
 from uuid import UUID
 from app.services.cache_service import cache_service
 from app.utils.pagination import CursorPaginationParams
+from app.utils.db_utils import get_articles_by_multiple_filters, get_popular_articles_optimized
+from app.utils.common_helpers import parse_uuid_list
+from app.utils.logger import app_logger
 
 router = APIRouter()
 
@@ -28,19 +31,21 @@ def read_articles(
     Retrieve articles
     """
     from uuid import UUID
-    author_uuid = UUID(author_id) if author_id else None
-    category_uuid = UUID(category_id) if category_id else None
-    tag_uuid = UUID(tag_id) if tag_id else None
+    from app.utils.db_utils import get_articles_by_multiple_filters
 
-    articles = crud.get_articles_with_categories_and_tags(
+    # 使用优化的查询函数
+    author_ids = [author_id] if author_id else None
+    category_ids = [category_id] if category_id else None
+    tag_ids = [tag_id] if tag_id else None
+
+    articles = get_articles_by_multiple_filters(
         db,
-        skip=skip,
-        limit=limit,
+        author_ids=author_ids,
+        category_ids=category_ids,
+        tag_ids=tag_ids,
         published_only=published_only,
-        category_id=category_uuid,
-        tag_id=tag_uuid,
-        author_id=author_uuid,
-        search=search
+        limit=limit,
+        offset=skip
     )
     return articles
 
@@ -93,14 +98,27 @@ def read_popular_articles(
     """
     Get popular articles based on views in recent days
     """
-    articles = crud.get_articles_with_categories_and_tags(
-        db,
-        skip=0,
-        limit=limit,
-        published_only=True,
-        order_by_views=True
-    )
-    return articles
+    from app.utils.db_utils import get_popular_articles_optimized
+    from app.utils.logger import app_logger
+
+    try:
+        app_logger.info(f"Fetching popular articles: limit={limit}, days={days}")
+
+        # 使用优化的查询函数
+        articles = get_popular_articles_optimized(
+            db,
+            limit=limit,
+            days=days
+        )
+
+        app_logger.info(f"Successfully fetched {len(articles)} popular articles")
+        return articles
+    except Exception as e:
+        app_logger.error(f"Error fetching popular articles: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch popular articles: {str(e)}"
+        )
 
 
 @router.get("/search", response_model=List[ArticleWithAuthor])
@@ -320,5 +338,208 @@ async def search_articles_fulltext(
         skip=skip,
         limit=limit
     )
-    
+
     return articles
+
+
+@router.post("/batch/delete", response_model=dict)
+async def batch_delete_articles(
+    article_ids: list[str],
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_superuser)  # 只有超级管理员可以批量删除
+) -> Any:
+    """
+    批量删除文章
+    只能删除当前用户有权限的文章
+    """
+    # 使用统一的UUID解析和验证
+    article_uuids = parse_uuid_list(
+        article_ids,
+        max_count=100,
+        error_detail_count="一次最多可以删除100篇文章"
+    )
+
+    app_logger.info(f"批量删除文章: {len(article_uuids)} 篇, 操作者: {current_user.username}")
+
+    # 查询要删除的文章以获取slug用于缓存清除
+    articles = db.query(Article).filter(
+        Article.id.in_(article_uuids)
+    ).all()
+
+    if not articles:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="未找到任何文章"
+        )
+
+    # 收集所有slug用于批量清除缓存
+    slugs = [article.slug for article in articles if article.slug]
+    deleted_ids = [str(article.id) for article in articles]
+
+    # 批量删除文章
+    deleted_count = db.query(Article).filter(
+        Article.id.in_(article_uuids)
+    ).delete(synchronize_session=False)
+
+    db.commit()
+
+    # 批量清除缓存
+    if deleted_ids:
+        # 批量删除文章ID缓存
+        await cache_service.delete_pattern("article:*")
+        # 批量删除slug缓存
+        for slug in slugs:
+            await cache_service.delete(f"article:slug:{slug}")
+
+    app_logger.info(f"批量删除完成: {deleted_count} 篇文章, IDs: {deleted_ids}")
+
+    return {
+        "message": f"成功删除 {deleted_count} 篇文章",
+        "deleted_count": deleted_count,
+        "deleted_ids": deleted_ids
+    }
+
+
+@router.post("/batch/publish", response_model=dict)
+async def batch_publish_articles(
+    article_ids: list[str],
+    publish: bool = Query(..., description="True: 发布, False: 取消发布"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)  # 需要登录
+) -> Any:
+    """
+    批量发布或取消发布文章
+    只能操作当前用户的文章（除非是超级管理员）
+    """
+    from datetime import datetime, timezone
+
+    # 使用统一的UUID解析和验证
+    article_uuids = parse_uuid_list(
+        article_ids,
+        max_count=100,
+        error_detail_count="一次最多可以操作100篇文章"
+    )
+
+    app_logger.info(f"批量{'发布' if publish else '取消发布'}文章: {len(article_uuids)} 篇, 操作者: {current_user.username}")
+
+    # 构建查询条件（普通用户只能操作自己的文章）
+    if current_user.is_superuser:
+        query = db.query(Article).filter(Article.id.in_(article_uuids))
+    else:
+        query = db.query(Article).filter(
+            Article.id.in_(article_uuids),
+            Article.author_id == current_user.id  # type: ignore
+        )
+
+    articles = query.all()
+
+    if not articles:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="未找到任何文章或没有权限操作这些文章"
+        )
+
+    # 批量更新文章发布状态
+    updated_count = 0
+    updated_ids = []
+    slugs = []
+    current_time = datetime.now(timezone.utc)
+
+    for article in articles:
+        old_status = article.is_published  # type: ignore
+
+        if publish:
+            # 发布文章
+            if not old_status:
+                article.is_published = True  # type: ignore
+                article.published_at = current_time  # type: ignore
+                updated_count += 1
+                updated_ids.append(str(article.id))
+                if article.slug:
+                    slugs.append(article.slug)
+        else:
+            # 取消发布
+            if old_status:
+                article.is_published = False  # type: ignore
+                article.published_at = None  # type: ignore
+                updated_count += 1
+                updated_ids.append(str(article.id))
+                if article.slug:
+                    slugs.append(article.slug)
+
+    db.commit()
+
+    # 批量清除缓存
+    if updated_ids:
+        await cache_service.delete_pattern("article:*")
+        for slug in slugs:
+            await cache_service.delete(f"article:slug:{slug}")
+
+    app_logger.info(f"批量{'发布' if publish else '取消发布'}完成: {updated_count} 篇文章, IDs: {updated_ids}")
+
+    action = "发布" if publish else "取消发布"
+    return {
+        "message": f"成功{action} {updated_count} 篇文章",
+        "updated_count": updated_count,
+        "updated_ids": updated_ids
+    }
+
+
+@router.post("/batch/featured", response_model=dict)
+async def batch_set_featured_articles(
+    article_ids: list[str],
+    featured: bool = Query(..., description="True: 设为精选, False: 取消精选"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_superuser)  # 只有超级管理员可以设置精选
+) -> Any:
+    """
+    批量设置或取消精选文章
+    """
+    # 使用统一的UUID解析和验证
+    article_uuids = parse_uuid_list(
+        article_ids,
+        max_count=100,
+        error_detail_count="一次最多可以操作100篇文章"
+    )
+
+    app_logger.info(f"批量{'设置精选' if featured else '取消精选'}文章: {len(article_uuids)} 篇, 操作者: {current_user.username}")
+
+    # 查询文章
+    articles = db.query(Article).filter(
+        Article.id.in_(article_uuids)
+    ).all()
+
+    if not articles:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="未找到任何文章"
+        )
+
+    # 批量更新精选状态
+    updated_ids = [str(article.id) for article in articles]
+    slugs = [article.slug for article in articles if article.slug]
+
+    # 使用批量更新
+    db.query(Article).filter(
+        Article.id.in_(article_uuids)
+    ).update(
+        {"is_featured": featured},
+        synchronize_session=False
+    )
+
+    db.commit()
+
+    # 批量清除缓存
+    if updated_ids:
+        await cache_service.delete_pattern("article:*")
+        for slug in slugs:
+            await cache_service.delete(f"article:slug:{slug}")
+
+    app_logger.info(f"批量{'设置精选' if featured else '取消精选'}完成: {len(updated_ids)} 篇文章, IDs: {updated_ids}")
+
+    action = "设置精选" if featured else "取消精选"
+    return {
+        "message": f"成功{action} {len(updated_ids)} 篇文章",
+        "updated_count": len(updated_ids),
+        "updated_ids": updated_ids
+    }

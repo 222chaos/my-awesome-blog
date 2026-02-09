@@ -45,9 +45,28 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, children, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
+    const rippleRef = React.useRef<HTMLSpanElement | null>(null);
+    const buttonRef = React.useRef<HTMLButtonElement>(null);
+    const animationTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // 优化的涟漪效果处理 - 使用 CSS 变量和固定的 span 元素
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rippleRefMerged = React.useMemo(
+      () => ({ current: null }),
+      []
+    );
+
+    React.useEffect(() => {
+      return () => {
+        if (animationTimeoutRef.current) {
+          clearTimeout(animationTimeoutRef.current);
+        }
+        if (rippleRef.current) {
+          rippleRef.current.remove();
+          rippleRef.current = null;
+        }
+      };
+    }, []);
+
+    const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
       if (onClick) {
         onClick(e);
       }
@@ -57,47 +76,40 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      // 检查是否已有涟漪元素
-      let ripple = button.querySelector('.button-ripple') as HTMLSpanElement | null;
+      let ripple = rippleRef.current;
       
       if (!ripple) {
         ripple = document.createElement('span');
         ripple.className = 'button-ripple';
+        rippleRef.current = ripple;
         button.appendChild(ripple);
       }
 
-      // 使用 CSS 变量设置位置
-      ripple.style.cssText = `
-        --ripple-x: ${x}px;
-        --ripple-y: ${y}px;
-        position: absolute;
-        border-radius: 50%;
-        background: currentColor;
-        transform: translate(var(--ripple-x), var(--ripple-y)) scale(0);
-        opacity: 0.3;
-        pointer-events: none;
-        left: 0;
-        top: 0;
-        width: 100px;
-        height: 100px;
-        margin-left: -50px;
-        margin-top: -50px;
-        animation: button-ripple 0.6s ease-out forwards;
-      `;
+      ripple.style.setProperty('--ripple-x', `${x}px`);
+      ripple.style.setProperty('--ripple-y', `${y}px`);
+      
+      ripple.style.animation = 'none';
+      ripple.offsetHeight;
+      ripple.style.animation = 'button-ripple 0.6s ease-out forwards';
 
-      // 清理动画完成后的样式
-      setTimeout(() => {
-        if (ripple) {
-          ripple.style.animation = 'none';
-          ripple.style.transform = 'translate(var(--ripple-x), var(--ripple-y)) scale(2)';
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+
+      animationTimeoutRef.current = setTimeout(() => {
+        if (rippleRef.current) {
+          rippleRef.current.remove();
+          rippleRef.current = null;
         }
       }, 600);
-    };
+    }, [onClick]);
+
+    React.useImperativeHandle(ref, () => buttonRef.current!);
 
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
-        ref={asChild ? undefined : ref}
+        ref={asChild ? undefined : buttonRef}
         onClick={handleClick}
         {...(asChild ? {} : { type: 'button' })}
         {...props}

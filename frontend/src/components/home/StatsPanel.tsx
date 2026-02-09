@@ -10,6 +10,9 @@ import FriendLinks from './FriendLinks'
 import ProfileCard from './ProfileCard'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area, Legend } from 'recharts'
 import { motion } from 'framer-motion'
+import { getPopularArticles } from '@/services/articleService'
+import logger from '@/utils/logger'
+import type { Article as BackendArticle } from '@/types'
 
 interface FriendLink {
   id: string
@@ -20,7 +23,7 @@ interface FriendLink {
 }
 
 interface Article {
-  id: number
+  id: string
   title: string
   excerpt: string
   category: string
@@ -61,38 +64,16 @@ const mockFriendLinks: FriendLink[] = [
   }
 ]
 
-const mockArticles: Article[] = [
-  {
-    id: 1,
-    title: '深入理解React Hooks的工作原理',
-    excerpt: 'React Hooks改变了我们编写组件的方式，本文将深入探讨Hooks的内部机制...',
-    category: '前端开发',
-    date: '2025-01-25',
-    likes: 128,
-    comments: 32,
-    image: '/assets/react-hooks-cover.jpg'
-  },
-  {
-    id: 2,
-    title: 'TypeScript高级类型系统指南',
-    excerpt: '掌握TypeScript的高级类型特性，让你的代码更加类型安全和可维护...',
-    category: 'TypeScript',
-    date: '2025-01-20',
-    likes: 95,
-    comments: 18,
-    image: '/assets/typescript-cover.jpg'
-  },
-  {
-    id: 3,
-    title: 'Next.js 15新特性详解',
-    excerpt: '探索Next.js 15带来的重大更新和新功能，包括App Router的改进...',
-    category: '框架技术',
-    date: '2025-01-18',
-    likes: 87,
-    comments: 24,
-    image: '/assets/nextjs-cover.jpg'
-  }
-]
+const formatArticleForDisplay = (article: BackendArticle): Article => ({
+  id: article.id,
+  title: article.title,
+  excerpt: article.excerpt || '',
+  category: article.categories?.[0]?.name || '未分类',
+  date: article.published_at,
+  likes: article.likes_count || 0,
+  comments: article.comments_count || 0,
+  image: article.cover_image || undefined
+})
 
 const monthlyStatsData = [
   { month: '1月', articles: 8, views: 12450, likes: 320 },
@@ -546,26 +527,57 @@ function StatsCharts() {
 export default function StatsPanel() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [articles, setArticles] = useState<Article[]>([])
   const { showLoading, hideLoading } = useLoading()
 
   useEffect(() => {
-    showLoading()
-    const timer = setTimeout(() => {
-      hideLoading()
-      setLoading(false)
-    }, 1500)
+    const fetchArticles = async () => {
+      showLoading()
+      setLoading(true)
+      setError(null)
+      
+      try {
+        logger.log('正在获取热门文章...')
+        const backendArticles = await getPopularArticles(3)
+        logger.log(`成功获取 ${backendArticles.length} 篇热门文章`)
+        
+        const formattedArticles = backendArticles.map(formatArticleForDisplay)
+        setArticles(formattedArticles)
+      } catch (err) {
+        logger.error('获取热门文章失败:', err)
+        setError(err instanceof Error ? err.message : '获取文章失败')
+      } finally {
+        hideLoading()
+        setLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchArticles()
   }, [])
 
   const handleRetry = () => {
     setError(null)
     showLoading()
     setLoading(true)
-    setTimeout(() => {
-      hideLoading()
-      setLoading(false)
-    }, 1500)
+    
+    const fetchArticles = async () => {
+      try {
+        logger.log('重新获取热门文章...')
+        const backendArticles = await getPopularArticles(3)
+        logger.log(`成功获取 ${backendArticles.length} 篇热门文章`)
+        
+        const formattedArticles = backendArticles.map(formatArticleForDisplay)
+        setArticles(formattedArticles)
+      } catch (err) {
+        logger.error('重新获取热门文章失败:', err)
+        setError(err instanceof Error ? err.message : '获取文章失败')
+      } finally {
+        hideLoading()
+        setLoading(false)
+      }
+    }
+
+    fetchArticles()
   }
 
   return (
@@ -578,7 +590,7 @@ export default function StatsPanel() {
           </div>
 
           <div className="lg:col-span-8">
-            <ArticleList articles={mockArticles} loading={loading} error={error} onRetry={handleRetry} />
+            <ArticleList articles={articles} loading={loading} error={error} onRetry={handleRetry} />
           </div>
         </div>
 

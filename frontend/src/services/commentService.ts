@@ -54,7 +54,7 @@ export const commentService = {
   },
 
   async createComment(commentData: CommentCreate): Promise<Comment> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -68,7 +68,7 @@ export const commentService = {
   },
 
   async updateComment(commentId: string, commentData: CommentUpdate): Promise<Comment> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${commentId}`, {
       method: 'PUT',
       headers: {
@@ -82,7 +82,7 @@ export const commentService = {
   },
 
   async deleteComment(commentId: string): Promise<void> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${commentId}`, {
       method: 'DELETE',
       headers: {
@@ -93,14 +93,12 @@ export const commentService = {
   },
 
   async approveComment(commentId: string): Promise<Comment> {
-    const token = localStorage.getItem('access_token');
-    const response = await fetch(`${API_URL}/${commentId}`, {
-      method: 'PUT',
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/${commentId}/approve`, {
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-      body: JSON.stringify({ is_approved: true }),
     });
     if (!response.ok) throw new Error('Failed to approve comment');
     return response.json();

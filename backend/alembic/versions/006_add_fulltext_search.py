@@ -12,7 +12,7 @@ from sqlalchemy import text
 
 # revision identifiers, used by Alembic.
 revision = '006'
-down_revision = '005'
+down_revision = '002'
 branch_labels = None
 depends_on = None
 

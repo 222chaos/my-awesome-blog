@@ -59,7 +59,7 @@ export const friendLinkService = {
   },
 
   async createFriendLink(linkData: FriendLinkCreate): Promise<FriendLink> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -73,7 +73,7 @@ export const friendLinkService = {
   },
 
   async updateFriendLink(linkId: string, linkData: FriendLinkUpdate): Promise<FriendLink> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${linkId}`, {
       method: 'PUT',
       headers: {
@@ -87,7 +87,7 @@ export const friendLinkService = {
   },
 
   async deleteFriendLink(linkId: string): Promise<void> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${linkId}`, {
       method: 'DELETE',
       headers: {

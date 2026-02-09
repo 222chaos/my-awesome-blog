@@ -8,6 +8,8 @@ from app.schemas.category import Category, CategoryCreate, CategoryUpdate, Categ
 from app.schemas.article import ArticleWithAuthor
 from app.models.user import User
 from app.models.article import Article
+from app.utils.common_helpers import parse_uuid
+from app.utils.logger import app_logger
 
 router = APIRouter()
 
@@ -48,15 +50,16 @@ def create_category(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A category with this name already exists",
         )
-    
+
     existing_category_by_slug = crud.get_category_by_slug(db, category_in.slug)
     if existing_category_by_slug:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A category with this slug already exists",
         )
-    
+
     category = crud.create_category(db, category=category_in)
+    app_logger.info(f"创建分类成功: {category.name} (ID: {category.id}), 操作者: {current_user.username}")
     return category
 
 
@@ -68,26 +71,19 @@ def read_category_by_id(
     """
     Get a specific category by id
     """
-    from uuid import UUID
-    try:
-        category_uuid = UUID(category_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid category ID format",
-        )
-    
+    category_uuid = parse_uuid(category_id, error_detail="Invalid category ID format")
+
     category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found",
         )
-    
+
     # Manually add article count since the CRUD function returns a list
     article_count = len(category.articles)
     category.article_count = article_count
-    
+
     return category
 
 
@@ -102,22 +98,15 @@ def update_category(
     """
     Update a category
     """
-    from uuid import UUID
-    try:
-        category_uuid = UUID(category_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid category ID format",
-        )
-    
+    category_uuid = parse_uuid(category_id, error_detail="Invalid category ID format")
+
     category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found",
         )
-    
+
     # Check if slug or name is being updated to an existing value
     if category_in.slug and category_in.slug != category.slug:
         existing_category = crud.get_category_by_slug(db, category_in.slug)
@@ -126,7 +115,7 @@ def update_category(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A category with this slug already exists",
             )
-    
+
     if category_in.name and category_in.name != category.name:
         existing_category = crud.get_category_by_name(db, category_in.name)
         if existing_category and existing_category.id != category.id:
@@ -134,8 +123,9 @@ def update_category(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A category with this name already exists",
             )
-    
+
     category = crud.update_category(db, category_id=category_uuid, category_update=category_in)
+    app_logger.info(f"更新分类: {category.name} (ID: {category_id}), 操作者: {current_user.username}")
     return category
 
 
@@ -149,36 +139,30 @@ def delete_category(
     """
     Delete a category
     """
-    from uuid import UUID
-    try:
-        category_uuid = UUID(category_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid category ID format",
-        )
-    
+    category_uuid = parse_uuid(category_id, error_detail="Invalid category ID format")
+
     category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found",
         )
-    
+
     # Check if category has associated articles
     if category.articles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete category that has associated articles",
         )
-    
+
     deleted = crud.delete_category(db, category_id=category_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found",
         )
-    
+
+    app_logger.info(f"删除分类: {category.name} (ID: {category_id}), 操作者: {current_user.username}")
     return {"message": "Category deleted successfully"}
 
 
@@ -193,22 +177,15 @@ def read_articles_by_category(
     """
     Get articles in a specific category
     """
-    from uuid import UUID
-    try:
-        category_uuid = UUID(category_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid category ID format",
-        )
-    
+    category_uuid = parse_uuid(category_id, error_detail="Invalid category ID format")
+
     category = crud.get_category(db, category_id=category_uuid)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found",
         )
-    
+
     # Get articles by category
     articles = crud.get_articles(
         db,
@@ -217,5 +194,5 @@ def read_articles_by_category(
         published_only=published_only,
         category_id=category_uuid
     )
-    
+
     return articles

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ThumbsUp, ThumbsDown, Flame, Laugh, Rocket, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ interface Particle {
   velocity: { x: number; y: number };
 }
 
-export default function MessageReactions({
+const MessageReactionsComponent = function MessageReactions({
   messageId,
   reactions = [],
   currentUser,
@@ -51,7 +51,7 @@ export default function MessageReactions({
     return reactions.find(r => r.emoji === emoji)?.users.includes(currentUser || '');
   };
 
-  const handleReactionClick = (emoji: string, event: React.MouseEvent) => {
+  const handleReactionClick = useCallback((emoji: string, event: React.MouseEvent) => {
     const rect = (event.target as HTMLElement).getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
@@ -61,18 +61,18 @@ export default function MessageReactions({
     onReaction?.(emoji);
 
     setTimeout(() => setActiveReaction(null), 500);
-  };
+  }, [onReaction]);
 
   const createParticles = (emoji: string, x: number, y: number) => {
-    const newParticles: Particle[] = Array.from({ length: 12 }, (_, i) => ({
+    const newParticles: Particle[] = Array.from({ length: 6 }, (_, i) => ({
       id: `${messageId}-${emoji}-${Date.now()}-${i}`,
       x,
       y,
       emoji,
       rotation: Math.random() * 360,
       velocity: {
-        x: (Math.random() - 0.5) * 200,
-        y: -Math.random() * 200 - 50
+        x: (Math.random() - 0.5) * 150,
+        y: -Math.random() * 150 - 50
       }
     }));
 
@@ -80,7 +80,7 @@ export default function MessageReactions({
 
     setTimeout(() => {
       setParticles([]);
-    }, 1000);
+    }, 800);
   };
 
   return (
@@ -159,4 +159,6 @@ export default function MessageReactions({
       </AnimatePresence>
     </div>
   );
-}
+};
+
+export default memo(MessageReactionsComponent);

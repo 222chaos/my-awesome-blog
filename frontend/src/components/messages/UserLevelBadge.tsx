@@ -67,7 +67,7 @@ const UserLevelBadge = ({
     <div className="flex flex-col items-center gap-1">
       <motion.div
         className={cn(
-          "relative flex items-center gap-1.5 rounded-full border-2 font-bold text-white",
+          "relative flex items-center gap-1.5 rounded-full border-2 font-bold text-white will-change-transform",
           sizeClasses[size],
           "bg-gradient-to-r",
           getLevelColor(level),
@@ -81,22 +81,24 @@ const UserLevelBadge = ({
         {getLevelIcon(level)}
         <span>Lv.{level}</span>
 
-        <motion.div
-          className="absolute inset-0 rounded-full"
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: [0.3, 0.6, 0.3],
-            scale: [1, 1.05, 1]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          style={{
-            background: `radial-gradient(circle, transparent 0%, rgba(255,255,255,0.3) ${100 - progress * 0.8}%, transparent 100%)`
-          }}
-        />
+        {showProgress && progress > 0 && (
+          <motion.div
+            className="absolute inset-0 rounded-full will-change-transform"
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: [0.2, 0.4, 0.2],
+              scale: [1, 1.02, 1]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            style={{
+              background: `radial-gradient(circle, transparent 0%, rgba(255,255,255,0.2) ${100 - progress * 0.8}%, transparent 100%)`
+            }}
+          />
+        )}
       </motion.div>
 
       {showProgress && progress > 0 && (

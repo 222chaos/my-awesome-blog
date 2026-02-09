@@ -1,7 +1,7 @@
 """Add new tables for enhanced blog functionality
 
 Revision ID: 001
-Revises: 
+Revises: 000
 Create Date: 2026-01-25 06:00:00.000000
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = '001'
-down_revision: Union[str, None] = None
+down_revision: Union[str, None] = '000'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -59,7 +59,7 @@ def upgrade() -> None:
     # Create article_categories table
     op.create_table(
         'article_categories',
-        sa.Column('article_id', sa.Integer(), nullable=False),
+        sa.Column('article_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('category_id', sa.Integer(), nullable=False),
         sa.Column('is_primary', sa.Boolean(), nullable=True),
         sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ondelete='CASCADE'),
@@ -72,7 +72,7 @@ def upgrade() -> None:
     # Create article_tags table
     op.create_table(
         'article_tags',
-        sa.Column('article_id', sa.Integer(), nullable=False),
+        sa.Column('article_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('tag_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ondelete='CASCADE'),
@@ -104,7 +104,7 @@ def upgrade() -> None:
     # Create portfolios table
     op.create_table(
         'portfolios',
-        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, nullable=False),
         sa.Column('title', sa.String(length=200), nullable=False),
         sa.Column('slug', sa.String(length=200), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
@@ -119,12 +119,65 @@ def upgrade() -> None:
         sa.Column('sort_order', sa.Integer(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
         sa.Column('updated_at', sa.DateTime(timezone=True), nullable=True),
-        sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('slug')
     )
     op.create_index(op.f('ix_portfolios_id'), 'portfolios', ['id'], unique=False)
     op.create_index(op.f('ix_portfolios_slug'), 'portfolios', ['slug'], unique=False)
     op.create_index(op.f('ix_portfolios_sort_order'), 'portfolios', ['sort_order'], unique=False)
+
+    # Create images table
+    op.create_table(
+        'images',
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, nullable=False),
+        sa.Column('original_filename', sa.String(length=255), nullable=False),
+        sa.Column('file_path', sa.String(length=500), nullable=False),
+        sa.Column('file_size', sa.BigInteger(), nullable=False),
+        sa.Column('mime_type', sa.String(length=50), nullable=False),
+        sa.Column('width', sa.Integer(), nullable=False),
+        sa.Column('height', sa.Integer(), nullable=False),
+        sa.Column('alt_text', sa.String(length=255), nullable=True),
+        sa.Column('caption', sa.Text(), nullable=True),
+        sa.Column('is_optimized', sa.Boolean(), nullable=True),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+    )
+    op.create_index(op.f('ix_images_id'), 'images', ['id'], unique=False)
+    op.create_index(op.f('ix_images_file_path'), 'images', ['file_path'], unique=False)
+
+    # Create image_variants table
+    op.create_table(
+        'image_variants',
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, nullable=False),
+        sa.Column('image_id', postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column('variant_name', sa.String(length=50), nullable=False),
+        sa.Column('file_path', sa.String(length=500), nullable=False),
+        sa.Column('width', sa.Integer(), nullable=False),
+        sa.Column('height', sa.Integer(), nullable=False),
+        sa.Column('file_size', sa.BigInteger(), nullable=False),
+        sa.Column('quality', sa.Integer(), nullable=False),
+        sa.Column('format', sa.String(length=10), nullable=False),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+        sa.ForeignKeyConstraint(['image_id'], ['images.id'], ondelete='CASCADE'),
+        sa.UniqueConstraint('image_id', 'variant_name', name='uq_image_variant')
+    )
+    op.create_index(op.f('ix_image_variants_id'), 'image_variants', ['id'], unique=False)
+    op.create_index(op.f('ix_image_variants_image_id'), 'image_variants', ['image_id'], unique=False)
+    op.create_index(op.f('ix_image_variants_variant_name'), 'image_variants', ['variant_name'], unique=False)
+
+    # Create portfolio_images table (association table for portfolios and images)
+    op.create_table(
+        'portfolio_images',
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, nullable=False),
+        sa.Column('portfolio_id', postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column('image_id', postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column('sort_order', sa.Integer(), nullable=True),
+        sa.Column('is_cover', sa.Boolean(), nullable=True),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
+        sa.ForeignKeyConstraint(['portfolio_id'], ['portfolios.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['image_id'], ['images.id'], ondelete='CASCADE'),
+    )
+    op.create_index(op.f('ix_portfolio_images_id'), 'portfolio_images', ['id'], unique=False)
+    op.create_index(op.f('ix_portfolio_images_portfolio_id'), 'portfolio_images', ['portfolio_id'], unique=False)
+    op.create_index(op.f('ix_portfolio_images_image_id'), 'portfolio_images', ['image_id'], unique=False)
 
     # Create timeline_events table
     op.create_table(
@@ -163,103 +216,15 @@ def upgrade() -> None:
     op.create_index(op.f('ix_subscriptions_email'), 'subscriptions', ['email'], unique=False)
     op.create_index(op.f('ix_subscriptions_is_active'), 'subscriptions', ['is_active'], unique=False)
 
-    # Create images table
-    op.create_table(
-        'images',
-        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column('original_filename', sa.String(length=255), nullable=False),
-        sa.Column('file_path', sa.String(length=500), nullable=False),
-        sa.Column('file_size', sa.BigInteger(), nullable=False),
-        sa.Column('mime_type', sa.String(length=50), nullable=False),
-        sa.Column('width', sa.Integer(), nullable=True),
-        sa.Column('height', sa.Integer(), nullable=True),
-        sa.Column('alt_text', sa.String(length=255), nullable=True),
-        sa.Column('caption', sa.Text(), nullable=True),
-        sa.Column('is_optimized', sa.Boolean(), nullable=True),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-        sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_images_id'), 'images', ['id'], unique=False)
-    op.create_index(op.f('ix_images_file_path'), 'images', ['file_path'], unique=False)
-
-    # Create image_variants table
-    op.create_table(
-        'image_variants',
-        sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column('image_id', sa.Integer(), nullable=False),
-        sa.Column('variant_name', sa.String(length=50), nullable=False),
-        sa.Column('file_path', sa.String(length=500), nullable=False),
-        sa.Column('width', sa.Integer(), nullable=False),
-        sa.Column('height', sa.Integer(), nullable=False),
-        sa.Column('file_size', sa.BigInteger(), nullable=False),
-        sa.Column('quality', sa.Integer(), nullable=True),
-        sa.Column('format', sa.String(length=10), nullable=True),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
-        sa.ForeignKeyConstraint(['image_id'], ['images.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('image_id', 'variant_name', name='uq_image_variant')
-    )
-    op.create_index(op.f('ix_image_variants_id'), 'image_variants', ['id'], unique=False)
-    op.create_index(op.f('ix_image_variants_image_id'), 'image_variants', ['image_id'], unique=False)
-    op.create_index(op.f('ix_image_variants_variant_name'), 'image_variants', ['variant_name'], unique=False)
-
-    # Add columns to articles table
-    op.add_column('articles', sa.Column('read_time', sa.Integer(), nullable=True))
-    op.add_column('articles', sa.Column('featured_image_id', sa.Integer(), nullable=True))
-    op.add_column('articles', sa.Column('is_featured', sa.Boolean(), nullable=True))
-    op.add_column('articles', sa.Column('is_pinned', sa.Boolean(), nullable=True))
-    op.add_column('articles', sa.Column('meta_title', sa.String(length=200), nullable=True))
-    op.add_column('articles', sa.Column('meta_description', sa.Text(), nullable=True))
-    
-    # Add foreign key constraint for featured_image_id
+    # Add featured_image_id column to articles table
+    op.add_column('articles', sa.Column('featured_image_id', postgresql.UUID(as_uuid=True), nullable=True))
     op.create_foreign_key('fk_articles_featured_image_id_images', 'articles', 'images', ['featured_image_id'], ['id'])
-
-    # Add indexes for new columns in articles
-    op.create_index(op.f('ix_articles_is_featured'), 'articles', ['is_featured', 'published_at'], unique=False, postgresql_ops={'published_at': 'DESC'})
-    op.create_index(op.f('ix_articles_is_pinned'), 'articles', ['is_pinned', 'published_at'], unique=False, postgresql_ops={'published_at': 'DESC'})
-
-    # Add columns to users table
-    op.add_column('users', sa.Column('avatar', sa.String(length=500), nullable=True))
-    op.add_column('users', sa.Column('bio', sa.Text(), nullable=True))
-    op.add_column('users', sa.Column('website', sa.String(length=200), nullable=True))
-    op.add_column('users', sa.Column('twitter', sa.String(length=100), nullable=True))
-    op.add_column('users', sa.Column('github', sa.String(length=100), nullable=True))
-    op.add_column('users', sa.Column('linkedin', sa.String(length=100), nullable=True))
 
 
 def downgrade() -> None:
-    # Drop columns from users table
-    op.drop_column('users', 'linkedin')
-    op.drop_column('users', 'github')
-    op.drop_column('users', 'twitter')
-    op.drop_column('users', 'website')
-    op.drop_column('users', 'bio')
-    op.drop_column('users', 'avatar')
-
-    # Drop indexes and foreign key for articles
-    op.drop_index(op.f('ix_articles_is_pinned'), table_name='articles')
-    op.drop_index(op.f('ix_articles_is_featured'), table_name='articles')
+    # Drop featured_image_id column from articles table
     op.drop_constraint('fk_articles_featured_image_id_images', 'articles', type_='foreignkey')
-    
-    # Drop columns from articles table
-    op.drop_column('articles', 'meta_description')
-    op.drop_column('articles', 'meta_title')
-    op.drop_column('articles', 'is_pinned')
-    op.drop_column('articles', 'is_featured')
     op.drop_column('articles', 'featured_image_id')
-    op.drop_column('articles', 'read_time')
-
-    # Drop image_variants table
-    op.drop_index(op.f('ix_image_variants_variant_name'), table_name='image_variants')
-    op.drop_index(op.f('ix_image_variants_image_id'), table_name='image_variants')
-    op.drop_index(op.f('ix_image_variants_id'), table_name='image_variants')
-    op.drop_table('image_variants')
-
-    # Drop images table
-    op.drop_index(op.f('ix_images_file_path'), table_name='images')
-    op.drop_index(op.f('ix_images_id'), table_name='images')
-    op.drop_table('images')
-
     # Drop subscriptions table
     op.drop_index(op.f('ix_subscriptions_is_active'), table_name='subscriptions')
     op.drop_index(op.f('ix_subscriptions_email'), table_name='subscriptions')
@@ -271,6 +236,23 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_timeline_events_event_date'), table_name='timeline_events')
     op.drop_index(op.f('ix_timeline_events_id'), table_name='timeline_events')
     op.drop_table('timeline_events')
+
+    # Drop portfolio_images table
+    op.drop_index(op.f('ix_portfolio_images_image_id'), table_name='portfolio_images')
+    op.drop_index(op.f('ix_portfolio_images_portfolio_id'), table_name='portfolio_images')
+    op.drop_index(op.f('ix_portfolio_images_id'), table_name='portfolio_images')
+    op.drop_table('portfolio_images')
+
+    # Drop image_variants table
+    op.drop_index(op.f('ix_image_variants_variant_name'), table_name='image_variants')
+    op.drop_index(op.f('ix_image_variants_image_id'), table_name='image_variants')
+    op.drop_index(op.f('ix_image_variants_id'), table_name='image_variants')
+    op.drop_table('image_variants')
+
+    # Drop images table
+    op.drop_index(op.f('ix_images_file_path'), table_name='images')
+    op.drop_index(op.f('ix_images_id'), table_name='images')
+    op.drop_table('images')
 
     # Drop portfolios table
     op.drop_index(op.f('ix_portfolios_sort_order'), table_name='portfolios')

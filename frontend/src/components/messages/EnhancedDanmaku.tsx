@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, Rainbow, Layers, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -29,6 +29,9 @@ const LAYERS = [
   { zIndex: 30, speed: 25, opacity: 1, scale: 1 }
 ];
 
+const MAX_DANMAKU_COUNT = 50;
+const COLLISION_THRESHOLD = 30;
+
 export default function EnhancedDanmaku({
   messages,
   className,
@@ -40,6 +43,7 @@ export default function EnhancedDanmaku({
   const [activeMessages, setActiveMessages] = useState<DanmakuMessage[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
+  const processedIndexRef = useRef(0);
 
   const getRandomPosition = useCallback(() => {
     return Math.random() * 70 + 10;
@@ -55,29 +59,35 @@ export default function EnhancedDanmaku({
   }, []);
 
   const checkCollision = useCallback((newY: number, existingMessages: DanmakuMessage[]) => {
-    const collisionThreshold = 30;
-
     for (const msg of existingMessages) {
       const distance = Math.abs(newY - msg.y);
-      if (distance < collisionThreshold) {
+      if (distance < COLLISION_THRESHOLD) {
         return true;
       }
     }
     return false;
   }, []);
 
+  const limitedMessages = useMemo(() => {
+    return messages.slice(0, MAX_DANMAKU_COUNT);
+  }, [messages]);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let index = 0;
+    processedIndexRef.current = 0;
 
     const processNext = () => {
-      if (index >= messages.length) {
+      if (processedIndexRef.current >= limitedMessages.length) {
         return;
       }
 
-      const msg = messages[index];
+      if (activeMessages.length >= MAX_DANMAKU_COUNT) {
+        return;
+      }
+
+      const msg = limitedMessages[processedIndexRef.current];
       let newY = getRandomPosition();
       let attempts = 0;
       const maxAttempts = 20;
@@ -97,32 +107,31 @@ export default function EnhancedDanmaku({
         speed
       };
 
-      setActiveMessages(prev => [...prev, danmakuMsg]);
+      setActiveMessages(prev => {
+        const newMessages = [...prev, danmakuMsg];
+        return newMessages.slice(-MAX_DANMAKU_COUNT);
+      });
 
-      index++;
+      processedIndexRef.current++;
 
       const delay = Math.random() * 500 + 200;
       const timerId = setTimeout(processNext, delay);
       timersRef.current.push(timerId);
     };
 
-    if (messages.length > 0) {
+    if (limitedMessages.length > 0) {
       setTimeout(processNext, 100);
     }
 
     return () => {
       timersRef.current.forEach(clearTimeout);
       timersRef.current = [];
+      setActiveMessages([]);
     };
-  }, [messages, activeMessages, getRandomPosition, getRandomLayer, getRandomSpeed, checkCollision]);
+  }, [limitedMessages, activeMessages, getRandomPosition, getRandomLayer, getRandomSpeed, checkCollision]);
 
   const handleMessageComplete = useCallback((id: string) => {
     setActiveMessages(prev => prev.filter(msg => msg.id !== id));
-  }, []);
-
-  const getRainbowGradient = useCallback(() => {
-    const hue = Date.now() % 360;
-    return `hsl(${hue}, 80%, 60%)`;
   }, []);
 
   return (
@@ -139,15 +148,15 @@ export default function EnhancedDanmaku({
             return (
               <motion.div
                 key={msg.id}
-                initial={{ x: '100vw' }}
-                animate={isPausedLayer ? { x: '100vw' } : { x: '-100vw' }}
+                initial={{ x: '100vw', opacity: 0 }}
+                animate={isPausedLayer ? { x: '100vw' } : { x: '-100vw', opacity: [0, 1, 1, 0] }}
                 transition={{
                   duration: msg.speed,
                   ease: "linear",
-                  repeat: isPausedLayer ? 0 : Infinity
+                  times: [0, 0.05, 0.95, 1]
                 }}
                 onAnimationComplete={() => !isPausedLayer && handleMessageComplete(msg.id)}
-                className="absolute whitespace-nowrap"
+                className="absolute whitespace-nowrap will-change-transform"
                 style={{
                   top: `${msg.y}%`,
                   zIndex: layerConfig.zIndex,
@@ -156,18 +165,22 @@ export default function EnhancedDanmaku({
                 }}
               >
                 <span
-                  className="text-lg font-bold px-4 py-1.5 rounded-full backdrop-blur-sm border"
+                  className={cn(
+                    "text-lg font-bold px-4 py-1.5 rounded-full backdrop-blur-md border",
+                    "will-change-transform",
+                    rainbowMode ? "animate-rainbow-shift" : ""
+                  )}
                   style={{
-                    color: rainbowMode ? getRainbowGradient() : msg.color,
+                    color: rainbowMode ? 'hsl(var(--rainbow-hue), 80%, 60%)' : msg.color,
                     background: rainbowMode
-                      ? `rgba(${(Date.now() % 360) / 3.6}, 100, 100, 0.2)`
-                      : 'rgba(0,0,0,0.3)',
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(0,0,0,0.4)',
                     borderColor: rainbowMode
-                      ? getRainbowGradient()
+                      ? 'hsl(var(--rainbow-hue), 80%, 60%)'
                       : `${msg.color}40`,
                     boxShadow: rainbowMode
-                      ? `0 0 20px ${getRainbowGradient()}40`
-                      : `0 0 15px ${msg.color}20`
+                      ? '0 0 20px hsl(var(--rainbow-hue), 80%, 60%, 0.3)'
+                      : `0 0 15px ${msg.color}30`
                   }}
                 >
                   {msg.content}
@@ -214,7 +227,7 @@ export default function EnhancedDanmaku({
         <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-black/40 border border-white/10">
           <Layers className="w-3 h-3 text-white/50" />
           <span className="text-xs text-white/50">
-            {activeMessages.length}/{messages.length}
+            {activeMessages.length}/{limitedMessages.length}
           </span>
         </div>
       </div>

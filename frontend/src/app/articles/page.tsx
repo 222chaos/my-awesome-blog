@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
+import { useState, useEffect, Suspense, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
 import { getArticles, getCategories, getTags, getFeaturedArticles } from '@/services/articleService';
 import { useLoading } from '@/context/loading-context';
@@ -14,62 +14,11 @@ import Loader from '@/components/loading/Loader';
 import GlitchText from '@/components/ui/GlitchText';
 import { FocusCards } from '@/components/ui/FocusCards';
 import ArticleCardSkeleton from '@/components/articles/ArticleCardSkeleton';
-import { Album } from '@/types';
-
-interface Article {
-  id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  is_published: boolean;
-  view_count: number;
-  created_at: string;
-  updated_at: string;
-  published_at: string;
-  author_id: string;
-  category_id: string;
-  cover_image?: string;
-  read_time: number;
-  likes_count: number;
-  comments_count: number;
-  shares_count: number;
-  author: {
-    id: string;
-    username: string;
-    email: string;
-    avatar?: string;
-    reputation: number;
-    followers_count: number;
-  };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-    article_count: number;
-  };
-  tags: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    article_count: number;
-  }>;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  article_count: number;
-}
-
-interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  article_count: number;
-}
+import { Album, Article, Category, Tag } from '@/types';
+import logger from '@/utils/logger';
+import { mapArticlesToAlbums, getHotArticles } from '@/utils/articleHelpers';
+import { useArticleFilters } from '@/hooks/useArticleFilters';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 
 const ARTICLES_PER_PAGE = 12;
 
@@ -81,169 +30,112 @@ function ArticlesPageContent() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(ARTICLES_PER_PAGE);
-  const searchParams = useSearchParams();
   const router = useRouter();
   const { themedClasses, getThemeClass } = useThemedClasses();
   const { showLoading, hideLoading } = useLoading();
-  const observerTargetRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const categoryParam = searchParams?.get('category');
-    const tagParam = searchParams?.get('tag');
-    const searchParam = searchParams?.get('search');
-    const viewParam = searchParams?.get('view');
+  const filters = useArticleFilters({ categories, tags });
 
-    if (categoryParam) setSelectedCategory(categoryParam);
-    if (tagParam) setSelectedTag(tagParam);
-    if (searchParam) setSearchQuery(searchParam);
-    if (viewParam === 'list' || viewParam === 'grid') {
-      setViewMode(viewParam);
-    }
-  }, [searchParams]);
+  const hotArticles = useMemo(() => getHotArticles(articles, 10), [articles]);
+  const featuredAlbums = useMemo(() => mapArticlesToAlbums(featuredArticles), [featuredArticles]);
+  const featuredArticleCount = featuredArticles.length;
 
-  const fetchArticles = useCallback(async (currentPage = 1, append = false) => {
+  const fetchInitialData = useCallback(async () => {
     try {
-      console.log('开始获取文章数据...');
-      if (!append) setLoading(true);
-      else setLoadingMore(true);
+      logger.log('开始获取文章数据...');
+      setLoading(true);
       setError(null);
       showLoading();
 
       const articlesData = await getArticles({
-        category: selectedCategory || undefined,
-        tag: selectedTag || undefined,
-        search: searchQuery || undefined,
+        category: filters.selectedCategory || undefined,
+        tag: filters.selectedTag || undefined,
+        search: filters.searchQuery || undefined,
         limit: ARTICLES_PER_PAGE,
-        offset: (currentPage - 1) * ARTICLES_PER_PAGE,
+        offset: 0,
       });
-      console.log('获取到文章数据:', articlesData);
-
-      if (append) {
-        setArticles(prev => [...prev, ...articlesData]);
-      } else {
-        setArticles(articlesData);
-        setVisibleCount(articlesData.length);
-      }
+      logger.log('获取到文章数据:', articlesData);
+      setArticles(articlesData);
 
       const categoriesData = await getCategories();
-      console.log('获取到分类数据:', categoriesData);
+      logger.log('获取到分类数据:', categoriesData);
       setCategories(categoriesData);
 
       const tagsData = await getTags();
-      console.log('获取到标签数据:', tagsData);
+      logger.log('获取到标签数据:', tagsData);
       setTags(tagsData);
 
-      if (currentPage === 1) {
-        const featuredData = await getFeaturedArticles(5);
-        console.log('获取到精选文章数据:', featuredData);
-        setFeaturedArticles(featuredData || []);
-      }
+      const featuredData = await getFeaturedArticles(5);
+      logger.log('获取到精选文章数据:', featuredData);
+      setFeaturedArticles(featuredData || []);
 
       setHasMore(articlesData.length >= ARTICLES_PER_PAGE);
+      setPage(1);
     } catch (error) {
-      console.error('获取数据失败:', error);
+      logger.error('获取数据失败:', error);
       setError(error instanceof Error ? error.message : '获取数据失败');
     } finally {
       hideLoading();
       setLoading(false);
-      setLoadingMore(false);
     }
-  }, [selectedCategory, selectedTag, searchQuery, showLoading, hideLoading]);
+  }, [filters.selectedCategory, filters.selectedTag, filters.searchQuery, showLoading, hideLoading]);
 
   useEffect(() => {
-    fetchArticles(1, false);
-  }, [fetchArticles]);
+    fetchInitialData();
+  }, [fetchInitialData]);
 
-  const handleCategoryChange = (categoryId: string | null) => {
-    setPage(1);
-    setArticles([]);
-    setSelectedCategory(categoryId);
-  };
-
-  const handleTagChange = (tagId: string | null) => {
-    setPage(1);
-    setArticles([]);
-    setSelectedTag(tagId);
-  };
-
-  const handleSearchChange = (query: string) => {
-    setPage(1);
-    setArticles([]);
-    setSearchQuery(query);
-  };
-
-  const handleViewToggle = (view: 'grid' | 'list') => {
-    setViewMode(view);
-  };
-
-  const loadMore = useCallback(() => {
+  const loadMore = useCallback(async () => {
     if (!loadingMore && hasMore) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      fetchArticles(nextPage, true);
-    }
-  }, [page, loadingMore, hasMore, fetchArticles]);
-
-  const handleScroll = useCallback(() => {
-    if (!observerTargetRef.current || loadingMore || !hasMore) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
-
-    if (scrollPercentage > 0.8) {
-      loadMore();
-    }
-  }, [loadMore, loadingMore, hasMore]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1, rootMargin: '100px' }
-    );
-
-    if (observerTargetRef.current) {
-      observer.observe(observerTargetRef.current);
-    }
-
-    return () => {
-      if (observerTargetRef.current) {
-        observer.unobserve(observerTargetRef.current);
+      try {
+        setLoadingMore(true);
+        const nextPage = page + 1;
+        const articlesData = await getArticles({
+          category: filters.selectedCategory || undefined,
+          tag: filters.selectedTag || undefined,
+          search: filters.searchQuery || undefined,
+          limit: ARTICLES_PER_PAGE,
+          offset: (nextPage - 1) * ARTICLES_PER_PAGE,
+        });
+        setArticles(prev => [...prev, ...articlesData]);
+        setPage(nextPage);
+        setHasMore(articlesData.length >= ARTICLES_PER_PAGE);
+      } catch (error) {
+        logger.error('加载更多失败:', error);
+      } finally {
+        setLoadingMore(false);
       }
-    };
-  }, [hasMore, loadingMore, loadMore]);
+    }
+  }, [loadingMore, hasMore, page, filters.selectedCategory, filters.selectedTag, filters.searchQuery]);
 
-  const getHotArticles = () => {
-    return [...articles]
-      .sort((a, b) => b.view_count - a.view_count)
-      .slice(0, 10);
-  };
+  const observerTargetRef = useInfiniteScroll({
+    loading: loadingMore,
+    hasMore,
+    onLoadMore: loadMore
+  });
 
-  const featuredArticleCount = featuredArticles.length;
+  const handleFilterChange = useCallback((filterType: 'category' | 'tag' | 'search') => {
+    setPage(1);
+    setArticles([]);
+    switch (filterType) {
+      case 'category':
+        filters.handleCategoryChange(null);
+        break;
+      case 'tag':
+        filters.handleTagChange(null);
+        break;
+      case 'search':
+        filters.handleSearchChange('');
+        break;
+    }
+  }, [filters]);
 
-  const mapToAlbums = (articles: Article[]): Album[] => {
-    return articles.map(article => ({
-      id: article.id,
-      title: article.title,
-      coverImage: article.cover_image || '/assets/placeholder.svg',
-      description: article.excerpt,
-      date: article.published_at,
-      featured: true,
-      images: 0,
-      slug: article.id
-    }));
-  };
+  const handleViewToggle = useCallback((view: 'grid' | 'list') => {
+    setViewMode(view);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#18181B] text-white font-sans selection:bg-[#EC4899] selection:text-white">
@@ -251,13 +143,13 @@ function ArticlesPageContent() {
         <div className="pt-20 pb-10 text-center">
           <GlitchText text="ARTICLES" size="lg" className="mb-4 font-display" />
           <p className="text-gray-400 font-mono text-sm tracking-widest uppercase">
-            Explore the digital frontier
+            Explore digital frontier
           </p>
         </div>
 
         {featuredArticleCount > 0 && (
           <div className="mb-16">
-            <FocusCards cards={mapToAlbums(featuredArticles)} />
+            <FocusCards cards={featuredAlbums} />
           </div>
         )}
 
@@ -265,9 +157,9 @@ function ArticlesPageContent() {
           <CommandBar
             categories={categories}
             tags={tags}
-            onCategoryChange={handleCategoryChange}
-            onTagChange={handleTagChange}
-            onSearchChange={handleSearchChange}
+            onCategoryChange={filters.handleCategoryChange}
+            onTagChange={filters.handleTagChange}
+            onSearchChange={filters.handleSearchChange}
             onViewToggle={handleViewToggle}
             currentView={viewMode}
             onOpenDrawer={() => setDrawerOpen(true)}
@@ -287,7 +179,7 @@ function ArticlesPageContent() {
                   {error}
                 </p>
                 <button
-                  onClick={() => fetchArticles(1, false)}
+                  onClick={() => fetchInitialData()}
                   className={`px-6 py-3 rounded-lg font-medium ${getThemeClass(
                     'bg-tech-cyan text-white hover:bg-tech-lightcyan',
                     'bg-blue-600 text-white hover:bg-blue-700'
@@ -353,7 +245,7 @@ function ArticlesPageContent() {
                           'bg-blue-600 text-white hover:bg-blue-700'
                         )}`}
                       >
-                        加载更多 ({visibleCount}/{articles.length})
+                        加载更多 ({articles.length})
                       </motion.button>
                     )}
                   </div>
@@ -369,7 +261,7 @@ function ArticlesPageContent() {
                   暂无文章
                 </div>
                 <p className={`text-lg ${getThemeClass('text-gray-400', 'text-gray-600')}`}>
-                  {selectedCategory || selectedTag || searchQuery
+                  {filters.selectedCategory || filters.selectedTag || filters.searchQuery
                     ? '没有找到匹配的文章，请尝试其他筛选条件'
                     : '暂无文章发布，请稍后再来'}
                 </p>
@@ -383,9 +275,9 @@ function ArticlesPageContent() {
           onClose={() => setDrawerOpen(false)}
           categories={categories}
           tags={tags}
-          hotArticles={getHotArticles()}
-          onCategorySelect={handleCategoryChange}
-          onTagSelect={handleTagChange}
+          hotArticles={hotArticles}
+          onCategorySelect={filters.handleCategoryChange}
+          onTagSelect={filters.handleTagChange}
         />
 
         <AnimatePresence>

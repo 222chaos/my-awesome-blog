@@ -1,0 +1,100 @@
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+.flip-card {
+  perspective: 1000px;
+  background-color: transparent;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+}
+
+.flip-card-front {
+  z-index: 2;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+.friend-link-corner {
+  position: relative;
+}
+
+.friend-link-corner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20%;
+  height: 20%;
+  background: var(--tech-cyan);
+  border-radius: 0 0 0 100%;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  opacity: 0.3;
+}
+
+.friend-link-corner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 20%;
+  height: 20%;
+  background: var(--tech-sky);
+  border-radius: 100% 0 0 0;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+  opacity: 0.3;
+}
+
+.friend-link-corner:hover::before {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  opacity: 0.8;
+}
+
+.friend-link-corner:hover::after {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  opacity: 0.8;
+}
+
+.dark .friend-link-corner::before {
+  background: var(--tech-lightcyan);
+}
+
+.dark .friend-link-corner::after {
+  background: var(--tech-cyan);
+}

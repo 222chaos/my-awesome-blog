@@ -8,6 +8,8 @@ from app.schemas.tag import Tag, TagCreate, TagUpdate, TagWithArticleCount
 from app.schemas.article import ArticleWithAuthor
 from app.models.user import User
 from app.models.article import Article
+from app.utils.common_helpers import parse_uuid
+from app.utils.logger import app_logger
 
 router = APIRouter()
 
@@ -55,6 +57,7 @@ def create_tag(
         )
     
     tag = crud.create_tag(db, tag=tag_in)
+    app_logger.info(f"创建标签成功: {tag.name} (ID: {tag.id}), 操作者: {current_user.username}")
     return tag
 
 
@@ -66,26 +69,19 @@ def read_tag_by_id(
     """
     Get a specific tag by id
     """
-    from uuid import UUID
-    try:
-        tag_uuid = UUID(tag_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid tag ID format",
-        )
-    
+    tag_uuid = parse_uuid(tag_id, error_detail="Invalid tag ID format")
+
     tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Tag not found",
         )
-    
+
     # Manually add article count since the CRUD function returns a list
     article_count = len(tag.articles)
     tag.article_count = article_count
-    
+
     return tag
 
 
@@ -100,22 +96,15 @@ def update_tag(
     """
     Update a tag
     """
-    from uuid import UUID
-    try:
-        tag_uuid = UUID(tag_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid tag ID format",
-        )
-    
+    tag_uuid = parse_uuid(tag_id, error_detail="Invalid tag ID format")
+
     tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Tag not found",
         )
-    
+
     # Check if slug or name is being updated to an existing value
     if tag_in.slug and tag_in.slug != tag.slug:
         existing_tag = crud.get_tag_by_slug(db, tag_in.slug)
@@ -124,7 +113,7 @@ def update_tag(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A tag with this slug already exists",
             )
-    
+
     if tag_in.name and tag_in.name != tag.name:
         existing_tag = crud.get_tag_by_name(db, tag_in.name)
         if existing_tag and existing_tag.id != tag.id:
@@ -132,8 +121,9 @@ def update_tag(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A tag with this name already exists",
             )
-    
+
     tag = crud.update_tag(db, tag_id=tag_uuid, tag_update=tag_in)
+    app_logger.info(f"更新标签: {tag.name} (ID: {tag_id}), 操作者: {current_user.username}")
     return tag
 
 
@@ -147,36 +137,30 @@ def delete_tag(
     """
     Delete a tag
     """
-    from uuid import UUID
-    try:
-        tag_uuid = UUID(tag_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid tag ID format",
-        )
-    
+    tag_uuid = parse_uuid(tag_id, error_detail="Invalid tag ID format")
+
     tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Tag not found",
         )
-    
+
     # Check if tag has associated articles
     if tag.articles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete tag that has associated articles",
         )
-    
+
     deleted = crud.delete_tag(db, tag_id=tag_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Tag not found",
         )
-    
+
+    app_logger.info(f"删除标签: {tag.name} (ID: {tag_id}), 操作者: {current_user.username}")
     return {"message": "Tag deleted successfully"}
 
 
@@ -191,22 +175,15 @@ def read_articles_by_tag(
     """
     Get articles with a specific tag
     """
-    from uuid import UUID
-    try:
-        tag_uuid = UUID(tag_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid tag ID format",
-        )
-    
+    tag_uuid = parse_uuid(tag_id, error_detail="Invalid tag ID format")
+
     tag = crud.get_tag(db, tag_id=tag_uuid)
     if not tag:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Tag not found",
         )
-    
+
     # Get articles by tag
     articles = crud.get_articles(
         db,
@@ -215,5 +192,5 @@ def read_articles_by_tag(
         published_only=published_only,
         tag_id=tag_uuid
     )
-    
+
     return articles

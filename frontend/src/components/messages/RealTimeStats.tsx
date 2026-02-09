@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Users, MessageSquare, TrendingUp, Activity, Zap, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -81,10 +81,15 @@ export default function RealTimeStats() {
         change: Math.floor(Math.random() * 5) - 2,
         value: stat.label === '活跃度' ? `${Math.floor(Math.random() * 10) + 1}/min` : stat.value
       })));
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const activityData = useMemo(() => {
+    return Array.from({ length: 24 }, (_, i) => Math.random() * 60 + 20);
+  }, []);
+
 
   const StatCard = ({ stat, index }: { stat: StatItem; index: number }) => (
     <motion.div
@@ -186,16 +191,16 @@ export default function RealTimeStats() {
           <div>
             <div className="text-xs text-white/50 mb-1">24小时活跃趋势</div>
             <div className="flex items-end gap-1 h-16">
-              {Array.from({ length: 24 }).map((_, i) => (
+              {activityData.map((height, i) => (
                 <motion.div
                   key={i}
-                  className="flex-1 bg-tech-cyan/30 rounded-t-sm relative group"
+                  className="flex-1 bg-tech-cyan/30 rounded-t-sm relative group will-change-transform"
                   initial={{ height: 0 }}
-                  animate={{ height: `${Math.random() * 60 + 20}%` }}
+                  animate={{ height: `${height}%` }}
                   transition={{ delay: i * 0.05, duration: 0.5 }}
                 >
                   <motion.div
-                    className="absolute inset-x-0 bottom-0 h-full bg-tech-cyan/0 group-hover:bg-tech-cyan/50 transition-colors rounded-t-sm"
+                    className="absolute inset-x-0 bottom-0 h-full bg-tech-cyan/0 group-hover:bg-tech-cyan/50 transition-colors rounded-t-sm will-change-opacity"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.05 + 0.3 }}

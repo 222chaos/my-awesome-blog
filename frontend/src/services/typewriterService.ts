@@ -47,7 +47,7 @@ export const typewriterService = {
   },
 
   async createTypewriterContent(contentData: TypewriterContentCreate): Promise<TypewriterContent> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -61,7 +61,7 @@ export const typewriterService = {
   },
 
   async updateTypewriterContent(contentId: string, contentData: TypewriterContentUpdate): Promise<TypewriterContent> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${contentId}`, {
       method: 'PUT',
       headers: {
@@ -75,7 +75,7 @@ export const typewriterService = {
   },
 
   async deleteTypewriterContent(contentId: string): Promise<void> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${contentId}`, {
       method: 'DELETE',
       headers: {

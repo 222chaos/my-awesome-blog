@@ -1,100 +1,62 @@
-import { useTheme } from '@/context/theme-context';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
+import type { Theme } from '@/constants/theme';
+import {
+  LIGHT_CLASS_NAMES,
+  DARK_CLASS_NAMES,
+  TECH_CLASS_NAMES,
+  THEME_VARIANTS,
+  GLASS_VARIANTS,
+} from '@/constants/theme';
 
-/**
- * 主题类接口
- */
-export interface ThemedClasses {
-  dropdownBgClass: string;
-  dropdownItemClass: string;
-  textColorClass: string;
-  separatorClass: string;
-  dropdownShadowClass: string;
-  textClass: string;
-  mutedTextClass: string;
-  borderClass: string;
-  cardBgClass: string;
+export interface ThemedClassesResult {
+  themedClasses: Record<string, string>;
+  getThemeClass: (darkClass: string, lightClass: string) => string;
+  isDark: boolean;
 }
 
-/**
- * 自定义Hook，提供主题相关的类名和工具方法
- * 合并了 useThemeUtils 的功能
- */
-export const useThemedClasses = () => {
-  const { resolvedTheme } = useTheme();
+export function useThemedClasses(): ThemedClassesResult {
+  const getTheme = useCallback((): Theme => {
+    if (typeof window === 'undefined') return 'dark';
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  }, []);
 
-  const themedClasses = useMemo(() => ({
-    dropdownBgClass: resolvedTheme === 'dark'
-      ? 'bg-glass/95 backdrop-blur-2xl border border-glass-border'
-      : 'bg-white/95 backdrop-blur-2xl border-gray-200',
-    dropdownItemClass: resolvedTheme === 'dark'
-      ? 'focus:bg-tech-cyan/15 hover:bg-glass/40 transition-all duration-200'
-      : 'focus:bg-tech-cyan/10 hover:bg-gray-50 transition-all duration-200',
-    textColorClass: resolvedTheme === 'dark'
-      ? 'text-foreground group-hover:text-tech-cyan transition-colors duration-200'
-      : 'text-gray-800 group-hover:text-tech-cyan transition-colors duration-200',
-    separatorClass: resolvedTheme === 'dark'
-      ? 'bg-glass-border/50'
-      : 'bg-gray-200/60',
-    dropdownShadowClass: resolvedTheme === 'dark'
-      ? 'shadow-2xl shadow-tech-cyan/5'
-      : 'shadow-xl shadow-gray-400/20',
-    // 新增通用类
-    textClass: resolvedTheme === 'dark' ? 'text-foreground' : 'text-gray-800',
-    mutedTextClass: resolvedTheme === 'dark' ? 'text-foreground/70' : 'text-gray-600',
-    borderClass: resolvedTheme === 'dark' ? 'border-glass-border' : 'border-gray-200',
-    cardBgClass: resolvedTheme === 'dark'
-      ? 'bg-glass/30 backdrop-blur-xl border border-glass-border'
-      : 'bg-white/80 backdrop-blur-xl border border-gray-200',
-  }), [resolvedTheme]);
+  const getThemeClass = useCallback((
+    darkClass: string,
+    lightClass: string
+  ): string => {
+    const theme = getTheme();
+    return theme === 'dark' ? darkClass : lightClass;
+  }, [getTheme]);
 
-  /**
-   * 根据当前主题返回相应的CSS类名（向后兼容 useThemeUtils）
-   * 
-   * @param darkClass - 深色主题时的CSS类名
-   * @param lightClass - 浅色主题时的CSS类名
-   * @returns 根据当前主题选择的CSS类名
-   */
-  const getThemeClass = (darkClass: string, lightClass: string) => {
-    return resolvedTheme === 'dark' ? darkClass : lightClass;
-  };
-
-  /**
-   * 根据当前主题返回相应的样式对象
-   * 
-   * @param darkStyles - 深色主题时的样式对象
-   * @param lightStyles - 浅色主题时的样式对象
-   * @returns 根据当前主题选择的样式对象
-   */
-  const getThemeStyles = (darkStyles: React.CSSProperties, lightStyles: React.CSSProperties) => {
-    return resolvedTheme === 'dark' ? darkStyles : lightStyles;
-  };
-
-  /**
-   * 判断当前是否为深色主题
-   * 
-   * @returns 是否为深色主题
-   */
-  const isDarkTheme = () => {
-    return resolvedTheme === 'dark';
-  };
-
-  /**
-   * 判断当前是否为浅色主题
-   * 
-   * @returns 是否为浅色主题
-   */
-  const isLightTheme = () => {
-    return resolvedTheme === 'light';
+  const themedClasses = {
+    primary: getThemeClass(LIGHT_CLASS_NAMES.primary, DARK_CLASS_NAMES.primary),
+    secondary: getThemeClass(LIGHT_CLASS_NAMES.secondary, DARK_CLASS_NAMES.secondary),
+    accent: getThemeClass(LIGHT_CLASS_NAMES.accent, DARK_CLASS_NAMES.accent),
+    muted: getThemeClass(LIGHT_CLASS_NAMES.muted, DARK_CLASS_NAMES.muted),
+    background: getThemeClass(LIGHT_CLASS_NAMES.background, DARK_CLASS_NAMES.background),
+    foreground: getThemeClass(LIGHT_CLASS_NAMES.foreground, DARK_CLASS_NAMES.foreground),
+    border: getThemeClass(LIGHT_CLASS_NAMES.border, DARK_CLASS_NAMES.border),
+    card: getThemeClass(LIGHT_CLASS_NAMES.card, DARK_CLASS_NAMES.card),
+    cardForeground: getThemeClass(LIGHT_CLASS_NAMES.cardForeground, DARK_CLASS_NAMES.cardForeground),
+    popover: getThemeClass(LIGHT_CLASS_NAMES.popover, DARK_CLASS_NAMES.popover),
+    popoverForeground: getThemeClass(LIGHT_CLASS_NAMES.popoverForeground, DARK_CLASS_NAMES.popoverForeground),
+    destructive: getThemeClass(LIGHT_CLASS_NAMES.destructive, DARK_CLASS_NAMES.destructive),
+    destructiveForeground: getThemeClass(LIGHT_CLASS_NAMES.destructiveForeground, DARK_CLASS_NAMES.destructiveForeground),
+    ring: getThemeClass(LIGHT_CLASS_NAMES.ring, DARK_CLASS_NAMES.ring),
+    techCyan: TECH_CLASS_NAMES.cyan,
+    techDarkblue: TECH_CLASS_NAMES.darkblue,
+    techDeepblue: TECH_CLASS_NAMES.deepblue,
+    techSky: TECH_CLASS_NAMES.sky,
+    glass: TECH_CLASS_NAMES.glass,
+    glassLight: TECH_CLASS_NAMES.glassLight,
+    glassDark: TECH_CLASS_NAMES.glassDark,
   };
 
   return {
-    resolvedTheme,
     themedClasses,
     getThemeClass,
-    getThemeStyles,
-    isDarkTheme,
-    isLightTheme,
-    currentTheme: resolvedTheme
+    isDark: getTheme() === 'dark',
   };
-};
+}
+
+export default useThemedClasses;

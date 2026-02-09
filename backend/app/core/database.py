@@ -16,10 +16,10 @@ engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
     echo=settings.DEBUG,
-    pool_size=5,
-    max_overflow=10,
-    pool_recycle=3600,
-    pool_timeout=30,
+    pool_size=settings.DATABASE_POOL_SIZE,
+    max_overflow=settings.DATABASE_MAX_OVERFLOW,  # 允许额外的连接处理高并发
+    pool_recycle=settings.DATABASE_POOL_RECYCLE,
+    pool_timeout=settings.DATABASE_POOL_TIMEOUT,
     pool_reset_on_return='commit',
     connect_args={
         "connect_timeout": 10,

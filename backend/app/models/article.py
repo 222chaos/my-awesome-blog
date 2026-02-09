@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, BigInteger, UUID
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, BigInteger, UUID, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import uuid
@@ -8,29 +8,37 @@ from app.core.database import Base
 class Article(Base):
     __tablename__ = "articles"
 
+    # 添加复合索引以优化常用查询
+    __table_args__ = (
+        Index('idx_article_published_created', 'is_published', 'created_at'),  # 按发布状态和时间查询
+        Index('idx_article_author_published', 'author_id', 'is_published'),   # 按作者和发布状态查询
+        Index('idx_article_published_featured', 'is_published', 'is_featured', 'created_at'),  # 精选文章查询
+        Index('idx_article_published_pinned', 'is_published', 'is_pinned', 'published_at'),    # 置顶文章查询
+    )
+
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    title = Column(String(200), nullable=False)
+    title = Column(String(200), nullable=False, index=True)  # 添加索引以加快搜索
     slug = Column(String(200), unique=True, index=True, nullable=False)
     content = Column(Text, nullable=False)
-    excerpt = Column(String(500))
+    excerpt = Column(String(500), index=True)  # 添加索引以加快搜索
     cover_image = Column(String(255))
-    is_published = Column(Boolean, default=False)
-    published_at = Column(DateTime(timezone=True))
-    view_count = Column(Integer, default=0)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    is_published = Column(Boolean, default=False, index=True)  # 添加索引以加快过滤
+    published_at = Column(DateTime(timezone=True), index=True)  # 添加索引以加快按时间排序
+    view_count = Column(Integer, default=0, index=True)  # 添加索引以加快排序
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)  # 添加索引以加快按时间排序
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # 新增字段
-    read_time = Column(Integer)  # 阅读时长（分钟）
+    read_time = Column(Integer, index=True)  # 阅读时长（分钟），添加索引以加快排序
     featured_image_id = Column(UUID(as_uuid=True), ForeignKey("images.id"))
-    is_featured = Column(Boolean, default=False)
-    is_pinned = Column(Boolean, default=False)
+    is_featured = Column(Boolean, default=False, index=True)  # 添加索引以加快过滤
+    is_pinned = Column(Boolean, default=False, index=True)  # 添加索引以加快过滤
     meta_title = Column(String(200))
-    meta_description = Column(Text)
-    
+    meta_description = Column(Text, index=True)  # 添加索引以加快搜索
+
     # Foreign keys
-    author_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    author_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)  # 添加索引以加快JOIN操作
     featured_image = relationship("Image", foreign_keys=[featured_image_id])
-    
+
     # Relationships
     author = relationship("User", back_populates="articles")
     comments = relationship("Comment", back_populates="article", cascade="all, delete-orphan")

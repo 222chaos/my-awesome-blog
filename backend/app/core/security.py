@@ -3,9 +3,11 @@ from typing import Optional
 from jose import JWTError, jwt
 import bcrypt
 from app.core.config import settings
+from app.utils.logger import app_logger
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    """创建JWT访问令牌"""
     to_encode = data.copy()
     
     if expires_delta:
@@ -19,6 +21,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 
 def verify_token(token: str) -> Optional[dict]:
+    """验证JWT令牌"""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
@@ -27,28 +30,22 @@ def verify_token(token: str) -> Optional[dict]:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # Truncate password if it exceeds bcrypt's 72-byte limit
-    # Convert to bytes to properly measure length considering multi-byte characters
-    if len(plain_password.encode('utf-8')) > 72:
-        # Truncate to 71 bytes to stay under the limit, preserving UTF-8 encoding
-        truncated = plain_password.encode('utf-8')[:71].decode('utf-8', errors='ignore')
-        try:
-            return bcrypt.checkpw(truncated.encode('utf-8'), hashed_password.encode('utf-8'))
-        except ValueError:
-            # If truncation still causes an issue, return False
-            return False
+    """
+    验证密码
+    注意：bcrypt 自动处理72字节限制，无需手动截断
+    """
     try:
         return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-    except ValueError:
-        # If verification fails due to password length, return False
+    except ValueError as e:
+        # 如果验证失败，记录错误并返回False
+        app_logger.error(f"Password verification error: {str(e)}")
         return False
 
 
 def get_password_hash(password: str) -> str:
-    # Truncate password if it exceeds bcrypt's 72-byte limit
-    # Convert to bytes to properly measure length considering multi-byte characters
-    if len(password.encode('utf-8')) > 72:
-        # Truncate to 71 bytes to stay under the limit, preserving UTF-8 encoding
-        truncated = password.encode('utf-8')[:71].decode('utf-8', errors='ignore')
-        return bcrypt.hashpw(truncated.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    """
+    生成密码哈希
+    注意：bcrypt 自动处理72字节限制，无需手动截断
+    密码长度限制应在 schema 层验证（见 user.py schema 的 PasswordStr）
+    """
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

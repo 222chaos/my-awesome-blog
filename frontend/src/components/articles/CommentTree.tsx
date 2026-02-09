@@ -1,25 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import GlassCard from '@/components/ui/GlassCard';
 import { cn } from '@/lib/utils';
 import { ThumbsUp, MessageSquare, ChevronDown, ChevronUp, User, Clock } from 'lucide-react';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-
-export interface Comment {
-  id: string;
-  content: string;
-  author: {
-    id: string;
-    username: string;
-    avatar?: string;
-  };
-  createdAt: string;
-  likes: number;
-  replies?: Comment[];
-}
+import { Comment } from '@/types';
+import { formatDateRelative } from '@/utils/dateFormat';
 
 interface CommentTreeProps {
   comments: Comment[];
@@ -51,32 +40,25 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
   const hasReplies = comment.replies && comment.replies.length > 0;
   const canReply = depth < maxDepth;
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return '刚刚';
-    if (diffMins < 60) return `${diffMins}分钟前`;
-    if (diffHours < 24) return `${diffHours}小时前`;
-    if (diffDays < 7) return `${diffDays}天前`;
-    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-  };
-
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     onLike?.(comment.id);
-  };
+  }, [onLike, comment.id]);
 
-  const handleReply = () => {
+  const handleReply = useCallback(() => {
     if (replyContent.trim()) {
       onReply?.(comment.id);
       setReplyContent('');
       setIsReplying(false);
     }
-  };
+  }, [onReply, replyContent]);
+
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
+
+  const toggleReplying = useCallback(() => {
+    setIsReplying(prev => !prev);
+  }, []);
 
   const itemVariants = {
     hidden: { opacity: 0, x: -10 },
@@ -127,14 +109,14 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
                 </span>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="w-3 h-3" />
-                  <span>{formatDate(comment.createdAt)}</span>
+                  <span>{formatDateRelative(comment.createdAt)}</span>
                 </div>
               </div>
               {hasReplies && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setIsExpanded(!isExpanded)}
+                  onClick={toggleExpanded}
                   className={cn('text-xs h-6 px-2', getThemeClass('text-foreground/70 hover:text-tech-cyan', 'text-gray-600 hover:text-blue-600'))}
                 >
                   {isExpanded ? (
@@ -171,14 +153,13 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setIsReplying(!isReplying)}
+                  onClick={toggleReplying}
                   className={cn('text-xs h-7 px-2', getThemeClass('text-foreground/70 hover:text-tech-cyan', 'text-gray-600 hover:text-blue-600'))}
                 >
                   <MessageSquare className="w-3 h-3 mr-1" />
                   {isReplying ? '取消' : '回复'}
                 </Button>
               )}
-            </div>
 
             <AnimatePresence>
               {isReplying && (
@@ -206,10 +187,7 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setIsReplying(false);
-                        setReplyContent('');
-                      }}
+                      onClick={toggleReplying}
                       className="text-xs"
                     >
                       取消
@@ -247,11 +225,14 @@ function CommentItem({ comment, depth, maxDepth, onReply, onLike }: CommentItemP
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </motion.div></div>
   );
 }
 
-export default function CommentTree({
+const CommentItemWithMemo = memo(CommentItem);
+CommentItemWithMemo.displayName = 'CommentItem';
+
+function CommentTree({
   comments,
   depth = 0,
   maxDepth = 3,
@@ -277,7 +258,7 @@ export default function CommentTree({
   return (
     <div className={cn('space-y-4', className)}>
       {comments.map((comment) => (
-        <CommentItem
+        <CommentItemWithMemo
           key={comment.id}
           comment={comment}
           depth={depth}
@@ -289,3 +270,8 @@ export default function CommentTree({
     </div>
   );
 }
+
+const CommentTreeWithMemo = memo(CommentTree);
+CommentTreeWithMemo.displayName = 'CommentTree';
+
+export default CommentTreeWithMemo;

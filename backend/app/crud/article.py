@@ -7,6 +7,7 @@ from app.models.article import Article
 from app.schemas.article import ArticleCreate, ArticleUpdate
 from app.services.cache_service import cache_service, cache_get_or_set
 from app.utils.pagination import CursorPaginationParams, CursorPaginationResult, paginate_with_cursor
+from app.utils.cache_keys import CacheKeys, CacheTTL
 from sqlalchemy import text
 
 
@@ -15,13 +16,16 @@ def get_article(db: Session, article_id: UUID) -> Optional[Article]:
 
 
 async def get_article_async(db: Session, article_id: UUID) -> Optional[Article]:
-    """异步获取文章，带缓存功能"""
-    cache_key = f"article:{article_id}"
+    """异步获取文章，带缓存功能和缓存穿透防护"""
+    cache_key = CacheKeys.article(article_id)
     cached_article = await cache_service.get(cache_key)
-    
+
     if cached_article is not None:
+        # 检查是否为空值缓存(用于缓存穿透防护)
+        if cached_article is False:  # 使用False标记空值
+            return None
         return cached_article
-    
+
     from sqlalchemy.orm import joinedload
     article = (
         db.query(Article)
@@ -31,9 +35,15 @@ async def get_article_async(db: Session, article_id: UUID) -> Optional[Article]:
         .filter(Article.id == article_id)
         .first()
     )
+
     if article:
-        await cache_service.set(cache_key, article, expire=3600)  # Cache for 1 hour
-    
+        # 缓存真实数据
+        await cache_service.set(cache_key, article, expire=CacheTTL.ARTICLE)
+    else:
+        # 缓存空值,防止缓存穿透(使用False标记,60秒过期)
+        null_cache_key = CacheKeys.article_null(article_id)
+        await cache_service.set(null_cache_key, False, expire=CacheTTL.VERY_SHORT)
+
     return article
 
 
@@ -66,13 +76,16 @@ def get_article_by_slug_with_relationships(db: Session, slug: str) -> Optional[A
 
 
 async def get_article_by_slug_with_relationships_async(db: Session, slug: str) -> Optional[Article]:
-    """异步获取文章，带缓存和关系数据"""
-    cache_key = f"article:slug:{slug}"
+    """异步获取文章，带缓存和关系数据,以及缓存穿透防护"""
+    cache_key = CacheKeys.article_by_slug(slug)
     cached_article = await cache_service.get(cache_key)
-    
+
     if cached_article is not None:
+        # 检查是否为空值缓存
+        if cached_article is False:
+            return None
         return cached_article
-    
+
     from sqlalchemy.orm import joinedload
     article = (
         db.query(Article)
@@ -82,10 +95,14 @@ async def get_article_by_slug_with_relationships_async(db: Session, slug: str) -
         .filter(Article.slug == slug)
         .first()
     )
-    
+
     if article:
-        await cache_service.set(cache_key, article, expire=3600)  # Cache for 1 hour
-    
+        await cache_service.set(cache_key, article, expire=CacheTTL.ARTICLE)
+    else:
+        # 缓存空值,防止缓存穿透
+        null_cache_key = CacheKeys.article_slug_null(slug)
+        await cache_service.set(null_cache_key, False, expire=CacheTTL.VERY_SHORT)
+
     return article
 
 
@@ -99,8 +116,26 @@ def get_articles(
     order_by_views: bool = False,
     category_id: Optional[UUID] = None,
     tag_id: Optional[UUID] = None,
+    with_relationships: bool = True,  # 默认预加载关联数据，防止 N+1 查询
 ):
-    query = db.query(Article)
+    """
+    获取文章列表
+    
+    Args:
+        with_relationships: 是否预加载关联数据（作者、分类、标签），
+                           默认为 True 以防止 N+1 查询问题
+    """
+    from sqlalchemy.orm import joinedload
+    
+    # 使用 joinedload 预加载关联数据，避免 N+1 查询
+    if with_relationships:
+        query = db.query(Article).options(
+            joinedload(Article.author),
+            joinedload(Article.categories),
+            joinedload(Article.tags)
+        )
+    else:
+        query = db.query(Article)
     
     if published_only:
         query = query.filter(Article.is_published == True)
@@ -181,9 +216,9 @@ async def update_article(db: Session, article_id: UUID, article_update: ArticleU
     db_article = get_article(db, article_id)
     if not db_article:
         return None
-    
+
     update_data = article_update.model_dump(exclude_unset=True)
-    
+
     # Handle publish status change
     if "is_published" in update_data:
         is_published = update_data["is_published"]
@@ -191,22 +226,22 @@ async def update_article(db: Session, article_id: UUID, article_update: ArticleU
             update_data["published_at"] = datetime.now(timezone.utc)
         elif not is_published and db_article.is_published:  # type: ignore
             update_data["published_at"] = None
-    
+
     for field, value in update_data.items():
         setattr(db_article, field, value)
-    
+
     db.commit()
     db.refresh(db_article)
-    
-    # Update cache
-    cache_key = f"article:{article_id}"
-    await cache_service.set(cache_key, db_article, expire=3600)  # Cache for 1 hour
-    
+
+    # 使用统一的缓存键更新缓存
+    cache_key = CacheKeys.article(article_id)
+    await cache_service.set(cache_key, db_article, expire=CacheTTL.ARTICLE)
+
     # Also update by slug cache if slug was changed
     if hasattr(article_update, 'slug') and article_update.slug:
-        slug_cache_key = f"article:slug:{article_update.slug}"
-        await cache_service.set(slug_cache_key, db_article, expire=3600)
-    
+        slug_cache_key = CacheKeys.article_by_slug(article_update.slug)
+        await cache_service.set(slug_cache_key, db_article, expire=CacheTTL.ARTICLE)
+
     return db_article
 
 
@@ -214,23 +249,24 @@ async def delete_article(db: Session, article_id: UUID) -> bool:
     db_article = get_article(db, article_id)
     if not db_article:
         return False
-    
+
     db.delete(db_article)
     db.commit()
-    
-    # Delete cache entries
-    cache_key = f"article:{article_id}"
+
+    # 使用统一的缓存键删除缓存
+    cache_key = CacheKeys.article(article_id)
     await cache_service.delete(cache_key)
-    
+
     if db_article.slug:
-        slug_cache_key = f"article:slug:{db_article.slug}"
+        slug_cache_key = CacheKeys.article_by_slug(db_article.slug)
         await cache_service.delete(slug_cache_key)
-    
+
     return True
 
 
 async def increment_view_count(db: Session, article_id: UUID) -> Optional[Article]:
     from sqlalchemy.orm import joinedload
+
     db_article = (
         db.query(Article)
         .options(joinedload(Article.author))
@@ -241,21 +277,25 @@ async def increment_view_count(db: Session, article_id: UUID) -> Optional[Articl
     )
     if not db_article:
         return None
-    
+
     db_article.view_count = db_article.view_count + 1  # type: ignore
     db.commit()
-    
-    # 更新缓存
-    cache_key = f"article:{article_id}"
-    await cache_service.set(cache_key, db_article, expire=3600)  # Cache for 1 hour
-    
+
+    # 使用统一的缓存键更新缓存
+    cache_key = CacheKeys.article(article_id)
+    await cache_service.set(cache_key, db_article, expire=CacheTTL.ARTICLE)
+
     return db_article
 
 
 def get_featured_articles(db: Session, limit: int = 10):
     """Get featured articles based on view count and publication date"""
+    from sqlalchemy.orm import joinedload
+    
+    # 使用 joinedload 预加载作者信息，避免 N+1 查询
     return (
         db.query(Article)
+        .options(joinedload(Article.author))
         .filter(Article.is_published == True)
         .order_by(Article.view_count.desc(), Article.created_at.desc())
         .limit(limit)
@@ -265,20 +305,27 @@ def get_featured_articles(db: Session, limit: int = 10):
 
 def get_related_articles(db: Session, article_id: UUID, limit: int = 5):
     """Get articles related to a specific article based on category or tags"""
+    from sqlalchemy.orm import joinedload
     from app.models.article_category import ArticleCategory
     from app.models.article_tag import ArticleTag
     
-    # Get the original article
-    original_article = get_article(db, article_id)
+    # Get the original article (预加载关联数据)
+    original_article = (
+        db.query(Article)
+        .options(joinedload(Article.article_categories))
+        .filter(Article.id == article_id)
+        .first()
+    )
     if not original_article:
         return []
     
-    # Find articles in the same category
+    # Find articles in the same category (预加载作者信息)
     related_by_category = []
     if original_article.article_categories and len(original_article.article_categories) > 0:
         category_id = original_article.article_categories[0].category_id
         related_by_category = (
             db.query(Article)
+            .options(joinedload(Article.author))  # 预加载作者，避免 N+1
             .join(ArticleCategory)
             .filter(
                 Article.id != article_id,
@@ -293,12 +340,15 @@ def get_related_articles(db: Session, article_id: UUID, limit: int = 5):
     # If we don't have enough articles from the same category, get popular articles
     if len(related_by_category) < limit:
         remaining = limit - len(related_by_category)
+        existing_ids = [a.id for a in related_by_category]
+        existing_ids.append(article_id)
+        
         popular_articles = (
             db.query(Article)
+            .options(joinedload(Article.author))  # 预加载作者，避免 N+1
             .filter(
-                Article.id != article_id,
                 Article.is_published == True,
-                Article.id.notin_([a.id for a in related_by_category])
+                ~Article.id.in_(existing_ids)
             )
             .order_by(Article.view_count.desc(), Article.created_at.desc())
             .limit(remaining)
@@ -352,6 +402,7 @@ def get_popular_articles(db: Session, limit: int = 5, days: int = 30):
     获取热门文章（基于浏览量和评论数）
     """
     from sqlalchemy import func, and_
+    from sqlalchemy.orm import joinedload
     from datetime import datetime, timedelta
     from app.models.comment import Comment
 
@@ -359,8 +410,10 @@ def get_popular_articles(db: Session, limit: int = 5, days: int = 30):
     since_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     # 查询热门文章（考虑浏览量和评论数）
+    # 使用 joinedload 预加载作者信息，避免 N+1 查询
     popular_articles = (
         db.query(Article)
+        .options(joinedload(Article.author))  # 预加载作者
         .join(Comment, Comment.article_id == Article.id, isouter=True)  # 左连接评论表
         .filter(and_(Article.is_published == True, Article.published_at >= since_date))
         .group_by(Article.id)  # 按文章分组

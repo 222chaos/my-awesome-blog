@@ -6,6 +6,7 @@ import { Camera, Image as ImageIcon, Calendar, Star, Heart, Share2, Download, Pl
 import { cn } from '@/lib/utils';
 import GlassCard from '@/components/ui/GlassCard';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
+import useThrottle from '@/hooks/useThrottle';
 
 export interface AlbumData {
   id: string;

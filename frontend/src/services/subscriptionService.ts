@@ -29,7 +29,7 @@ export const subscriptionService = {
     if (params?.skip !== undefined) queryString.append('skip', params.skip.toString());
     if (params?.limit !== undefined) queryString.append('limit', params.limit.toString());
 
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}?${queryString.toString()}`, {
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -40,7 +40,7 @@ export const subscriptionService = {
   },
 
   async getSubscriptionById(subscriptionId: string): Promise<Subscription> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${subscriptionId}`, {
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -51,7 +51,7 @@ export const subscriptionService = {
   },
 
   async createSubscription(email: string): Promise<Subscription> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -73,7 +73,7 @@ export const subscriptionService = {
   },
 
   async updateSubscription(subscriptionId: string, subscriptionData: SubscriptionUpdate): Promise<Subscription> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${subscriptionId}`, {
       method: 'PUT',
       headers: {
@@ -87,7 +87,7 @@ export const subscriptionService = {
   },
 
   async deleteSubscription(subscriptionId: string): Promise<void> {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_URL}/${subscriptionId}`, {
       method: 'DELETE',
       headers: {

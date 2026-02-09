@@ -10,6 +10,9 @@ from app.schemas.message import (
 )
 from app.models.user import User
 from uuid import UUID
+from app.utils.common_helpers import parse_uuid
+from app.utils.permission_helpers import check_edit_permission, check_delete_permission
+from app.utils.logger import app_logger
 
 router = APIRouter()
 
@@ -77,6 +80,7 @@ def create_message(
         message=message_in,
         author_id=current_user.id  # type: ignore
     )
+    app_logger.info(f"创建留言成功: {message.id}, 操作者: {current_user.username}")
     return message
 
 
@@ -129,21 +133,15 @@ def read_message_by_id(
     """
     Get a specific message by id
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.get_message(db, message_id=message_uuid, with_relationships=True)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
     return message
 
 
@@ -157,21 +155,15 @@ def read_message_replies(
     """
     Get replies to a message
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.get_message(db, message_id=message_uuid)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
     replies = crud.get_replies(
         db,
         message_id=message_uuid,
@@ -193,29 +185,20 @@ def update_message(
     """
     Update a message
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.get_message(db, message_id=message_uuid)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
-    # Check permission: only author or superuser can update
-    if message.author_id != current_user.id and not current_user.is_superuser:  # type: ignore
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to update this message",
-        )
-    
+
+    # 使用统一的权限检查
+    check_edit_permission(message, current_user, superuser_bypass=True, resource_name="留言")
+
     message = crud.update_message(db, message_id=message_uuid, message_update=message_in)
+    app_logger.info(f"更新留言: {message_id}, 操作者: {current_user.username}")
     return message
 
 
@@ -229,35 +212,26 @@ def delete_message(
     """
     Delete a message (soft delete)
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.get_message(db, message_id=message_uuid)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
-    # Check permission: only author or superuser can delete
-    if message.author_id != current_user.id and not current_user.is_superuser:  # type: ignore
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to delete this message",
-        )
-    
+
+    # 使用统一的权限检查
+    check_delete_permission(message, current_user, superuser_bypass=True, resource_name="留言")
+
     deleted = crud.delete_message(db, message_id=message_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
+    app_logger.info(f"删除留言: {message_id}, 操作者: {current_user.username}")
     return {"message": "Message deleted successfully"}
 
 
@@ -269,21 +243,15 @@ def like_message(
     """
     Like a message
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.like_message(db, message_id=message_uuid)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
     return message
 
 
@@ -296,21 +264,15 @@ def unlike_message(
     """
     Unlike a message (requires authentication)
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.unlike_message(db, message_id=message_uuid)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
     return message
 
 
@@ -324,26 +286,21 @@ def hard_delete_message(
     """
     Hard delete a message (admin only)
     """
-    try:
-        message_uuid = UUID(message_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid message ID format",
-        )
-    
+    message_uuid = parse_uuid(message_id, error_detail="Invalid message ID format")
+
     message = crud.get_message(db, message_id=message_uuid)
     if not message:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
     deleted = crud.hard_delete_message(db, message_id=message_uuid)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Message not found",
         )
-    
+
+    app_logger.info(f"永久删除留言: {message_id}, 操作者: {current_user.username}")
     return {"message": "Message permanently deleted"}

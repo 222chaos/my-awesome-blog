@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
 import { Album } from '@/types';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8989/api/v1';
+import { API_BASE_URL } from '@/config/api';
 
 // GET /api/albums - 获取所有相册
 export async function GET(request: NextRequest) {
@@ -11,13 +10,30 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '100';
 
     // 从后端API获取相册数据
-    const response = await fetch(`${API_BASE_URL}/albums?skip=${skip}&limit=${limit}`);
+    const response = await fetch(`${API_BASE_URL}/albums?skip=${skip}&limit=${limit}`, {
+      cache: 'no-store'
+    });
     
     if (!response.ok) {
+      console.error(`后端API请求失败: ${response.status} ${response.statusText}`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
-    const albums: Album[] = await response.json();
+    const text = await response.text();
+    console.log('后端响应内容:', text);
+    
+    let albums: Album[];
+    try {
+      albums = JSON.parse(text);
+    } catch (parseError) {
+      console.error('JSON解析失败:', parseError);
+      throw new Error('Invalid JSON response from backend');
+    }
+    
+    if (!Array.isArray(albums)) {
+      console.error('后端返回的数据不是数组:', typeof albums);
+      throw new Error('Backend returned non-array data');
+    }
     
     return Response.json({
       success: true,
