@@ -1228,7 +1228,7 @@ export default function ImageTrail({ items = [], variant = 1 }: ImageTrailProps)
           className="content__img w-[190px] aspect-[1.1] rounded-[15px] absolute top-0 left-0 opacity-0 overflow-hidden [will-change:transform,filter]"
           key={i}
         >
-          <div
+          <div 
             className="content__img-inner bg-center bg-cover w-[calc(100%+20px)] h-[calc(100%+20px)] absolute top-[-10px] left-[-10px]"
             style={{ backgroundImage: `url(${url})` }}
           />

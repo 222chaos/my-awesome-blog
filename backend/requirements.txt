@@ -39,7 +39,7 @@ gputil==1.4.0
 Pillow==10.0.1
 
 # File validation and async file operations
-python-magic-bin==0.4.14
+puremagic==1.28
 aiofiles==23.2.1
 
 # Redis support

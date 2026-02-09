@@ -79,6 +79,7 @@ def setup_logger():
         rotation="10 MB",
         retention="90 days",
         compression="zip",
+        filter=lambda record: record["extra"].get("has_traceback", False),
         enqueue=True  # 异步处理，避免阻塞
     )
 
@@ -136,7 +137,7 @@ def log_error_with_traceback(error: Exception, context: str = ""):
     记录带有完整堆栈跟踪的错误
     """
     tb_str = traceback.format_exception(type(error), error, error.__traceback__)
-    app_logger.bind(traceback="".join(tb_str)).error(f"ERROR in {context}: {str(error)}")
+    app_logger.bind(traceback="".join(tb_str), has_traceback=True).error(f"ERROR in {context}: {str(error)}")
 
 
 # Convenience functions

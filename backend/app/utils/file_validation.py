@@ -4,7 +4,7 @@
 """
 import os
 import tempfile
-import magic
+import puremagic
 from pathlib import Path
 from typing import List, Tuple, Set
 from fastapi import HTTPException, UploadFile, status
@@ -71,7 +71,7 @@ def validate_mime_type(file_path: str) -> Tuple[bool, str]:
         Tuple[bool, str]: (是否有效, MIME类型或错误信息)
     """
     try:
-        mime_type = magic.from_file(file_path, mime=True)
+        mime_type = puremagic.from_file(file_path, mime=True)
         if mime_type not in ALLOWED_MIME_TYPES:
             return False, f"不支持的文件类型: {mime_type}"
         return True, mime_type
