@@ -252,14 +252,14 @@ const AlbumsPage = () => {
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20" />
 
-            <div className="absolute inset-0 z-0 overflow-visible min-h-[450px] w-full">
+            <div className="absolute inset-0 z-0 overflow-visible min-h-[450px] w-full pointer-events-auto">
               <ImageTrail
                 items={albums.map(album => album.coverImage)}
                 variant={3}
               />
             </div>
             
-            <div className="relative z-10 text-center min-h-[400px] flex flex-col justify-center items-center">
+            <div className="relative z-10 text-center min-h-[400px] flex flex-col justify-center items-center pointer-events-none">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -267,29 +267,29 @@ const AlbumsPage = () => {
               >
                 <Camera className="w-6 h-6 text-tech-cyan" />
               </motion.div>
-              
+
               <h1 className="text-4xl sm:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-tech-cyan via-tech-sky via-purple-400 to-pink-500">
                 我的相册
               </h1>
-              
+
               <div className="flex items-center justify-center gap-4 my-4">
                 <div className="h-px w-16 bg-gradient-to-r from-transparent to-tech-cyan/50" />
                 <div className="w-2 h-2 rounded-full bg-tech-cyan animate-pulse" />
                 <div className="h-px w-16 bg-gradient-to-l from-transparent to-tech-cyan/50" />
               </div>
-              
+
               <p className={cn("text-base sm:text-lg max-w-2xl mx-auto font-light tracking-wide leading-relaxed mb-8", themedClasses.mutedTextClass)}>
                 探索生活中的美好瞬间 · 用镜头记录难忘时刻
               </p>
 
               {/* 统计信息 - 内联到标题框中 */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 max-w-md mx-auto">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 max-w-md mx-auto pointer-events-auto">
                 <motion.div
                   whileHover={{ scale: 1.05, y: -4 }}
-                  className="flex-1 group relative p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden"
+                  className="flex-1 group relative p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden pointer-events-auto"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-tech-cyan/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
+
                   <div className="relative z-10 flex items-center justify-center gap-3">
                     <motion.div
                       animate={{ rotate: [0, 360] }}
