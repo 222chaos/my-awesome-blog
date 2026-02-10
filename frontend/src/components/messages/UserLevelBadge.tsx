@@ -1,33 +1,37 @@
 'use client';
 
-import { motion, memo } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Crown, Zap, Star, Trophy, Flame } from 'lucide-react';
 
 interface UserLevelBadgeProps {
-  level: number;
+  level?: number;
   username?: string;
   showProgress?: boolean;
   progress?: number;
   achievements?: string[];
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
-const UserLevelBadge = memo(({
-  level,
+const UserLevelBadge = ({
+  level: propLevel,
   username,
   showProgress = true,
   progress = 0,
   achievements = [],
   size = 'md'
 }: UserLevelBadgeProps) => {
+  const level = (typeof propLevel === 'number' && !isNaN(propLevel)) ? propLevel : 1;
+
   const sizeClasses = {
+    xs: 'text-xs px-1.5 py-0.5',
     sm: 'text-xs px-2 py-0.5',
     md: 'text-sm px-3 py-1',
     lg: 'text-base px-4 py-1.5'
   };
 
   const iconSize = {
+    xs: 'w-2.5 h-2.5',
     sm: 'w-3 h-3',
     md: 'w-4 h-4',
     lg: 'w-5 h-5'
@@ -136,6 +140,6 @@ const UserLevelBadge = memo(({
       )}
     </div>
   );
-});
+};
 
 export default UserLevelBadge;

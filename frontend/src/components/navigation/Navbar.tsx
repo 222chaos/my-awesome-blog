@@ -4,7 +4,7 @@ import Link from 'next/link';
 import AnimatedLogo from './AnimatedLogo';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, Search, X, Menu, Music, Image, Film, Gamepad2, ChevronDown } from 'lucide-react';
+import { Home, BookOpen, Briefcase, Mail, Camera, Wrench, Search, X, Menu, Music, Image, Film, Gamepad2, ChevronDown, MessageSquare, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { RopeThemeToggler } from '@/components/ui/rope-theme-toggler';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
@@ -35,7 +35,9 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [homeDropdownOpen, setHomeDropdownOpen] = useState(false);
+  const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const homeDropdownRef = useRef<HTMLDivElement>(null);
+  const toolsDropdownRef = useRef<HTMLDivElement>(null);
   const navbarRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -111,7 +113,15 @@ export default function Navbar() {
     },
     { href: '/articles', label: '文章', icon: BookOpen },
     { href: '/albums', label: '相册', icon: Camera },
-    { href: '/tools', label: '百宝箱', icon: Wrench },
+    {
+      href: '/tools',
+      label: '百宝箱',
+      icon: Wrench,
+      children: [
+        { href: '/chat', label: '模型对话', icon: MessageSquare },
+        { href: '/online-tools', label: '在线工具', icon: Cpu },
+      ]
+    },
     { href: '/messages', label: '留言', icon: Mail },
     { href: '/contact', label: '联系我', icon: Mail },
   ];
@@ -175,7 +185,8 @@ export default function Navbar() {
                   const IconComponent = link.icon;
                   const hasChildren = link.children && link.children.length > 0;
                   const isHomeDropdown = link.href === '/home';
-                  
+                  const isToolsDropdown = link.href === '/tools';
+
                   if (isHomeDropdown && hasChildren) {
                     return (
                       <motion.div
@@ -251,7 +262,83 @@ export default function Navbar() {
                       </motion.div>
                     );
                   }
-                  
+
+                  if (isToolsDropdown && hasChildren) {
+                    return (
+                      <motion.div
+                        key={link.href}
+                        initial="hidden"
+                        animate="visible"
+                        custom={index}
+                        variants={navItemVariants}
+                        className="relative"
+                        ref={toolsDropdownRef}
+                        onMouseEnter={() => setToolsDropdownOpen(true)}
+                        onMouseLeave={() => setToolsDropdownOpen(false)}
+                      >
+                        <button
+                          className={cn(
+                            'nav-link relative text-sm font-medium transition-colors flex items-center py-2 px-3 space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-tech-cyan rounded-lg overflow-hidden group',
+                            pathname === link.href
+                              ? "text-tech-cyan"
+                              : "text-foreground/80 hover:text-tech-cyan"
+                          )}
+                          aria-expanded={toolsDropdownOpen}
+                          aria-haspopup="true"
+                        >
+                          <IconComponent className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                          <span className="relative">
+                            {link.label}
+                            <span className={cn(
+                              "absolute bottom-0 left-0 h-0.5 bg-tech-cyan transform scale-x-0 transition-transform duration-300 origin-left",
+                              "group-hover:scale-x-100"
+                            )} />
+                          </span>
+                          <ChevronDown className={cn(
+                            "h-3 w-3 ml-1 transition-transform duration-200",
+                            toolsDropdownOpen && "rotate-180"
+                          )} />
+                        </button>
+
+                        {/* 下拉菜单 */}
+                        <AnimatePresence>
+                          {toolsDropdownOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              transition={{ duration: 0.2 }}
+                              className="absolute top-full left-0 mt-2 w-48 py-2 bg-glass backdrop-blur-3xl rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50"
+                            >
+                              <div className="px-3 py-2 border-b border-white/10 mb-1">
+                                <span className="text-xs font-medium text-white/50 uppercase tracking-wider">工具</span>
+                              </div>
+                              {link.children?.map((child) => {
+                                const ChildIcon = child.icon;
+                                return (
+                                  <Link
+                                    key={child.href}
+                                    href={child.href as any}
+                                    className={cn(
+                                      'flex items-center space-x-3 px-4 py-2.5 text-sm transition-colors hover:bg-white/5',
+                                      pathname === child.href
+                                        ? "text-tech-cyan bg-tech-cyan/10"
+                                        : "text-foreground/80 hover:text-tech-cyan"
+                                    )}
+                                    onClick={() => setToolsDropdownOpen(false)}
+                                  >
+                                    <ChildIcon className="h-4 w-4" />
+                                    <span>{child.label}</span>
+                                  </Link>
+                                );
+                              })}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  }
+
                   return (
                     <motion.div
                       key={link.href}

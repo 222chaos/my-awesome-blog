@@ -80,14 +80,11 @@ async def stream_chat(
 
 
 @router.get("/models", response_model=LLMModelsResponse, status_code=status.HTTP_200_OK)
-async def get_models(
-    current_user: User = Depends(get_current_active_user),
-) -> LLMModelsResponse:
+async def get_models() -> LLMModelsResponse:
     """
     获取可用的 LLM 模型列表
 
     返回所有已配置且可用的 LLM 提供商和模型信息
     """
-    app_logger.info(f"User {current_user.username} requested available LLM models")
     response = await llm_service.get_available_models()
     return response

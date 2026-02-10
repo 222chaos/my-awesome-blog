@@ -4,25 +4,28 @@ import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { motion, memo } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface MessagePaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
   className?: string;
   showEdgeButtons?: boolean;
   showEllipsis?: boolean;
 }
 
-const MessagePagination = memo(function MessagePagination({
-  currentPage,
-  totalPages,
-  onPageChange,
+const MessagePagination = ({
+  currentPage: propCurrentPage = 1,
+  totalPages: propTotalPages = 1,
+  onPageChange = () => {},
   className,
   showEdgeButtons = true,
   showEllipsis = true
-}: MessagePaginationProps) {
+}: MessagePaginationProps) => {
+  const currentPage = (typeof propCurrentPage === 'number' && !isNaN(propCurrentPage)) ? propCurrentPage : 1;
+  const totalPages = (typeof propTotalPages === 'number' && !isNaN(propTotalPages)) ? propTotalPages : 1;
+
   const { getThemeClass } = useThemedClasses();
 
   const getPageNumbers = () => {
@@ -210,6 +213,6 @@ const MessagePagination = memo(function MessagePagination({
       </motion.div>
     </motion.div>
   );
-});
+};
 
 export default MessagePagination;

@@ -40,6 +40,12 @@ function ReportDialog({
   const mutedTextClass = themedClasses.mutedTextClass;
   const cardBgClass = themedClasses.cardBgClass;
 
+  const handleClose = useCallback(() => {
+    setSelectedReason('');
+    setDetails('');
+    onClose();
+  }, [onClose]);
+
   const handleSubmit = useCallback(async () => {
     if (!selectedReason) return;
 
@@ -52,12 +58,6 @@ function ReportDialog({
       setIsSubmitting(false);
     }
   }, [selectedReason, details, onSubmit, handleClose]);
-
-  const handleClose = useCallback(() => {
-    setSelectedReason('');
-    setDetails('');
-    onClose();
-  }, [onClose]);
 
   if (!isOpen) return null;
 

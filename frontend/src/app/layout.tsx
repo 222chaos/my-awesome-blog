@@ -8,7 +8,6 @@ import { LoadingProvider } from '@/context/loading-context';
 import LoadingHandler from '@/components/loading/LoadingHandler';
 import { Toaster } from '@/components/ui/toaster';
 import { env } from '@/lib/env';
-import ErrorBoundary from '@/components/error/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' });
@@ -23,18 +22,16 @@ export const metadata: Metadata = {
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ErrorBoundary>
-      <LoadingProvider>
-        <ThemeWrapper>
-          <Navbar />
-          <main className="bg-background min-h-screen">
-            <LoadingHandler>{children}</LoadingHandler>
-          </main>
-          <Footer />
-          <Toaster />
-        </ThemeWrapper>
-      </LoadingProvider>
-    </ErrorBoundary>
+    <LoadingProvider>
+      <ThemeWrapper>
+        <Navbar />
+        <main className="bg-background min-h-screen">
+          <LoadingHandler>{children}</LoadingHandler>
+        </main>
+        <Footer />
+        <Toaster />
+      </ThemeWrapper>
+    </LoadingProvider>
   );
 };
 

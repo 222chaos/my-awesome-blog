@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
-import { Grid } from 'react-window';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Heart, Reply, Trash2, Flame, Flag, Edit2, Check, Pin, Star, Settings } from 'lucide-react';
+import { Heart, Reply, Trash2, Flame, Flag, Edit2, Check, Pin, Star, Settings, MoreHorizontal } from 'lucide-react';
 import { LazyAvatar } from '@/components/ui/LazyImage';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
@@ -60,8 +59,7 @@ const MessageCard = memo(function MessageCard({
   onLikeReply,
   onDeleteReply,
   onOpenManage,
-  isAdmin,
-  style
+  isAdmin
 }: {
   msg: Message;
   currentUser: UserProfile | null;
@@ -76,15 +74,26 @@ const MessageCard = memo(function MessageCard({
   onDeleteReply?: (replyId: string) => void;
   onOpenManage: (msg: Message) => void;
   isAdmin?: boolean;
-  style?: React.CSSProperties;
 }) {
   const isOwner = currentUser?.id === msg.author.id;
   const level = userLevels[msg.author.username] || 1;
+  
+  // 控制内容显示的展开/收起
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // 截取内容以显示摘要
+  const getContentSummary = () => {
+    if (isExpanded) return msg.content;
+    
+    const maxLength = 150; // 最大字符数
+    if (msg.content.length <= maxLength) return msg.content;
+    
+    return msg.content.substring(0, maxLength) + '...';
+  };
 
   return (
     <motion.div
       id={`message-${msg.id}`}
-      style={style}
       className="p-2"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -107,7 +116,7 @@ const MessageCard = memo(function MessageCard({
             <div>
               <div className="font-bold text-sm text-white/90 flex items-center gap-1">
                 @{msg.author.username}
-                <UserLevelBadge level={level} size="xs" showProgress={false} />
+                <UserLevelBadge level={userLevels[msg.author.username] || 1} size="xs" showProgress={false} />
               </div>
               <div className="text-xs text-white/40">
                 {formatDistanceToNow(new Date(msg.created_at), {
@@ -148,11 +157,24 @@ const MessageCard = memo(function MessageCard({
             style={{ color: msg.color || 'rgba(255,255,255,0.8)' }}
           >
             <MarkdownRenderer
-              content={msg.content}
-              className="max-h-64 overflow-y-auto"
-              maxHeight="16rem"
+              content={getContentSummary()}
+              className={isExpanded ? "" : "max-h-40 overflow-hidden"}
             />
           </div>
+          
+          {/* 如果内容过长，显示展开/收起按钮 */}
+          {msg.content.length > 150 && (
+            <div className="mt-2">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-xs text-tech-cyan hover:text-tech-lightcyan transition-colors font-mono flex items-center gap-1"
+              >
+                {isExpanded ? '收起内容' : '展开内容'}
+                <MoreHorizontal className={`w-3 h-3 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
+          )}
+          
           {/* 编辑标记 */}
           {msg.isEdited && (
             <div className="flex items-center gap-1 mt-2 text-xs text-white/40">
@@ -254,7 +276,7 @@ const MessageCard = memo(function MessageCard({
         {msg.replies && msg.replies.length > 0 && (
           <MessageReplies
             message={msg}
-            currentUser={currentUser || undefined}
+            currentUser={currentUser || null}
             onReply={async (content, parentReplyId) => {
               await onMessageReply?.(msg.id, content, parentReplyId);
             }}
@@ -287,26 +309,6 @@ function useColumnCount() {
   return columnCount;
 }
 
-// 响应式行高计算
-function useResponsiveRowHeight(columnCount: number) {
-  const [rowHeight, setRowHeight] = useState(220);
-
-  useEffect(() => {
-    const updateRowHeight = () => {
-      const width = window.innerWidth;
-      if (width < 640) setRowHeight(300); // 移动端更高，适应触摸操作
-      else if (width < 1024) setRowHeight(240); // 平板适中
-      else setRowHeight(220); // 桌面紧凑
-    };
-
-    updateRowHeight();
-    window.addEventListener('resize', updateRowHeight);
-    return () => window.removeEventListener('resize', updateRowHeight);
-  }, [columnCount]);
-
-  return rowHeight;
-}
-
 export default function VirtualMessageList({
   messages,
   currentUser,
@@ -325,10 +327,6 @@ export default function VirtualMessageList({
   columnCount: propColumnCount
 }: VirtualMessageListProps) {
   const columnCount = propColumnCount || useColumnCount();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(1200);
-  const [containerHeight, setContainerHeight] = useState(800);
-  const rowHeight = useResponsiveRowHeight(columnCount); // 使用响应式行高
 
   // 编辑对话框状态
   const [editMessage, setEditMessage] = useState<Message | null>(null);
@@ -379,72 +377,6 @@ export default function VirtualMessageList({
     }
   }, [onMessageReply]);
 
-  // 更新容器尺寸
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setContainerWidth(rect.width);
-        setContainerHeight(Math.min(window.innerHeight * 0.7, rect.height));
-      }
-    };
-
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
-
-  const rowCount = Math.ceil(messages.length / columnCount);
-  const columnWidth = containerWidth / columnCount;
-
-  // 获取指定位置的留言
-  const getMessage = useCallback(
-    (rowIndex: number, columnIndex: number) => {
-      const index = rowIndex * columnCount + columnIndex;
-      return messages[index] || null;
-    },
-    [messages, columnCount]
-  );
-
-  // 单元格渲染
-  const Cell = useCallback(
-    ({
-      columnIndex,
-      rowIndex,
-      style
-    }: {
-      columnIndex: number;
-      rowIndex: number;
-      style: React.CSSProperties;
-    }) => {
-      const msg = getMessage(rowIndex, columnIndex);
-      if (!msg) return null;
-
-      return (
-        <MessageCard
-          msg={msg}
-          currentUser={currentUser}
-          isAdmin={isAdmin}
-          onLike={onLike}
-          onDelete={onDelete}
-          onReply={onReply}
-          onReport={onReport}
-          onEdit={onEdit}
-          onOpenEdit={handleOpenEdit}
-          onMessageReply={handleMessageReply}
-          onLikeReply={onLikeReply}
-          onDeleteReply={onDeleteReply}
-          onOpenManage={handleOpenManage}
-          style={{
-            ...style,
-            width: columnWidth - 16 // 减去间距
-          }}
-        />
-      );
-    },
-    [getMessage, currentUser, isAdmin, onLike, onDelete, onReply, onReport, onEdit, handleOpenEdit, handleMessageReply, onLikeReply, onDeleteReply, handleOpenManage, columnWidth]
-  );
-
   if (messages.length === 0) {
     return (
       <div className="text-center py-20 text-white/30 font-mono">
@@ -455,24 +387,40 @@ export default function VirtualMessageList({
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[70vh]">
-      <Grid
-        columnCount={columnCount}
-        columnWidth={columnWidth}
-        height={containerHeight}
-        rowCount={rowCount}
-        rowHeight={rowHeight}
-        width={containerWidth}
-        overscanCount={2}
-        cellComponent={Cell}
-        cellProps={{}}
-      />
+    <div className="w-full">
+      <div 
+        className={cn(
+          "grid gap-4",
+          columnCount === 1 && "grid-cols-1",
+          columnCount === 2 && "grid-cols-2",
+          columnCount === 3 && "grid-cols-3"
+        )}
+      >
+        {messages.map((msg) => (
+          <MessageCard
+            key={msg.id}
+            msg={msg}
+            currentUser={currentUser}
+            isAdmin={isAdmin}
+            onLike={onLike}
+            onDelete={onDelete}
+            onReply={onReply}
+            onReport={onReport}
+            onEdit={onEdit}
+            onOpenEdit={handleOpenEdit}
+            onMessageReply={handleMessageReply}
+            onLikeReply={onLikeReply}
+            onDeleteReply={onDeleteReply}
+            onOpenManage={handleOpenManage}
+          />
+        ))}
+      </div>
 
       {/* 统计信息 */}
       <div className="mt-4 flex items-center justify-between text-xs text-white/40">
         <span>共 {messages.length} 条留言</span>
         <span>
-          显示 {Math.min(rowCount * columnCount, messages.length)} / {messages.length}
+          显示 {messages.length} / {messages.length}
         </span>
       </div>
 

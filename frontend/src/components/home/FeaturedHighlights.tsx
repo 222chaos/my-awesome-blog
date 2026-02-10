@@ -1,8 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Pin, Star, TrendingUp, ArrowRight, Eye, Heart, Flame, Clock } from 'lucide-react'
+import { Pin, Star, TrendingUp, ArrowRight, Eye, Heart, Flame, Clock, AlertCircle, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getArticles } from '@/lib/api/articles'
 
 interface HighlightItem {
   id: string
@@ -21,77 +23,6 @@ interface HighlightItem {
   category?: string
   readTime?: string
 }
-
-const mockHighlights: HighlightItem[] = [
-  {
-    id: '1',
-    type: 'pinned',
-    title: '深入理解 React Server Components',
-    description: '探索 Next.js 14 中 Server Components 的核心概念、最佳实践和性能优化技巧。',
-    icon: <Pin className="w-5 h-5" />,
-    link: '/articles/react-server-components',
-    badge: '置顶',
-    color: 'from-red-500 to-orange-500',
-    category: 'React',
-    readTime: '15 min',
-    stats: {
-      views: 12580,
-      likes: 892,
-      comments: 156
-    }
-  },
-  {
-    id: '2',
-    type: 'featured',
-    title: 'Next.js 14 最佳实践指南',
-    description: '全面介绍 Next.js 14 的新特性、架构设计模式和生产环境部署策略。',
-    icon: <Star className="w-5 h-5" />,
-    link: '/articles/nextjs-best-practices',
-    badge: '精选',
-    color: 'from-tech-cyan to-tech-sky',
-    category: 'Next.js',
-    readTime: '20 min',
-    stats: {
-      views: 8932,
-      likes: 654,
-      comments: 89
-    }
-  },
-  {
-    id: '3',
-    type: 'trending',
-    title: 'TypeScript 高级类型系统',
-    description: '深入掌握 TypeScript 高级类型、泛型、条件类型和工具类型的使用技巧。',
-    icon: <Flame className="w-5 h-5" />,
-    link: '/articles/typescript-advanced-types',
-    badge: '热门',
-    color: 'from-purple-500 to-pink-500',
-    category: 'TypeScript',
-    readTime: '18 min',
-    stats: {
-      views: 15234,
-      likes: 1245,
-      comments: 234
-    }
-  },
-  {
-    id: '4',
-    type: 'latest',
-    title: '全栈开发实战：从零到一',
-    description: '使用 Next.js、FastAPI 和 PostgreSQL 构建完整的全栈应用程序。',
-    icon: <TrendingUp className="w-5 h-5" />,
-    link: '/articles/fullstack-development',
-    badge: '最新',
-    color: 'from-green-500 to-emerald-500',
-    category: '全栈',
-    readTime: '25 min',
-    stats: {
-      views: 3456,
-      likes: 234,
-      comments: 45
-    }
-  }
-]
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -126,7 +57,93 @@ function formatNumber(num: number): string {
   return num.toString()
 }
 
+function formatReadTime(content: string): string {
+  const wordsPerMinute = 200
+  const wordCount = content.length
+  const minutes = Math.ceil(wordCount / wordsPerMinute)
+  return `${minutes} min`
+}
+
 export default function FeaturedHighlights() {
+  const [highlights, setHighlights] = useState<HighlightItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchHighlights = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const articles = await getArticles({ limit: 6, published_only: true })
+        
+        const mappedHighlights: HighlightItem[] = articles.map((article, index) => {
+          const type: HighlightItem['type'] = index === 0 ? 'pinned' : index === 1 ? 'featured' : index === 2 ? 'trending' : 'latest'
+          const badgeMap = { pinned: '置顶', featured: '精选', trending: '热门', latest: '最新' }
+          const colorMap = { 
+            pinned: 'from-red-500 to-orange-500',
+            featured: 'from-tech-cyan to-tech-sky',
+            trending: 'from-purple-500 to-pink-500',
+            latest: 'from-green-500 to-emerald-500'
+          }
+          const iconMap = { pinned: Pin, featured: Star, trending: Flame, latest: TrendingUp }
+          
+          return {
+            id: article.id,
+            type,
+            title: article.title,
+            description: article.excerpt || article.content.substring(0, 100) + '...',
+            icon: iconMap[type],
+            link: `/articles/${article.id}`,
+            badge: badgeMap[type],
+            color: colorMap[type],
+            category: article.category_id,
+            readTime: formatReadTime(article.content),
+            stats: {
+              views: article.view_count,
+              likes: article.like_count,
+              comments: article.comment_count
+            }
+          }
+        })
+        
+        setHighlights(mappedHighlights)
+      } catch (err) {
+        console.error('Failed to fetch articles:', err)
+        setError(err instanceof Error ? err.message : '获取文章失败')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchHighlights()
+  }, [])
+
+  if (error) {
+    return (
+      <section className="relative overflow-hidden py-6 sm:py-8 lg:py-10 bg-gradient-to-b from-tech-darkblue to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center py-12">
+            <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+            <p className="text-red-400 text-center">{error}</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (loading) {
+    return (
+      <section className="relative overflow-hidden py-6 sm:py-8 lg:py-10 bg-gradient-to-b from-tech-darkblue to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center py-12">
+            <RefreshCw className="w-12 h-12 text-tech-cyan animate-spin" />
+            <p className="text-gray-400 ml-4">加载中...</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="relative overflow-hidden py-6 sm:py-8 lg:py-10 bg-gradient-to-b from-tech-darkblue to-transparent">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -144,7 +161,7 @@ export default function FeaturedHighlights() {
           </div>
           <div className="flex-1 h-px bg-gradient-to-r from-glass-border/50 to-transparent" />
           <span className="text-xs sm:text-sm text-gray-400">
-            {mockHighlights.length} 篇精选
+            {highlights.length} 篇精选
           </span>
         </motion.div>
 
@@ -154,7 +171,7 @@ export default function FeaturedHighlights() {
           animate="visible"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
         >
-          {mockHighlights.map((item, index) => (
+          {highlights.map((item, index) => (
             <motion.div
               key={item.id}
               variants={cardVariants}
@@ -188,7 +205,7 @@ export default function FeaturedHighlights() {
                         'text-white shadow-lg'
                       )}
                     >
-                      {item.icon}
+                      <item.icon className="w-6 h-6" />
                     </motion.div>
                     <div className="flex flex-col gap-2 items-end">
                       <span

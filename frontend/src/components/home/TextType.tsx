@@ -3,7 +3,7 @@
 import { ElementType, createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { getActiveTypewriterContents, TypewriterContent } from '@/lib/api';
+import { getActiveTypewriterContents, TypewriterContent } from '@/lib/api/typewriter';
 
 interface TextTypeProps {
   className?: string;
