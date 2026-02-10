@@ -86,6 +86,27 @@ class Settings(BaseSettings):
     CACHE_ARTICLES_TTL: int = Field(default=1800, description="文章缓存TTL（秒）")
     CACHE_USERS_TTL: int = Field(default=900, description="用户缓存TTL（秒）")
 
+    # LLM Configuration
+    LLM_DEFAULT_MODEL: str = Field(default="deepseek-chat", description="默认使用的LLM模型")
+    LLM_TIMEOUT: int = Field(default=120, description="LLM API请求超时时间（秒）")
+    LLM_MAX_RETRIES: int = Field(default=3, description="LLM API请求最大重试次数")
+    LLM_STREAM_ENABLED: bool = Field(default=True, description="是否启用流式响应")
+
+    # DeepSeek Configuration
+    DEEPSEEK_API_KEY: str = Field(default="", description="DeepSeek API密钥")
+    DEEPSEEK_BASE_URL: str = Field(default="https://api.deepseek.com/v1", description="DeepSeek API基础URL")
+    DEEPSEEK_MODEL: str = Field(default="deepseek-chat", description="DeepSeek模型名称")
+
+    # GLM (智谱) Configuration
+    GLM_API_KEY: str = Field(default="", description="智谱AI API密钥")
+    GLM_BASE_URL: str = Field(default="https://open.bigmodel.cn/api/paas/v4", description="智谱AI API基础URL")
+    GLM_MODEL: str = Field(default="glm-4-plus", description="智谱AI模型名称")
+
+    # Qwen (通义千问) Configuration
+    QWEN_API_KEY: str = Field(default="", description="通义千问API密钥")
+    QWEN_BASE_URL: str = Field(default="https://dashscope.aliyuncs.com/compatible-mode/v1", description="通义千问API基础URL")
+    QWEN_MODEL: str = Field(default="qwen-plus", description="通义千问模型名称")
+
     # Pagination
     DEFAULT_PAGE_SIZE: int = Field(default=20, description="默认页面大小")
     MAX_PAGE_SIZE: int = Field(default=100, description="最大页面大小")

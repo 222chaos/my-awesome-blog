@@ -3,7 +3,7 @@ from app.api.v1.endpoints import (
     auth, users, articles, comments, typewriter_contents,
     categories, tags, friend_links, portfolio, timeline_events,
     statistics, subscriptions, images, audit_logs, analytics, oss_upload,
-    messages, albums, monitoring
+    messages, albums, monitoring, llm
 )
 
 api_router = APIRouter()
@@ -28,3 +28,4 @@ api_router.include_router(oss_upload.router, prefix="/oss", tags=["oss-upload"])
 api_router.include_router(messages.router, prefix="/messages", tags=["messages"])
 api_router.include_router(albums.router, prefix="/albums", tags=["albums"])
 api_router.include_router(monitoring.router, prefix="/monitoring", tags=["monitoring"])
+api_router.include_router(llm.router, prefix="/llm", tags=["llm"])
