@@ -20,7 +20,12 @@ async def _log_with_semaphore(log_func, *args, **kwargs):
     """使用信号量包装日志任务，限制并发数"""
     try:
         async with _log_task_semaphore:
-            await log_func(*args, **kwargs)
+            # 检查是否为异步函数
+            if asyncio.iscoroutinefunction(log_func):
+                await log_func(*args, **kwargs)
+            else:
+                # 同步函数直接调用，不使用 await
+                log_func(*args, **kwargs)
     except Exception as e:
         # 日志记录失败不应该影响主流程
         app_logger.error(f"Failed to log performance metrics: {str(e)}")

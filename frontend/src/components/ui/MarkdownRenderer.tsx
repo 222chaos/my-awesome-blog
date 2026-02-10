@@ -200,33 +200,35 @@ export default function MarkdownRenderer({
   };
 
   return (
-    <div className={cn("markdown-content", className)}>
+    <div
+      className={cn(
+        "markdown-content prose prose-invert max-w-none",
+        "prose-headings:text-white/90 prose-headings:font-syne",
+        "prose-p:text-white/80 prose-p:leading-relaxed",
+        "prose-strong:text-white/90 prose-strong:font-bold",
+        "prose-em:text-white/80 prose-em:italic",
+        "prose-code:text-tech-cyan prose-code:font-mono",
+        "prose-pre:bg-slate-900/50 prose-pre:border prose-pre:border-white/10",
+        "prose-blockquote:border-tech-cyan/50 prose-blockquote:text-white/70",
+        "prose-ul:marker:text-white/40 prose-ol:marker:text-white/40",
+        "prose-a:text-tech-cyan prose-a:no-underline hover:prose-a:text-tech-lightcyan",
+        "prose-table:divide-white/10 prose-th:bg-slate-800/50",
+        "prose-img:rounded-lg prose-img:border prose-img:border-white/10",
+        "dark:prose-invert",
+        className
+      )}
+      style={maxHeight && !showFull ? {
+        maxHeight,
+        overflow: 'hidden',
+        position: 'relative'
+      } : undefined}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSanitize]}
         components={components}
         allowedElements={allowedElements}
         unwrapDisallowed
-        className={cn(
-          "prose prose-invert max-w-none",
-          "prose-headings:text-white/90 prose-headings:font-syne",
-          "prose-p:text-white/80 prose-p:leading-relaxed",
-          "prose-strong:text-white/90 prose-strong:font-bold",
-          "prose-em:text-white/80 prose-em:italic",
-          "prose-code:text-tech-cyan prose-code:font-mono",
-          "prose-pre:bg-slate-900/50 prose-pre:border prose-pre:border-white/10",
-          "prose-blockquote:border-tech-cyan/50 prose-blockquote:text-white/70",
-          "prose-ul:marker:text-white/40 prose-ol:marker:text-white/40",
-          "prose-a:text-tech-cyan prose-a:no-underline hover:prose-a:text-tech-lightcyan",
-          "prose-table:divide-white/10 prose-th:bg-slate-800/50",
-          "prose-img:rounded-lg prose-img:border prose-img:border-white/10",
-          "dark:prose-invert"
-        )}
-        style={maxHeight && !showFull ? {
-          maxHeight,
-          overflow: 'hidden',
-          position: 'relative'
-        } : undefined}
       >
         {content}
       </ReactMarkdown>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Rainbow, Layers, Zap, Copy, Flag, Info, MessageSquare } from 'lucide-react';
+import { Play, Pause, Rainbow, Layers, Zap, Copy, Flag, Info, MessageSquare, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Message } from '@/types';
 
@@ -159,6 +159,10 @@ export default function EnhancedDanmaku({
       };
 
       setActiveMessages(prev => {
+        // 检查是否已存在相同 id 的消息
+        if (prev.some(m => m.id === danmakuMsg.id)) {
+          return prev;
+        }
         const newMessages = [...prev, danmakuMsg];
         return newMessages.slice(-maxDanmakuCount);
       });
@@ -250,7 +254,7 @@ export default function EnhancedDanmaku({
     <div className={cn("relative", className)}>
       <div
         ref={containerRef}
-        className="fixed inset-0 z-[9999] overflow-hidden"
+        className="fixed inset-0 z-[9999] overflow-hidden pointer-events-none"
       >
         <AnimatePresence mode="popLayout">
           {activeMessages.map((msg) => {
@@ -268,7 +272,7 @@ export default function EnhancedDanmaku({
                   times: [0, 0.05, 0.95, 1]
                 }}
                 onAnimationComplete={() => !isPausedLayer && handleMessageComplete(msg.id)}
-                className="absolute whitespace-nowrap cursor-pointer"
+                className="absolute whitespace-nowrap cursor-pointer pointer-events-auto"
                 style={{
                   top: `${msg.y}%`,
                   zIndex: layerConfig.zIndex,

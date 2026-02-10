@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import SongRow from './SongRow';
 import type { Song } from '@/types/music';
+import { Music } from 'lucide-react';
 
 interface SongListProps {
   songs: Song[];
@@ -28,47 +29,40 @@ export default function SongList({
   return (
     <div className="w-full">
       {showHeader && (
-        <div className="flex items-center h-10 px-4 border-b border-black/8 dark:border-white/8">
+        <div className="flex items-center h-10 px-4 border-b border-white/5 mx-2">
           <div className="w-8 flex-shrink-0">
-            <span className="font-sf-pro-text text-caption-1 text-black/40 dark:text-white/40">
+            <span className="text-xs font-medium text-white/40">
               #
             </span>
           </div>
           {showAlbum && (
-            <div className="w-12 h-12 flex-shrink-0 mr-3">
-              <span className="font-sf-pro-text text-caption-1 text-black/40 dark:text-white/40">
-                专辑
+            <div className="w-10 flex-shrink-0 mr-4">
+              <span className="text-xs font-medium text-white/40">
+                封面
               </span>
             </div>
           )}
           <div className="flex-1 min-w-0 mr-4">
-            <span className="font-sf-pro-text text-caption-1 text-black/40 dark:text-white/40">
+            <span className="text-xs font-medium text-white/40">
               歌曲标题
             </span>
           </div>
           {showAlbum && !showAlbum && (
             <div className="w-40 flex-shrink-0 hidden md:block">
-              <span className="font-sf-pro-text text-caption-1 text-black/40 dark:text-white/40">
+              <span className="text-xs font-medium text-white/40">
                 专辑
               </span>
             </div>
           )}
-          {showDuration && (
-            <div className="w-16 flex-shrink-0 text-right">
-              <span className="font-sf-pro-text text-caption-1 text-black/40 dark:text-white/40">
-                时长
-              </span>
-            </div>
-          )}
-          <div className="w-20 flex-shrink-0">
-            <span className="font-sf-pro-text text-caption-1 text-black/40 dark:text-white/40">
-              操作
-            </span>
+          <div className="w-24 flex-shrink-0 text-right pr-4">
+             <span className="text-xs font-medium text-white/40">
+               时长
+             </span>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col">
+      <div className="flex flex-col py-2">
         {songs.map((song, index) => (
           <SongRow
             key={song.id}
@@ -85,9 +79,9 @@ export default function SongList({
       </div>
 
       {songs.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16">
-          <span className="text-6xl mb-4">🎵</span>
-          <p className="font-sf-pro-text text-body text-black/60 dark:text-white/60">
+        <div className="flex flex-col items-center justify-center py-20 opacity-50">
+          <Music className="w-16 h-16 text-white/20 mb-4" />
+          <p className="text-sm text-white/40">
             暂无歌曲
           </p>
         </div>

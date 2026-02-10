@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 
 interface SectionProps {
   title: string;
@@ -13,17 +14,26 @@ interface SectionProps {
 
 export default function Section({ title, titleClassName, children, moreLink, moreText = '查看全部' }: SectionProps) {
   return (
-    <div>
+    <div className="py-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className={cn('font-sf-pro-display text-title-2 text-black dark:text-white', titleClassName)}>
+        <h2 className={cn(
+          'text-xl font-bold text-white tracking-tight',
+          titleClassName
+        )}>
           {title}
         </h2>
         {moreLink && (
-          <Link 
+          <Link
             href={moreLink}
-            className="font-sf-pro-text text-body text-[#fa2d2f] hover:text-[#ff3b30] transition-colors duration-200"
+            className={cn(
+              'group inline-flex items-center gap-1',
+              'text-sm font-medium text-indigo-400',
+              'transition-all duration-300',
+              'hover:text-pink-400 hover:gap-2'
+            )}
           >
             {moreText}
+            <ChevronRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
           </Link>
         )}
       </div>

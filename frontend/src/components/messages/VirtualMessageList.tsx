@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { Grid } from 'react-window';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart, Reply, Trash2, Flame, Flag, Edit2, Check, Pin, Star, Settings } from 'lucide-react';
 import { LazyAvatar } from '@/components/ui/LazyImage';
@@ -464,10 +464,10 @@ export default function VirtualMessageList({
         rowCount={rowCount}
         rowHeight={rowHeight}
         width={containerWidth}
-        overscanRowCount={2}
-      >
-        {Cell}
-      </Grid>
+        overscanCount={2}
+        cellComponent={Cell}
+        cellProps={{}}
+      />
 
       {/* 统计信息 */}
       <div className="mt-4 flex items-center justify-between text-xs text-white/40">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import MusicSidebar from '@/components/music/MusicSidebar';
 import HeroBanner from '@/components/music/HeroBanner';
 import PlaylistScroll from '@/components/music/PlaylistScroll';
@@ -9,6 +10,7 @@ import SongList from '@/components/music/SongList';
 import ArtistScroll from '@/components/music/ArtistScroll';
 import PlayerBar from '@/components/music/PlayerBar';
 import MobileNav from '@/components/music/MobileNav';
+import AnimatedSection from '@/components/music/AnimatedSection';
 import type { Playlist, Song, Artist, Banner, PlayMode } from '@/types/music';
 
 export default function MusicHallPage() {
@@ -213,8 +215,36 @@ export default function MusicHallPage() {
     },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    },
+  };
+
   return (
-    <div className="flex">
+    <motion.div 
+      className="flex h-screen pt-16 overflow-hidden"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       <MusicSidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
@@ -223,9 +253,9 @@ export default function MusicHallPage() {
         onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
-      <main className="flex-1 overflow-y-auto pb-22 md:pb-22">
+      <main className="flex-1 overflow-y-auto pb-22 md:pb-22 scrollbar-hide">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-6">
-          <section className="mb-8">
+          <motion.section className="mb-8" variants={sectionVariants}>
             <HeroBanner
               banners={mockBanners}
               autoPlay={true}
@@ -233,12 +263,11 @@ export default function MusicHallPage() {
               showArrows={true}
               showIndicators={true}
             />
-          </section>
+          </motion.section>
 
-          <section className="mb-12">
+          <motion.section className="mb-12" variants={sectionVariants}>
             <Section
               title="推荐歌单"
-              titleClassName="font-sf-pro-display text-title-2"
               moreLink="/music/playlists"
               moreText="查看全部"
             >
@@ -249,12 +278,11 @@ export default function MusicHallPage() {
                 onPlaylistClick={(playlist) => console.log('Click playlist:', playlist.name)}
               />
             </Section>
-          </section>
+          </motion.section>
 
-          <section className="mb-12">
+          <motion.section className="mb-12" variants={sectionVariants}>
             <Section
               title="最新音乐"
-              titleClassName="font-sf-pro-display text-title-2"
             >
               <SongList
                 songs={mockSongs}
@@ -267,12 +295,11 @@ export default function MusicHallPage() {
                 onSongDoubleClick={handleSongClick}
               />
             </Section>
-          </section>
+          </motion.section>
 
-          <section className="mb-12">
+          <motion.section className="mb-12" variants={sectionVariants}>
             <Section
               title="热门歌手"
-              titleClassName="font-sf-pro-display text-title-2"
               moreLink="/music/artists"
               moreText="查看全部"
             >
@@ -282,7 +309,7 @@ export default function MusicHallPage() {
                 onArtistClick={(artist) => console.log('Click artist:', artist.name)}
               />
             </Section>
-          </section>
+          </motion.section>
         </div>
       </main>
 
@@ -309,6 +336,6 @@ export default function MusicHallPage() {
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
-    </div>
+    </motion.div>
   );
 }

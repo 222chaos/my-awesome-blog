@@ -6,9 +6,19 @@
   --macos-animation-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --macos-animation-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
   --macos-animation-ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Music Theme Colors */
+  --music-bg-primary: #0f0f23;
+  --music-bg-secondary: #1a1a2e;
+  --music-bg-tertiary: #252542;
+  --music-primary: #6366f1;
+  --music-primary-hover: #4f46e5;
+  --music-accent: #ec4899;
+  --music-accent-warm: #f59e0b;
 }
 
 @layer utilities {
+  /* Hide Scrollbar */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -17,29 +27,50 @@
     display: none;
   }
 
+  /* Custom Scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;
   }
   .scrollbar-thin::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.25);
   }
 
-  .scrollbar-thin-dark::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+  /* Glass Effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
-  .scrollbar-thin-dark::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+
+  .glass-hover:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Text Gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Safe Area for Mobile */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
@@ -246,12 +277,50 @@
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: perspective(1000px) rotateY(-8deg) rotateX(5deg) translateY(0);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(-8deg) rotateX(5deg) translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 @layer utilities {
   .animate-fade-in-up {
     animation: fadeInUp 0.4s var(--macos-animation-ease-out) forwards;
   }
   .animate-fade-in-scale {
     animation: fadeInScale 0.3s var(--macos-animation-spring) forwards;
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
   }
 }
 
@@ -285,6 +354,176 @@
 @layer utilities {
   .animate-pulse-slow {
     animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+/* ============================================
+   Apple Music Style Enhanced Animations
+   ============================================ */
+
+/* Album Spin Animation */
+@keyframes albumSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes albumSpinPause {
+  from {
+    transform: rotate(var(--rotation, 0deg));
+  }
+  to {
+    transform: rotate(calc(var(--rotation, 0deg) + 360deg));
+  }
+}
+
+@layer utilities {
+  .animate-album-spin {
+    animation: albumSpin 8s linear infinite;
+  }
+  .animate-album-spin-slow {
+    animation: albumSpin 12s linear infinite;
+  }
+}
+
+/* Enhanced Sound Wave Animation */
+@keyframes soundWave1 {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+
+@keyframes soundWave2 {
+  0%, 100% { height: 8px; }
+  50% { height: 20px; }
+}
+
+@keyframes soundWave3 {
+  0%, 100% { height: 6px; }
+  50% { height: 14px; }
+}
+
+@keyframes soundWave4 {
+  0%, 100% { height: 10px; }
+  50% { height: 18px; }
+}
+
+@layer utilities {
+  .animate-sound-wave-1 {
+    animation: soundWave1 0.6s ease-in-out infinite;
+  }
+  .animate-sound-wave-2 {
+    animation: soundWave2 0.7s ease-in-out infinite 0.1s;
+  }
+  .animate-sound-wave-3 {
+    animation: soundWave3 0.5s ease-in-out infinite 0.2s;
+  }
+  .animate-sound-wave-4 {
+    animation: soundWave4 0.8s ease-in-out infinite 0.15s;
+  }
+}
+
+/* Card Glare Effect */
+@keyframes glareSweep {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(45deg);
+  }
+}
+
+@layer utilities {
+  .card-glare {
+    position: relative;
+    overflow: hidden;
+  }
+  .card-glare::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transform: translateX(-100%) rotate(45deg);
+    transition: none;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .card-glare:hover::before {
+    animation: glareSweep 0.8s ease-out;
+  }
+}
+
+/* 3D Card Transform */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
+
+/* Stagger Animation Delays */
+@layer utilities {
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+  .stagger-7 { animation-delay: 0.35s; }
+  .stagger-8 { animation-delay: 0.4s; }
+  .stagger-9 { animation-delay: 0.45s; }
+  .stagger-10 { animation-delay: 0.5s; }
+}
+
+/* Glow Effects */
+@layer utilities {
+  .glow-indigo {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4),
+                0 0 40px rgba(99, 102, 241, 0.2);
+  }
+  .glow-pink {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4),
+                0 0 40px rgba(236, 72, 153, 0.2);
+  }
+  .glow-gradient {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.3),
+                0 0 60px rgba(236, 72, 153, 0.2);
+  }
+}
+
+/* Smooth spring transition */
+@layer utilities {
+  .transition-spring {
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .transition-smooth {
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+}
+
+/* Parallax container */
+@layer utilities {
+  .parallax-container {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  .parallax-layer {
+    will-change: transform;
   }
 }
 

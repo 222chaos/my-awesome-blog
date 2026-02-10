@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { Music, Radio, Video, Mic2, Heart, HardDrive, Download, ListMusic, ChevronLeft, ChevronRight, Disc } from 'lucide-react';
 import { useTheme } from '@/context/theme-context';
+import { cn } from '@/lib/utils';
 import type { Playlist } from '@/types/music';
 
 interface MusicSidebarProps {
@@ -17,92 +17,114 @@ export default function MusicSidebar({ activeSection, onSectionChange, playlists
   const { resolvedTheme } = useTheme();
 
   const navItems = [
-    { id: 'discover', icon: '🎵', label: '发现音乐' },
-    { id: 'fm', icon: '🎧', label: '私人FM' },
-    { id: 'video', icon: '📺', label: '视频' },
-    { id: 'radio', icon: '🎤', label: '电台' },
+    { id: 'discover', icon: Music, label: '发现音乐' },
+    { id: 'fm', icon: Radio, label: '私人FM' },
+    { id: 'video', icon: Video, label: '视频' },
+    { id: 'radio', icon: Mic2, label: '电台' },
   ];
 
   const myMusicItems = [
-    { id: 'liked', icon: '❤️', label: '我喜欢的音乐' },
-    { id: 'local', icon: '💿', label: '本地音乐' },
-    { id: 'download', icon: '⬇️', label: '下载管理' },
+    { id: 'liked', icon: Heart, label: '我喜欢的音乐' },
+    { id: 'local', icon: HardDrive, label: '本地音乐' },
+    { id: 'download', icon: Download, label: '下载管理' },
   ];
 
   return (
     <aside className={cn(
-      'hidden md:flex flex-col h-screen flex-shrink-0 transition-all duration-300',
-      'bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-2xl',
-      'border-r border-black/8 dark:border-white/8',
-      'shadow-macos-glass-2',
-      isCollapsed ? 'w-16' : 'w-65'
+      'hidden md:flex flex-col h-full flex-shrink-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+      'bg-[#1a1a2e]/95 backdrop-blur-2xl',
+      'border-r border-white/5',
+      'shadow-lg shadow-black/20 z-20',
+      isCollapsed ? 'w-20' : 'w-64'
     )}>
-      <div className="flex-1 overflow-y-auto py-4 px-3">
+      <div className="flex-1 overflow-y-auto py-6 px-4 scrollbar-hide">
         <button
           onClick={onToggleCollapse}
-          className="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-200 mb-2"
+          className={cn(
+            "w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors duration-300 mb-6",
+            isCollapsed ? "mx-auto" : "ml-auto"
+          )}
           aria-label={isCollapsed ? '展开侧边栏' : '收起侧边栏'}
         >
-          <span className="text-2xl">{isCollapsed ? '▶️' : '◀️'}</span>
+          {isCollapsed ? (
+            <ChevronRight className="w-5 h-5 text-white/60" />
+          ) : (
+            <ChevronLeft className="w-5 h-5 text-white/60" />
+          )}
         </button>
 
         {!isCollapsed && (
           <>
-            <div className="mb-6">
-              <h3 className="font-sf-pro-text text-subhead text-black/40 dark:text-white/40 mb-2 px-3">发现</h3>
-              <nav className="flex flex-col gap-2">
+            <div className="mb-8">
+              <h3 className="text-xs font-semibold text-white/40 mb-3 px-3 uppercase tracking-wider">发现</h3>
+              <nav className="flex flex-col gap-1">
                 {navItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => onSectionChange(item.id)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-xl transition-colors duration-200',
+                      'group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300',
                       'w-full text-left',
-                      activeSection === item.id ? 'bg-[#fa2d2f]/10 text-[#fa2d2f]' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black dark:text-white'
+                      activeSection === item.id
+                        ? 'bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg shadow-indigo-500/20'
+                        : 'hover:bg-white/5 text-white/70'
                     )}
                   >
-                    <span className="text-xl w-5 h-5 flex items-center justify-center">{item.icon}</span>
-                    <span className="font-sf-pro-text text-body">{item.label}</span>
+                    <item.icon className={cn(
+                      "w-5 h-5 transition-all duration-300 group-active:scale-95",
+                      activeSection === item.id ? "text-white" : "text-white/50 group-hover:text-white"
+                    )} />
+                    <span className="text-sm font-medium">{item.label}</span>
                   </button>
                 ))}
               </nav>
             </div>
 
-            <div className="mb-6">
-              <h3 className="font-sf-pro-text text-subhead text-black/40 dark:text-white/40 mb-2 px-3">我的音乐</h3>
-              <nav className="flex flex-col gap-2">
+            <div className="mb-8">
+              <h3 className="text-xs font-semibold text-white/40 mb-3 px-3 uppercase tracking-wider">我的音乐</h3>
+              <nav className="flex flex-col gap-1">
                 {myMusicItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => onSectionChange(item.id)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-xl transition-colors duration-200',
+                      'group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300',
                       'w-full text-left',
-                      activeSection === item.id ? 'bg-[#fa2d2f]/10 text-[#fa2d2f]' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black dark:text-white'
+                      activeSection === item.id
+                        ? 'bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg shadow-indigo-500/20'
+                        : 'hover:bg-white/5 text-white/70'
                     )}
                   >
-                    <span className="text-xl w-5 h-5 flex items-center justify-center">{item.icon}</span>
-                    <span className="font-sf-pro-text text-body">{item.label}</span>
+                    <item.icon className={cn(
+                      "w-5 h-5 transition-all duration-300 group-active:scale-95",
+                      activeSection === item.id ? "text-white" : "text-white/50 group-hover:text-white"
+                    )} />
+                    <span className="text-sm font-medium">{item.label}</span>
                   </button>
                 ))}
               </nav>
             </div>
 
             <div>
-              <h3 className="font-sf-pro-text text-subhead text-black/40 dark:text-white/40 mb-2 px-3">创建的歌单</h3>
-              <nav className="flex flex-col gap-2">
+              <h3 className="text-xs font-semibold text-white/40 mb-3 px-3 uppercase tracking-wider">创建的歌单</h3>
+              <nav className="flex flex-col gap-1">
                 {playlists.map((playlist) => (
                   <button
                     key={playlist.id}
                     onClick={() => onSectionChange(playlist.id)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-xl transition-colors duration-200',
+                      'group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300',
                       'w-full text-left',
-                      activeSection === playlist.id ? 'bg-[#fa2d2f]/10 text-[#fa2d2f]' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black dark:text-white'
+                      activeSection === playlist.id
+                        ? 'bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg shadow-indigo-500/20'
+                        : 'hover:bg-white/5 text-white/70'
                     )}
                   >
-                    <span className="text-lg w-5 h-5 flex items-center justify-center">📝</span>
-                    <span className="font-sf-pro-text text-body truncate">{playlist.name}</span>
+                    <ListMusic className={cn(
+                      "w-5 h-5 transition-all duration-300 group-active:scale-95",
+                      activeSection === playlist.id ? "text-white" : "text-white/50 group-hover:text-white"
+                    )} />
+                    <span className="text-sm font-medium truncate">{playlist.name}</span>
                   </button>
                 ))}
               </nav>
@@ -111,20 +133,46 @@ export default function MusicSidebar({ activeSection, onSectionChange, playlists
         )}
 
         {isCollapsed && (
-          <nav className="flex flex-col gap-2">
+          <nav className="flex flex-col gap-4 items-center">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onSectionChange(item.id)}
                 className={cn(
-                  'w-12 h-12 flex items-center justify-center rounded-xl transition-colors duration-200',
-                  activeSection === item.id ? 'bg-[#fa2d2f]/10 text-[#fa2d2f]' : 'hover:bg-black/5 dark:hover:bg-white/5 text-black dark:text-white'
+                  'w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300',
+                  activeSection === item.id
+                    ? 'bg-gradient-to-r from-indigo-500 to-pink-500 text-white shadow-lg shadow-indigo-500/20'
+                    : 'hover:bg-white/5 text-white/50'
                 )}
                 title={item.label}
               >
-                <span className="text-xl">{item.icon}</span>
+                <item.icon className="w-5 h-5" />
               </button>
             ))}
+            <div className="w-8 h-[1px] bg-black/5 dark:bg-white/5 my-2" />
+            {myMusicItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => onSectionChange(item.id)}
+                className={cn(
+                  'w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200',
+                  activeSection === item.id 
+                    ? 'bg-[#fa2d2f] text-white shadow-md shadow-[#fa2d2f]/20' 
+                    : 'hover:bg-black/5 dark:hover:bg-white/10 text-black/60 dark:text-white/60'
+                )}
+                title={item.label}
+              >
+                <item.icon className="w-5 h-5" />
+              </button>
+            ))}
+            <div className="w-8 h-[1px] bg-black/5 dark:bg-white/5 my-2" />
+            <button
+               onClick={() => {}}
+               className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-black/60 dark:text-white/60 transition-all duration-200"
+               title="歌单"
+            >
+              <ListMusic className="w-5 h-5" />
+            </button>
           </nav>
         )}
       </div>

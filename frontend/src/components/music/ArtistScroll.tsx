@@ -25,7 +25,7 @@ export default function ArtistScroll({
           msOverflowStyle: 'none',
         }}
       >
-        {artists.map((artist) => (
+        {artists.map((artist, index) => (
           <div 
             key={artist.id} 
             className="flex-shrink-0 snap-start"
@@ -34,6 +34,7 @@ export default function ArtistScroll({
               artist={artist}
               size={size}
               onClick={() => onArtistClick?.(artist)}
+              index={index}
             />
           </div>
         ))}
