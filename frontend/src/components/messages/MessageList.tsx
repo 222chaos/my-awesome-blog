@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Message, Reply } from '@/types';
 import { formatDistanceToNow } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { Trash2, MessageSquare, Heart, Reply as ReplyIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Trash2, MessageSquare, Heart, Reply as ReplyIcon, ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { deleteMessage, likeMessage, replyToMessage } from '@/services/messageService';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
+import ConfirmDialog from '@/components/feedback/ConfirmDialog';
 
 interface MessageListProps {
   messages: Message[];
@@ -28,22 +29,34 @@ export default function MessageList({
   const [replies, setReplies] = useState<Record<string, boolean>>({});
   const [replyTexts, setReplyTexts] = useState<Record<string, string>>({});
   const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这条留言吗？')) return;
+  const handleDelete = useCallback(async (id: string) => {
+    setMessageToDelete(id);
+    setDeleteConfirmOpen(true);
+  }, []);
 
-    setDeletingId(id);
+  const confirmDelete = useCallback(async () => {
+    if (!messageToDelete) return;
+
+    setDeletingId(messageToDelete);
     try {
-      await deleteMessage(id);
-      onMessageDeleted?.(id);
+      await deleteMessage(messageToDelete);
+      onMessageDeleted?.(messageToDelete);
     } catch (error) {
-      alert(error instanceof Error ? error.message : '删除失败');
+      setAlertMessage(error instanceof Error ? error.message : '删除失败');
+      setAlertOpen(true);
     } finally {
       setDeletingId(null);
+      setDeleteConfirmOpen(false);
+      setMessageToDelete(null);
     }
-  };
+  }, [messageToDelete, onMessageDeleted]);
 
-  const handleLike = async (id: string) => {
+  const handleLike = useCallback(async (id: string) => {
     try {
       const updatedMessage = await likeMessage(id);
       setLikedMessages(prev => ({
@@ -52,10 +65,10 @@ export default function MessageList({
       }));
       onMessageUpdated?.(updatedMessage);
     } catch (error) {
-      console.error('点赞失败:', error);
-      alert('点赞失败，请重试');
+      setAlertMessage('点赞失败，请重试');
+      setAlertOpen(true);
     }
-  };
+  }, [onMessageUpdated]);
 
   const toggleReply = (id: string) => {
     setReplies(prev => ({
@@ -64,7 +77,7 @@ export default function MessageList({
     }));
   };
 
-  const handleReplySubmit = async (id: string) => {
+  const handleReplySubmit = useCallback(async (id: string) => {
     const text = replyTexts[id];
     if (!text || text.trim().length === 0) return;
 
@@ -84,17 +97,17 @@ export default function MessageList({
         [id]: false
       }));
     } catch (error) {
-      console.error('回复失败:', error);
-      alert('回复失败，请重试');
+      setAlertMessage('回复失败，请重试');
+      setAlertOpen(true);
     }
-  };
+  }, [replyTexts, onMessageUpdated]);
 
-  const toggleReplies = (id: string) => {
+  const toggleReplies = useCallback((id: string) => {
     setExpandedReplies(prev => ({
       ...prev,
       [id]: !prev[id]
     }));
-  };
+  }, []);
 
   if (messages.length === 0) {
     return (
@@ -224,14 +237,7 @@ export default function MessageList({
                     )}
                   </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    <Star className="w-3.5 h-3.5" />
-                    收藏
-                  </Button>
+
                 </div>
 
                 {/* 回复列表 */}
@@ -297,6 +303,30 @@ export default function MessageList({
           </div>
         ))}
       </div>
+
+      {/* 删除确认对话框 */}
+      <ConfirmDialog
+        isOpen={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="删除留言"
+        description="删除后无法恢复，确定要删除这条留言吗？"
+        type="danger"
+        confirmText="确定删除"
+        cancelText="取消"
+      />
+
+      {/* 提示对话框 */}
+      <ConfirmDialog
+        isOpen={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        onConfirm={() => setAlertOpen(false)}
+        title="提示"
+        description={alertMessage}
+        type="info"
+        confirmText="知道了"
+        cancelText="取消"
+      />
     </div>
   );
 }

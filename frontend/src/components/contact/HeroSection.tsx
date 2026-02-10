@@ -1,154 +1,127 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search, Mail, MessageSquare, Github, Twitter, User, MapPin, Calendar } from 'lucide-react';
+import { Mail, MessageSquare, Github, Twitter, Linkedin, MapPin, Clock, Globe } from 'lucide-react';
+import { useTheme } from '@/context/theme-context';
+import GlassCard from '@/components/ui/GlassCard';
 
 export default function HeroSection() {
+  const { resolvedTheme } = useTheme();
+
   return (
-    <section className="relative w-full mb-10">
-      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-        
-        <div className="relative z-10 px-6 md:px-12 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+    <section className="relative w-full py-16 md:py-24 overflow-hidden">
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute inset-0 bg-gradient-to-br from-tech-cyan/20 via-purple-500/20 to-pink-500/20 dark:from-tech-cyan/10 dark:via-purple-500/10 dark:to-pink-500/10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-tech-cyan/30 rounded-full blur-3xl dark:bg-tech-cyan/20" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl dark:bg-purple-500/20" />
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          className="max-w-4xl mx-auto"
+        >
+          <GlassCard padding="lg" className="text-center">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-1"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="mb-8"
             >
-              <div className="bg-white/90 dark:bg-black/90 backdrop-blur-2xl rounded-2xl p-6 shadow-2xl text-center">
+              <div className="relative inline-block">
+                <div className="w-32 h-32 mx-auto bg-gradient-to-br from-tech-cyan to-purple-500 rounded-full flex items-center justify-center text-white text-5xl font-bold shadow-2xl">
+                  <Mail className="w-16 h-16" />
+                </div>
                 <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
-                  className="relative"
-                >
-                  <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-xl">
-                    <User className="w-12 h-12" />
-                  </div>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-                    className="absolute top-4 right-16 w-4 h-4 bg-green-500 rounded-full border-4 border-white dark:border-black"
-                  />
-                </motion.div>
-                
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  我的名字
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  全栈开发者 & 技术顾问
-                </p>
-                
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium rounded-full">
-                    在线
-                  </span>
-                </div>
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+                  className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-4 border-white dark:border-black shadow-lg"
+                />
+              </div>
 
-                <div className="space-y-2 text-left">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <MapPin className="w-4 h-4" />
-                    <span>中国 · 上海</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Calendar className="w-4 h-4" />
-                    <span>UTC+8</span>
-                  </div>
-                </div>
+              <h1 className="font-sf-pro-display text-4xl md:text-5xl font-bold text-foreground mb-3">
+                联系我
+              </h1>
+              <p className="font-sf-pro-text text-lg text-foreground/80 max-w-2xl mx-auto mb-6">
+                很高兴与你交流。无论是技术咨询、商务合作，还是单纯聊天，欢迎随时联系我。
+              </p>
 
-                <div className="flex justify-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer">
-                    <Github className="w-5 h-5" />
-                  </a>
-                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer">
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                  <a href="mailto:contact@example.com" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer">
-                    <Mail className="w-5 h-5" />
-                  </a>
-                </div>
+              <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+                <span className="flex items-center gap-2 text-sm text-foreground/60 bg-foreground/10 dark:bg-foreground/5 px-4 py-2 rounded-full border border-foreground/20">
+                  <MapPin className="w-4 h-4" />
+                  <span>中国 · 上海</span>
+                </span>
+                <span className="flex items-center gap-2 text-sm text-foreground/60 bg-foreground/10 dark:bg-foreground/5 px-4 py-2 rounded-full border border-foreground/20">
+                  <Clock className="w-4 h-4" />
+                  <span>UTC+8</span>
+                </span>
+                <span className="flex items-center gap-2 text-sm text-foreground/60 bg-foreground/10 dark:bg-foreground/5 px-4 py-2 rounded-full border border-foreground/20">
+                  <Globe className="w-4 h-4" />
+                  <span>中英文交流</span>
+                </span>
               </div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="lg:col-span-2"
-            >
-              <div className="bg-white/90 dark:bg-black/90 backdrop-blur-2xl rounded-2xl p-8 md:p-12 shadow-2xl">
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                  联系我
-                </h1>
-                <p className="text-gray-600 dark:text-gray-300 text-lg mb-8">
-                  很高兴与你交流。无论是技术咨询、商务合作，还是单纯聊聊天，欢迎随时联系我。
-                </p>
-                
-                <div className="relative max-w-md mb-6">
-                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                    <Search className="w-5 h-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="搜索常见问题..."
-                    className="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400"
-                  />
-                </div>
-                
-                <div className="flex flex-wrap gap-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
-                    <kbd className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">⌘</kbd>
-                    <kbd className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">K</kbd>
-                    <span>聚焦搜索</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-lg">
-                    <kbd className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs font-mono">Esc</kbd>
-                    <span>清除搜索</span>
-                  </div>
-                </div>
+            <div className="flex flex-wrap justify-center gap-4 pt-6 border-t border-foreground/10">
+              <motion.a
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                href="mailto:contact@example.com"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-tech-cyan to-cyan-500 text-white rounded-2xl font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Mail className="w-5 h-5" />
+                邮件联系
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-foreground/5 dark:bg-foreground/10 text-foreground dark:text-white rounded-2xl font-medium border border-foreground/20 hover:bg-foreground/10 dark:hover:bg-foreground/20 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Github className="w-5 h-5" />
+                GitHub
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-foreground/5 dark:bg-foreground/10 text-foreground dark:text-white rounded-2xl font-medium border border-foreground/20 hover:bg-foreground/10 dark:hover:bg-foreground/20 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Twitter className="w-5 h-5" />
+                Twitter
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-foreground/5 dark:bg-foreground/10 text-foreground dark:text-white rounded-2xl font-medium border border-foreground/20 hover:bg-foreground/10 dark:hover:bg-foreground/20 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Linkedin className="w-5 h-5" />
+                LinkedIn
+              </motion.a>
+            </div>
+          </GlassCard>
 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4"
-                >
-                  <motion.a
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    href="mailto:contact@example.com"
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
-                  >
-                    <Mail className="w-5 h-5" />
-                    邮件联系
-                  </motion.a>
-                  <motion.a
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    href="#contact-form"
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
-                  >
-                    <MessageSquare className="w-5 h-5" />
-                    在线咨询
-                  </motion.a>
-                  <motion.a
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    href="#faq"
-                    className="flex items-center justify-center gap-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-6 py-3 rounded-xl font-medium border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
-                  >
-                    <Search className="w-5 h-5" />
-                    查看FAQ
-                  </motion.a>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="mt-8 text-center"
+          >
+            <p className="text-foreground/60 max-w-xl mx-auto font-sf-pro-text">
+              我通常在工作日的 <span className="text-tech-cyan font-semibold">24小时内</span> 回复邮件，紧急事项请通过社交媒体联系我。
+            </p>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

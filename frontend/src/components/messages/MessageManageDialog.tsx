@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pin, Star, Tag, Plus, X as CloseIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -22,7 +22,7 @@ const SUGGESTED_TAGS = [
   '娱乐', '有趣', '创意', '学习', '求助', '感谢', '建议'
 ];
 
-export default function MessageManageDialog({
+function MessageManageDialog({
   message,
   isOpen,
   onClose,
@@ -42,25 +42,25 @@ export default function MessageManageDialog({
   }, [message]);
 
   // 添加标签
-  const handleAddTag = () => {
+  const handleAddTag = useCallback(() => {
     const trimmedTag = newTag.trim();
     if (trimmedTag && !tags.includes(trimmedTag)) {
       setTags([...tags, trimmedTag]);
       setNewTag('');
     }
-  };
+  }, [newTag, tags]);
 
   // 移除标签
-  const handleRemoveTag = (tagToRemove: string) => {
+  const handleRemoveTag = useCallback((tagToRemove: string) => {
     setTags(tags.filter(t => t !== tagToRemove));
-  };
+  }, [tags]);
 
   // 添加建议标签
-  const handleAddSuggestedTag = (tag: string) => {
+  const handleAddSuggestedTag = useCallback((tag: string) => {
     if (!tags.includes(tag)) {
       setTags([...tags, tag]);
     }
-  };
+  }, [tags]);
 
   // 切换置顶
   const handleTogglePin = async () => {
@@ -68,8 +68,6 @@ export default function MessageManageDialog({
     setIsSubmitting(true);
     try {
       await onTogglePin(message.id, !message.isPinned);
-    } catch (error) {
-      console.error('置顶操作失败:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,8 +79,6 @@ export default function MessageManageDialog({
     setIsSubmitting(true);
     try {
       await onToggleFeature(message.id, !message.isFeatured);
-    } catch (error) {
-      console.error('精华操作失败:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -95,19 +91,17 @@ export default function MessageManageDialog({
     try {
       await onUpdateTags(message.id, tags);
       onClose();
-    } catch (error) {
-      console.error('保存标签失败:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // 处理关闭
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!isSubmitting) {
       onClose();
     }
-  };
+  }, [isSubmitting, onClose]);
 
   if (!message) return null;
 
@@ -301,3 +295,5 @@ export default function MessageManageDialog({
     </AnimatePresence>
   );
 }
+
+export default memo(MessageManageDialog);

@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useCallback, memo } from 'react';
-import { Reply, User } from 'lucide-react';
+import { Reply } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LazyAvatar } from '@/components/ui/LazyImage';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
+import ConfirmDialog from '@/components/feedback/ConfirmDialog';
 import type { Message } from '@/types';
 
 interface MessageRepliesProps {
@@ -45,13 +47,13 @@ const ReplyItem = memo(function ReplyItem({
   const maxDepth = 3; // 最大嵌套深度
 
   // 高亮@用户
-  const highlightMentions = (content: string) => {
+  const highlightMentions = (content: string): string => {
     if (!reply.mentionedUsers || reply.mentionedUsers.length === 0) {
       return content;
     }
     return content.replace(
       /@(\w+)/g,
-      '<span class="text-tech-cyan font-bold cursor-pointer hover:underline">@$1</span>'
+      '**@$1**'
     );
   };
 
@@ -102,10 +104,12 @@ const ReplyItem = memo(function ReplyItem({
               <span className="text-xs text-white/30">已编辑</span>
             )}
           </div>
-          <div
-            className="text-xs text-white/70 break-words"
-            dangerouslySetInnerHTML={{ __html: highlightMentions(reply.content) }}
-          />
+          <div className="text-xs text-white/70 break-words">
+            <MarkdownRenderer
+              content={highlightMentions(reply.content)}
+              className="inline"
+            />
+          </div>
           <div className="flex items-center gap-3 mt-1">
             <button
               onClick={() => onLikeReply?.(reply.id)}
@@ -211,6 +215,10 @@ export default function MessageReplies({
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [replyToDelete, setReplyToDelete] = useState<string | null>(null);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const replies = message.replies || [];
   const replyCount = message.reply_count || replies.length;
@@ -244,39 +252,47 @@ export default function MessageReplies({
 
   // 处理删除回复
   const handleDeleteReply = useCallback((replyId: string) => {
-    if (confirm('确定要删除这条回复吗？')) {
-      onDeleteReply?.(replyId);
+    setReplyToDelete(replyId);
+    setDeleteConfirmOpen(true);
+  }, []);
+
+  const confirmDeleteReply = useCallback(() => {
+    if (replyToDelete) {
+      onDeleteReply?.(replyToDelete);
+      setDeleteConfirmOpen(false);
+      setReplyToDelete(null);
     }
-  }, [onDeleteReply]);
+  }, [replyToDelete, onDeleteReply]);
 
   // 显示的回复
   const visibleReplies = isExpanded ? replies : replies.slice(0, maxVisible);
 
   return (
-    <div className="mt-3 pt-3 border-t border-white/5">
-      {/* 回复统计 */}
-      {hasReplies && (
-        <div className="flex items-center justify-between mb-2">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1.5 text-xs text-white/50 hover:text-tech-cyan transition-colors"
-          >
-            <Reply className="w-3.5 h-3.5" />
-            <span>
-              {replyCount} 条回复{!isExpanded && replyCount > maxVisible && ` (显示前${maxVisible}条)`}
-            </span>
-            <motion.span
-              animate={{ rotate: isExpanded ? 180 : 0 }}
-              className="transition-transform"
+    <>
+      <div className="mt-3 pt-3 border-t border-white/5">
+        {/* 回复统计 */}
+        {hasReplies && (
+          <div className="flex items-center justify-between mb-2">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1.5 text-xs text-white/50 hover:text-tech-cyan transition-colors"
             >
-              ▼
-            </motion.span>
-          </button>
-        </div>
-      )}
+              <Reply className="w-3.5 h-3.5" />
+              <span>
+                {replyCount} 条回复{!isExpanded && replyCount > maxVisible && ` (显示前${maxVisible}条)`}
+              </span>
+              <motion.span
+                animate={{ rotate: isExpanded ? 180 : 0 }}
+                className="transition-transform"
+              >
+                ▼
+              </motion.span>
+            </button>
+          </div>
+        )}
 
-      {/* 回复列表 */}
-      <AnimatePresence mode="wait">
+        {/* 回复列表 */}
+        <AnimatePresence mode="wait">
         <motion.div
           key={isExpanded ? 'expanded' : 'collapsed'}
           initial={{ opacity: 0 }}
@@ -372,7 +388,8 @@ export default function MessageReplies({
         <motion.button
           onClick={() => {
             if (!currentUser) {
-              alert('请先登录');
+              setAlertMessage('请先登录');
+              setAlertOpen(true);
               return;
             }
             setShowReplyForm(true);
@@ -386,5 +403,30 @@ export default function MessageReplies({
         </motion.button>
       )}
     </div>
+
+    {/* 删除确认对话框 */}
+    <ConfirmDialog
+      isOpen={deleteConfirmOpen}
+      onClose={() => setDeleteConfirmOpen(false)}
+      onConfirm={confirmDeleteReply}
+      title="删除回复"
+      description="删除后无法恢复，确定要删除这条回复吗？"
+      type="danger"
+      confirmText="确定删除"
+      cancelText="取消"
+    />
+
+    {/* 提示对话框 */}
+    <ConfirmDialog
+      isOpen={alertOpen}
+      onClose={() => setAlertOpen(false)}
+      onConfirm={() => setAlertOpen(false)}
+      title="提示"
+      description={alertMessage}
+      type="info"
+      confirmText="知道了"
+      cancelText="取消"
+    />
+    </>
   );
 }

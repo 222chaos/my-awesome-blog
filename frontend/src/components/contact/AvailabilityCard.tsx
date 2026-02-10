@@ -1,147 +1,210 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Clock, Globe, Calendar, MessageSquare, CheckCircle2, XCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, XCircle, Clock, Calendar, MessageSquare, AlertCircle } from 'lucide-react';
+import { useTheme } from '@/context/theme-context';
+import GlassCard from '@/components/ui/GlassCard';
 
-interface AvailabilityStatus {
-  isOnline: boolean;
-  timezone: string;
+type AvailabilityStatus = 'available' | 'busy' | 'offline' | 'away';
+
+interface AvailabilityInfo {
+  status: AvailabilityStatus;
+  label: string;
+  description: string;
   responseTime: string;
-  workingHours: string;
-  availability: 'available' | 'busy' | 'away';
+  color: string;
+  icon: React.ReactNode;
 }
 
 export default function AvailabilityCard() {
-  const status: AvailabilityStatus = {
-    isOnline: true,
-    timezone: 'Asia/Shanghai (UTC+8)',
-    responseTime: '24小时内',
-    workingHours: '周一至周五 9:00 - 18:00',
-    availability: 'available',
+  const { resolvedTheme } = useTheme();
+  const [availability, setAvailability] = useState<AvailabilityInfo>({
+    status: 'available',
+    label: '在线',
+    description: '现在可以回复消息',
+    responseTime: '通常在 24 小时内回复',
+    color: 'text-green-500',
+    icon: <CheckCircle className="w-5 h-5" />,
+  });
+
+  useEffect(() => {
+    const getCurrentAvailability = (): AvailabilityInfo => {
+      const now = new Date();
+      const hour = now.getHours();
+      const day = now.getDay();
+
+      const isWeekday = day >= 1 && day <= 5;
+      const isWorkHours = hour >= 9 && hour < 18;
+
+      if (isWeekday && isWorkHours) {
+        return {
+          status: 'available',
+          label: '在线',
+          description: '现在可以回复消息',
+          responseTime: '通常在 2 小时内回复',
+          color: 'text-green-500',
+          icon: <CheckCircle className="w-5 h-5" />,
+        };
+      } else if (isWeekday && hour >= 18 && hour < 22) {
+        return {
+          status: 'busy',
+          label: '忙碌',
+          description: '正在处理紧急任务',
+          responseTime: '可能在 24 小时内回复',
+          color: 'text-yellow-500',
+          icon: <AlertCircle className="w-5 h-5" />,
+        };
+      } else if (hour >= 22 || hour < 9) {
+        return {
+          status: 'away',
+          label: '离线',
+          description: '非工作时间',
+          responseTime: '下一个工作日回复',
+          color: 'text-gray-500',
+          icon: <Clock className="w-5 h-5" />,
+        };
+      } else {
+        return {
+          status: 'offline',
+          label: '离线',
+          description: '周末休息',
+          responseTime: '周一回复',
+          color: 'text-gray-500',
+          icon: <XCircle className="w-5 h-5" />,
+        };
+      }
+    };
+
+    setAvailability(getCurrentAvailability());
+  }, []);
+
+  const getNextWorkingDay = () => {
+    const now = new Date();
+    const day = now.getDay();
+    let daysUntilMonday = (8 - day) % 7 || 7;
+    const nextMonday = new Date(now);
+    nextMonday.setDate(now.getDate() + daysUntilMonday);
+    return nextMonday.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
   };
 
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 px-1">
-        联系状态
-      </h2>
-
-      <div className="bg-white/50 dark:bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-gray-200 dark:border-gray-800">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              className="flex items-start gap-4 p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl"
-            >
-              <div className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0",
-                status.isOnline ? "bg-green-500" : "bg-gray-400"
-              )}>
-                {status.isOnline ? (
-                  <CheckCircle2 className="w-6 h-6 text-white" />
-                ) : (
-                  <XCircle className="w-6 h-6 text-white" />
-                )}
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  当前状态
-                </h3>
-                <p className={cn(
-                  "text-sm",
-                  status.isOnline ? "text-green-600 dark:text-green-400" : "text-gray-600 dark:text-gray-400"
-                )}>
-                  {status.isOnline ? '在线 - 随时可以联系' : '离线 - 请留言'}
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex items-start gap-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl"
-            >
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Globe className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  时区
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {status.timezone}
-                </p>
-              </div>
-            </motion.div>
+    <section className="w-full py-12">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 text-center">
+            <h2 className="font-sf-pro-display text-3xl font-bold text-foreground mb-2">
+              当前状态
+            </h2>
+            <p className="font-sf-pro-text text-foreground/70">
+              了解我的工作状态和响应时间
+            </p>
           </div>
 
-          <div className="space-y-4">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="flex items-start gap-4 p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl"
-            >
-              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  响应时间
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {status.responseTime}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  工作日通常更快
-                </p>
-              </div>
-            </motion.div>
+          <GlassCard padding="xl">
+            <div className="flex items-center gap-6 mb-8">
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [1, 0.7, 1],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${availability.color.replace('text-', 'from-')} to-white/20 dark:to-black/20 flex items-center justify-center`}
+              >
+                <div className={availability.color}>
+                  {availability.icon}
+                </div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="flex items-start gap-4 p-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl"
-            >
-              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  工作时间
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {status.workingHours}
+              <div className="flex-grow">
+                <div className="flex items-center gap-3 mb-1">
+                  <h3 className="font-sf-pro-display text-2xl font-semibold text-foreground">
+                    {availability.label}
+                  </h3>
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    className={`w-3 h-3 rounded-full ${availability.color.replace('text-', 'bg-')}`}
+                  />
+                </div>
+                <p className="font-sf-pro-text text-foreground/70">
+                  {availability.description}
                 </p>
               </div>
-            </motion.div>
-          </div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-6 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/5 dark:to-purple-500/5 rounded-xl border border-blue-200/50 dark:border-blue-800/50"
-        >
-          <div className="flex items-start gap-3">
-            <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                如果您需要紧急联系，可以直接使用上方的<span className="font-semibold text-blue-600 dark:text-blue-400">快速咨询</span>功能，或者通过社交媒体私信我。
-              </p>
             </div>
-          </div>
-        </motion.div>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-4 bg-foreground/5 dark:bg-foreground/10 rounded-2xl">
+                <div className="w-10 h-10 rounded-xl bg-tech-cyan/10 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="w-5 h-5 text-tech-cyan" />
+                </div>
+                <div>
+                  <h4 className="font-sf-pro-display font-semibold text-foreground mb-1">
+                    响应时间
+                  </h4>
+                  <p className="font-sf-pro-text text-foreground/70">
+                    {availability.responseTime}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-foreground/5 dark:bg-foreground/10 rounded-2xl">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                  <Calendar className="w-5 h-5 text-purple-500" />
+                </div>
+                <div>
+                  <h4 className="font-sf-pro-display font-semibold text-foreground mb-1">
+                    工作时间
+                  </h4>
+                  <p className="font-sf-pro-text text-foreground/70">
+                    周一至周五 09:00 - 18:00 (UTC+8)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 bg-foreground/5 dark:bg-foreground/10 rounded-2xl">
+                <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center flex-shrink-0">
+                  <AlertCircle className="w-5 h-5 text-pink-500" />
+                </div>
+                <div>
+                  <h4 className="font-sf-pro-display font-semibold text-foreground mb-1">
+                    紧急事项
+                  </h4>
+                  <p className="font-sf-pro-text text-foreground/70">
+                    如果有紧急事项，请通过社交媒体直接联系我，我会优先处理。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              {availability.status === 'offline' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-6 p-4 bg-foreground/5 dark:bg-foreground/10 rounded-2xl"
+                >
+                  <p className="font-sf-pro-text text-foreground/70 text-center">
+                    下一个工作日：<span className="text-tech-cyan font-semibold">{getNextWorkingDay()}</span>
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </GlassCard>
+        </div>
       </div>
     </section>
   );
-}
-
-function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ');
 }

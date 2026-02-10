@@ -250,7 +250,6 @@ export default function MessagesPage() {
       setTrendingMessages(trending);
       setCurrentUser(user);
     } catch (error) {
-      console.error('Failed to load data', error);
       toast({
         title: "加载失败",
         description: "无法连接到服务器矩阵，请稍后重试。",
@@ -394,7 +393,7 @@ useEffect(() => {
       setMessages(messages.map(m => m.id === id ? { ...m, likes: (m.likes || 0) + 1 } : m));
       setTrendingMessages(trendingMessages.map(m => m.id === id ? { ...m, likes: (m.likes || 0) + 1 } : m));
     } catch (error) {
-      console.error('Like failed', error);
+      toast({ title: "点赞失败", description: "操作失败。", variant: "destructive" });
     }
   };
 
@@ -416,7 +415,6 @@ useEffect(() => {
       setMessages(messages.map(m => m.id === messageId ? editedMessage : m));
       toast({ title: "编辑成功", description: "留言内容已更新。" });
     } catch (error) {
-      console.error('Edit failed', error);
       throw error;
     }
   };
@@ -433,7 +431,6 @@ useEffect(() => {
       await loadData();
       toast({ title: "回复成功", description: "您的回复已发送。" });
     } catch (error) {
-      console.error('Reply failed', error);
       toast({ title: "回复失败", description: "回复发送失败。", variant: "destructive" });
       throw error;
     }
@@ -445,7 +442,6 @@ useEffect(() => {
       await likeReplyMessage(replyId);
       toast({ title: "点赞成功", description: "您点赞了这条回复。" });
     } catch (error) {
-      console.error('Like reply failed', error);
       toast({ title: "点赞失败", description: "操作失败。", variant: "destructive" });
     }
   };
@@ -458,7 +454,6 @@ useEffect(() => {
       await loadData();
       toast({ title: "删除成功", description: "回复已删除。" });
     } catch (error) {
-      console.error('Delete reply failed', error);
       toast({ title: "删除失败", description: "操作失败。", variant: "destructive" });
     }
   };
@@ -477,7 +472,6 @@ useEffect(() => {
         description: isPinned ? "留言已置顶到顶部。" : "留言已取消置顶。"
       });
     } catch (error) {
-      console.error('Pin message failed', error);
       toast({ title: "操作失败", description: "置顶操作失败。", variant: "destructive" });
     }
   };
@@ -492,7 +486,6 @@ useEffect(() => {
         description: isFeatured ? "留言已标记为精华。" : "留言已取消精华标记。"
       });
     } catch (error) {
-      console.error('Feature message failed', error);
       toast({ title: "操作失败", description: "精华操作失败。", variant: "destructive" });
     }
   };
@@ -504,7 +497,6 @@ useEffect(() => {
       await loadData();
       toast({ title: "标签更新成功", description: "留言标签已更新。" });
     } catch (error) {
-      console.error('Update tags failed', error);
       toast({ title: "操作失败", description: "标签更新失败。", variant: "destructive" });
     }
   };

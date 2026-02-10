@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, memo } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Crown, Zap, Star, Trophy, Flame } from 'lucide-react';
 
@@ -13,7 +13,7 @@ interface UserLevelBadgeProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const UserLevelBadge = ({
+const UserLevelBadge = memo(({
   level,
   username,
   showProgress = true,
@@ -136,6 +136,6 @@ const UserLevelBadge = ({
       )}
     </div>
   );
-};
+});
 
 export default UserLevelBadge;

@@ -375,7 +375,6 @@ export default function VirtualMessageList({
     try {
       await onMessageReply(messageId, content, parentReplyId);
     } catch (error) {
-      console.error('回复失败:', error);
       throw error;
     }
   }, [onMessageReply]);

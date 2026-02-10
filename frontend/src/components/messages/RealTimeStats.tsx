@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   Users, MessageSquare, TrendingUp, Activity, Zap, Globe,
   BarChart2, Clock, Flame, Heart, Tag, Trophy,
   Calendar, Eye, Reply
@@ -31,7 +31,7 @@ interface TimeRange {
   value: string;
 }
 
-export default function RealTimeStats() {
+function RealTimeStats() {
   const [onlineUsers, setOnlineUsers] = useState(10);
   const [messageRate, setMessageRate] = useState(0);
   const [activeTab, setActiveTab] = useState<'realtime' | 'stats' | 'leaderboard'>('realtime');
@@ -616,3 +616,5 @@ export default function RealTimeStats() {
     </div>
   );
 }
+
+export default memo(RealTimeStats);

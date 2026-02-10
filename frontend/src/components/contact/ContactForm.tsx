@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Send, CheckCircle, AlertCircle, User, MessageSquare, Tag } from 'lucide-react';
+import { Mail, User, MessageSquare, Send, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { useTheme } from '@/context/theme-context';
+import GlassCard from '@/components/ui/GlassCard';
 
 interface FormData {
   name: string;
@@ -11,291 +13,281 @@ interface FormData {
   message: string;
 }
 
-interface FormErrors {
-  name?: string;
-  email?: string;
-  subject?: string;
-  message?: string;
-}
+type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
 export default function ContactForm() {
+  const { resolvedTheme } = useTheme();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     subject: '',
     message: '',
   });
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [status, setStatus] = useState<FormStatus>('idle');
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof FormData, boolean>>>({});
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = '请输入您的姓名';
-    } else if (formData.name.length < 2) {
-      newErrors.name = '姓名至少需要2个字符';
+  const validateField = (name: keyof FormData, value: string): string => {
+    switch (name) {
+      case 'name':
+        if (!value.trim()) return '请输入您的姓名';
+        if (value.length < 2) return '姓名至少需要2个字符';
+        return '';
+      case 'email':
+        if (!value.trim()) return '请输入您的邮箱';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return '请输入有效的邮箱地址';
+        return '';
+      case 'subject':
+        if (!value.trim()) return '请输入主题';
+        if (value.length < 3) return '主题至少需要3个字符';
+        return '';
+      case 'message':
+        if (!value.trim()) return '请输入消息内容';
+        if (value.length < 10) return '消息内容至少需要10个字符';
+        return '';
+      default:
+        return '';
     }
-
-    if (!formData.email.trim()) {
-      newErrors.email = '请输入您的邮箱';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '请输入有效的邮箱地址';
-    }
-
-    if (!formData.subject.trim()) {
-      newErrors.subject = '请输入主题';
-    } else if (formData.subject.length < 3) {
-      newErrors.subject = '主题至少需要3个字符';
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = '请输入消息内容';
-    } else if (formData.message.length < 10) {
-      newErrors.message = '消息至少需要10个字符';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setErrors({});
-    }, 2000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+    
+    if (touched[name as keyof FormData]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: validateField(name as keyof FormData, value),
+      }));
     }
   };
 
-  const resetForm = () => {
-    setIsSuccess(false);
+  const handleBlur = (name: keyof FormData, value: string) => {
+    setTouched(prev => ({ ...prev, [name]: true }));
+    setErrors(prev => ({
+      ...prev,
+      [name]: validateField(name, value),
+    }));
   };
 
-  return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 px-1">
-        发送消息
-      </h2>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    Object.entries(formData).forEach(([key, value]) => {
+      const error = validateField(key as keyof FormData, value);
+      if (error) newErrors[key as keyof FormData] = error;
+    });
 
-      <div className="bg-white/50 dark:bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-gray-200 dark:border-gray-800">
-        <AnimatePresence mode="wait">
-          {isSuccess ? (
-            <motion.div
-              key="success"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="text-center py-12"
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="w-20 h-20 mx-auto mb-6 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"
-              >
-                <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
-              </motion.div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                发送成功！
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                感谢您的留言，我会尽快回复您的消息。
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={resetForm}
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
-              >
-                发送另一条消息
-              </motion.button>
-            </motion.div>
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTouched({
+        name: true,
+        email: true,
+        subject: true,
+        message: true,
+      });
+      return;
+    }
+
+    setStatus('submitting');
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setStatus('success');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTouched({});
+      setErrors({});
+      
+      setTimeout(() => setStatus('idle'), 3000);
+    } catch (error) {
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 3000);
+    }
+  };
+
+  const renderInput = (
+    name: keyof FormData,
+    label: string,
+    type: string = 'text',
+    icon: React.ReactNode,
+    rows?: number
+  ) => {
+    const error = errors[name];
+    const isTouched = touched[name];
+    const showError = isTouched && error;
+
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-foreground/90 font-sf-pro-text">
+          {label}
+        </label>
+        <div className="relative group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 group-focus-within:text-tech-cyan transition-colors duration-200">
+            {icon}
+          </div>
+          {rows ? (
+            <textarea
+              name={name}
+              value={formData[name]}
+              onChange={handleChange}
+              onBlur={() => handleBlur(name, formData[name])}
+              rows={rows}
+              className={`
+                w-full pl-12 pr-4 py-4 rounded-2xl border-2
+                bg-background/80 dark:bg-foreground/5
+                text-foreground dark:text-white
+                placeholder-foreground/40 dark:placeholder-white/30
+                transition-all duration-300
+                resize-none
+                ${showError 
+                  ? 'border-red-500 dark:border-red-400 focus:ring-4 focus:ring-red-500/10' 
+                  : 'border-foreground/10 dark:border-white/10 hover:border-foreground/20 dark:hover:border-white/20 focus:border-tech-cyan focus:ring-4 focus:ring-tech-cyan/10'
+                }
+                focus:outline-none focus:bg-background dark:focus:bg-foreground/10
+                font-sf-pro-text
+              `}
+              placeholder={`请输入${label}...`}
+            />
           ) : (
-            <motion.form
-              key="form"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onSubmit={handleSubmit}
-              className="space-y-6"
+            <input
+              type={type}
+              name={name}
+              value={formData[name]}
+              onChange={handleChange}
+              onBlur={() => handleBlur(name, formData[name])}
+              className={`
+                w-full pl-12 pr-4 py-4 rounded-2xl border-2
+                bg-background/80 dark:bg-foreground/5
+                text-foreground dark:text-white
+                placeholder-foreground/40 dark:placeholder-white/30
+                transition-all duration-300
+                ${showError 
+                  ? 'border-red-500 dark:border-red-400 focus:ring-4 focus:ring-red-500/10' 
+                  : 'border-foreground/10 dark:border-white/10 hover:border-foreground/20 dark:hover:border-white/20 focus:border-tech-cyan focus:ring-4 focus:ring-tech-cyan/10'
+                }
+                focus:outline-none focus:bg-background dark:focus:bg-foreground/10
+                font-sf-pro-text
+              `}
+              placeholder={`请输入${label}...`}
+            />
+          )}
+        </div>
+        <AnimatePresence mode="wait">
+          {showError && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center gap-1.5 text-sm text-red-500 dark:text-red-400"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2">
-                    <User className="w-4 h-4" />
-                    姓名 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="您的姓名"
-                    className={cn(
-                      'w-full px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400',
-                      errors.name
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-200 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500'
-                    )}
-                  />
-                  {errors.name && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-1.5 mt-1.5 text-sm text-red-500"
-                    >
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {errors.name}
-                    </motion.p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2">
-                    <Mail className="w-4 h-4" />
-                    邮箱 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="your@email.com"
-                    className={cn(
-                      'w-full px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400',
-                      errors.email
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-200 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500'
-                    )}
-                  />
-                  {errors.email && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-center gap-1.5 mt-1.5 text-sm text-red-500"
-                    >
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {errors.email}
-                    </motion.p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  <Tag className="w-4 h-4" />
-                  主题 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="消息主题"
-                  className={cn(
-                    'w-full px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400',
-                    errors.subject
-                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-200 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500'
-                  )}
-                />
-                {errors.subject && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-1.5 mt-1.5 text-sm text-red-500"
-                  >
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {errors.subject}
-                  </motion.p>
-                )}
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  <MessageSquare className="w-4 h-4" />
-                  消息 <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="请输入您的消息内容..."
-                  rows={6}
-                  className={cn(
-                    'w-full px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-400 resize-none',
-                    errors.message
-                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-200 dark:border-gray-700 focus:ring-blue-500 focus:border-blue-500'
-                  )}
-                />
-                {errors.message && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-1.5 mt-1.5 text-sm text-red-500"
-                  >
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {errors.message}
-                  </motion.p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  disabled={isSubmitting}
-                  className={cn(
-                    'flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer',
-                    isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:from-blue-600 hover:to-purple-700'
-                  )}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                        className="w-5 h-5"
-                      >
-                        <Send className="w-5 h-5" />
-                      </motion.div>
-                      发送中...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      发送消息
-                    </>
-                  )}
-                </motion.button>
-              </div>
-            </motion.form>
+              <AlertCircle className="w-4 h-4" />
+              {error}
+            </motion.p>
           )}
         </AnimatePresence>
       </div>
+    );
+  };
+
+  return (
+    <section className="w-full py-12 relative">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
+          {/* 标题区域 */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-10 text-center"
+          >
+            <h2 className="font-sf-pro-display text-3xl md:text-4xl font-bold text-foreground mb-3">
+              发送消息
+            </h2>
+            <p className="font-sf-pro-text text-foreground/70 max-w-xl mx-auto">
+              填写下面的表单，我会尽快回复你。通常在 24 小时内回复。
+            </p>
+          </motion.div>
+
+          <GlassCard padding="xl" className="shadow-xl shadow-foreground/5 dark:shadow-black/20">
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderInput('name', '姓名', 'text', <User className="w-5 h-5" />)}
+                {renderInput('email', '邮箱', 'email', <Mail className="w-5 h-5" />)}
+              </div>
+
+              {renderInput('subject', '主题', 'text', <MessageSquare className="w-5 h-5" />)}
+              {renderInput('message', '消息内容', 'text', <MessageSquare className="w-5 h-5" />, 6)}
+
+              <motion.button
+                type="submit"
+                disabled={status === 'submitting'}
+                whileHover={{ scale: status === 'submitting' ? 1 : 1.02, y: status === 'submitting' ? 0 : -2 }}
+                whileTap={{ scale: status === 'submitting' ? 1 : 0.98 }}
+                className={`
+                  w-full py-4 rounded-2xl font-semibold font-sf-pro-text
+                  transition-all duration-300
+                  flex items-center justify-center gap-3
+                  shadow-lg
+                  ${status === 'submitting'
+                    ? 'bg-foreground/20 dark:bg-white/10 cursor-not-allowed text-foreground/50'
+                    : 'bg-gradient-to-r from-tech-cyan via-cyan-500 to-blue-500 text-white shadow-tech-cyan/25 hover:shadow-xl hover:shadow-tech-cyan/30'
+                  }
+                `}
+              >
+                {status === 'submitting' ? (
+                  <>
+                    <motion.div
+                      className="w-5 h-5 border-2 border-foreground/30 border-t-foreground rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    />
+                    <span>发送中...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    <span>发送消息</span>
+                  </>
+                )}
+              </motion.button>
+            </form>
+
+            <AnimatePresence mode="wait">
+              {status === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="mt-6 p-4 bg-green-500/10 dark:bg-green-500/20 border border-green-500/20 dark:border-green-500/30 rounded-2xl"
+                >
+                  <div className="flex items-center gap-3 text-green-600 dark:text-green-400">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="font-sf-pro-text">消息发送成功！我会尽快回复你。</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {status === 'error' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="mt-6 p-4 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 dark:border-red-500/30 rounded-2xl"
+                >
+                  <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+                    <XCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="font-sf-pro-text">发送失败，请稍后重试。</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </GlassCard>
+        </div>
+      </div>
     </section>
   );
-}
-
-function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ');
 }

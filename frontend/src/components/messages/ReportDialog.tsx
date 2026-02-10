@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flag, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -24,7 +24,7 @@ const reportReasons = [
   { id: 'other', label: '其他原因', icon: '📝' },
 ];
 
-export default function ReportDialog({
+function ReportDialog({
   isOpen,
   onClose,
   onSubmit,
@@ -40,7 +40,7 @@ export default function ReportDialog({
   const mutedTextClass = themedClasses.mutedTextClass;
   const cardBgClass = themedClasses.cardBgClass;
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!selectedReason) return;
 
     setIsSubmitting(true);
@@ -48,18 +48,16 @@ export default function ReportDialog({
       await new Promise(resolve => setTimeout(resolve, 500));
       onSubmit(selectedReason, details);
       handleClose();
-    } catch (error) {
-      console.error('举报失败:', error);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [selectedReason, details, onSubmit, handleClose]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setSelectedReason('');
     setDetails('');
     onClose();
-  };
+  }, [onClose]);
 
   if (!isOpen) return null;
 
@@ -196,3 +194,5 @@ export default function ReportDialog({
     </AnimatePresence>
   );
 }
+
+export default memo(ReportDialog);

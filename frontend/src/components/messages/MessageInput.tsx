@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { createMessage, DANMAKU_COLORS, validateMessage } from '@/services/messageService';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { Send, Palette, MessageSquare, Sparkles, Smile } from 'lucide-react';
+import { Send, Palette, MessageSquare, Sparkles, Smile, Bold, Italic, Link, AtSign } from 'lucide-react';
 import { Message } from '@/types';
 
 interface MessageInputProps {
@@ -14,7 +14,7 @@ interface MessageInputProps {
   onMessageSent: (message: Message) => void;
 }
 
-export default function MessageInput({
+function MessageInput({
   isLoggedIn,
   currentUser,
   onMessageSent
@@ -28,7 +28,7 @@ export default function MessageInput({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -57,18 +57,18 @@ export default function MessageInput({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [content, selectedColor, isDanmaku, onMessageSent]);
 
   // 自动调整文本框高度
-  const adjustTextareaHeight = () => {
+  const adjustTextareaHeight = useCallback(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
-  };
+  }, []);
 
   // 插入表情符号
-  const insertEmoji = (emoji: string) => {
+  const insertEmoji = useCallback((emoji: string) => {
     if (textareaRef.current) {
       const startPos = textareaRef.current.selectionStart;
       const endPos = textareaRef.current.selectionEnd;
@@ -79,7 +79,7 @@ export default function MessageInput({
       // 延迟调整高度
       setTimeout(adjustTextareaHeight, 0);
     }
-  };
+  }, [content, adjustTextareaHeight]);
 
   if (!isLoggedIn) {
     return (
@@ -280,3 +280,5 @@ export default function MessageInput({
     </form>
   );
 }
+
+export default memo(MessageInput);

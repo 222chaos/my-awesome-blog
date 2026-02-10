@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useThemedClasses } from '@/hooks/useThemedClasses';
-import { motion } from 'framer-motion';
+import { motion, memo } from 'framer-motion';
 
 interface MessagePaginationProps {
   currentPage: number;
@@ -15,7 +15,7 @@ interface MessagePaginationProps {
   showEllipsis?: boolean;
 }
 
-export default function MessagePagination({
+const MessagePagination = memo(function MessagePagination({
   currentPage,
   totalPages,
   onPageChange,
@@ -210,4 +210,6 @@ export default function MessagePagination({
       </motion.div>
     </motion.div>
   );
-}
+});
+
+export default MessagePagination;
