@@ -299,3 +299,273 @@ export interface RelatedArticle {
   };
   view_count: number;
 }
+
+// LLM 相关类型
+export type LLMProvider = 'deepseek' | 'glm' | 'qwen';
+
+export interface LLMChatRequest {
+  message: string;
+  conversation_id?: string;
+  provider?: LLMProvider;
+  model?: string;
+  temperature?: number;
+  max_tokens?: number;
+  stream?: boolean;
+  use_memory?: boolean;
+  use_context?: boolean;
+}
+
+export interface LLMChatResponse {
+  id: string;
+  conversation_id: string;
+  message: string;
+  role: 'assistant' | 'user';
+  tokens?: number;
+  model: string;
+  created_at: string;
+}
+
+export interface LLMStreamChunk {
+  id?: string;
+  conversation_id?: string;
+  delta?: string;
+  role?: 'assistant' | 'user';
+  tokens?: number;
+  done?: boolean;
+  error?: string;
+}
+
+export interface LLMProviderInfo {
+  name: LLMProvider;
+  display_name: string;
+  models: LLMModel[];
+}
+
+export interface LLMModel {
+  name: string;
+  display_name: string;
+  description?: string;
+  max_tokens?: number;
+  supports_streaming?: boolean;
+}
+
+// Prompt 相关类型
+export interface Prompt {
+  id: string;
+  tenant_id: string;
+  name: string;
+  version: string;
+  content: string;
+  variables?: Record<string, any>;
+  description?: string;
+  category?: string;
+  is_active: boolean;
+  is_system: boolean;
+  ab_test_group?: 'A' | 'B' | null;
+  ab_test_percentage?: number;
+  usage_count: number;
+  success_rate: number;
+  total_interactions: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PromptCreate {
+  name: string;
+  version: string;
+  content: string;
+  variables?: Record<string, any>;
+  description?: string;
+  category?: string;
+  is_system?: boolean;
+}
+
+export interface PromptUpdate {
+  name?: string;
+  content?: string;
+  variables?: Record<string, any>;
+  description?: string;
+  category?: string;
+  is_active?: boolean;
+}
+
+export interface PromptVersion {
+  id: string;
+  prompt_id: string;
+  version: string;
+  content: string;
+  variables?: Record<string, any>;
+  created_at: string;
+}
+
+export interface ABTestResult {
+  prompt_id: string;
+  group_a: {
+    version: string;
+    usage_count: number;
+    success_rate: number;
+  };
+  group_b: {
+    version: string;
+    usage_count: number;
+    success_rate: number;
+  };
+  winner?: 'A' | 'B' | null;
+  statistical_significance?: number;
+}
+
+// Memory 相关类型
+export interface Memory {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  memory_type: 'short_term' | 'long_term';
+  content: string;
+  embedding?: string;
+  importance?: number;
+  access_count: number;
+  expires_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MemoryCreate {
+  memory_type: 'short_term' | 'long_term';
+  content: string;
+  importance?: number;
+  expires_at?: string;
+}
+
+export interface MemoryUpdate {
+  content?: string;
+  importance?: number;
+  expires_at?: string;
+}
+
+export interface MemorySearchResult {
+  memory: Memory;
+  similarity_score: number;
+}
+
+export interface MemorySearchRequest {
+  query: string;
+  limit?: number;
+  threshold?: number;
+  memory_type?: 'short_term' | 'long_term' | 'all';
+}
+
+// Conversation 相关类型
+export interface Conversation {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  title: string;
+  status: 'active' | 'archived' | 'deleted';
+  prompt_id?: string;
+  model: string;
+  total_messages: number;
+  total_tokens: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationCreate {
+  title: string;
+  model?: string;
+  prompt_id?: string;
+}
+
+export interface ConversationUpdate {
+  title?: string;
+  status?: 'active' | 'archived' | 'deleted';
+}
+
+export interface ConversationMessage {
+  id: string;
+  conversation_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  tokens?: number;
+  model?: string;
+  created_at: string;
+}
+
+export interface ConversationWithMessages extends Conversation {
+  messages: ConversationMessage[];
+}
+
+// Tenant 相关类型
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  is_active: boolean;
+  max_users: number;
+  max_conversations: number;
+  max_storage_mb: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TenantCreate {
+  name: string;
+  slug: string;
+  description?: string;
+  max_users?: number;
+  max_conversations?: number;
+  max_storage_mb?: number;
+}
+
+export interface TenantUpdate {
+  name?: string;
+  description?: string;
+  is_active?: boolean;
+  max_users?: number;
+  max_conversations?: number;
+  max_storage_mb?: number;
+}
+
+export interface TenantUsageStats {
+  tenant_id: string;
+  prompt_count: number;
+  memory_count: number;
+  conversation_count: number;
+  message_count: number;
+  storage_used_mb: number;
+  storage_percentage: number;
+  storage_limit_mb: number;
+  status: string;
+}
+
+export interface TenantConfig {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  max_users: number;
+  max_conversations: number;
+  max_storage_mb: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TenantLimits {
+  allowed: boolean;
+  tenant_id?: string;
+  limits?: {
+    max_users: number;
+    max_conversations: number;
+    max_storage_mb: number;
+  };
+  reason?: string;
+}
+
+// 分页响应类型
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  skip: number;
+  limit: number;
+}

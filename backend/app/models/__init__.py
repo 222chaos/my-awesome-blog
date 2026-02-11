@@ -16,3 +16,8 @@ from app.models.subscription import Subscription
 from app.models.image import Image, ImageVariant
 from app.models.typewriter_content import TypewriterContent
 from app.models.message import Message
+from app.models.tenant import Tenant
+from app.models.prompt import Prompt
+from app.models.conversation import Conversation, ConversationMessage
+from app.models.memory import Memory
+from app.models.context_history import ContextHistory
