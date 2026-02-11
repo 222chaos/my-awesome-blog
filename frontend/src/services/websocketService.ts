@@ -28,7 +28,7 @@ class WebSocketService {
   constructor() {
     // 根据环境配置 WebSocket URL
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = process.env.NEXT_PUBLIC_WS_HOST || '127.0.0.1:8989';
+    const host = process.env.NEXT_PUBLIC_WS_HOST || 'localhost:8989';
     this.url = `${protocol}//${host}/ws/notifications`;
     
     // 如果未定义 NEXT_PUBLIC_WS_HOST，则启用模拟模式

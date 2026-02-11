@@ -5,7 +5,7 @@ import { ArrowRight, Heart, MessageCircle, Calendar, AlertCircle, RefreshCw, Ext
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/Button'
 import { useLoading } from '@/context/loading-context'
-import { ArticleCardSkeleton } from './ArticleCardSkeleton'
+import ArticleCardSkeleton from './ArticleCardSkeleton'
 import FriendLinks from './FriendLinks'
 import ProfileCard from './ProfileCard'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area, Legend } from 'recharts'

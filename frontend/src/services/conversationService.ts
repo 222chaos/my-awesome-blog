@@ -81,8 +81,8 @@ export const conversationService = {
     onComplete?: () => void,
     onError?: (error: string) => void
   ): Promise<void> {
-    const token = localStorage.getItem('access_token');
-    const url = `${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8989'}${API_BASE}/${id}/chat/stream`;
+    const token = localStorage.getItem('auth_token');
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8989'}${API_BASE}/${id}/chat/stream`;
     
     try {
       const response = await fetch(url, {

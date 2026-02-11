@@ -1,24 +1,42 @@
 'use client';
 
-export function ArticleCardSkeleton() {
+import { cn } from '@/lib/utils';
+
+interface ArticleCardSkeletonProps {
+  variant?: 'default' | 'short' | 'tall';
+}
+
+export default function ArticleCardSkeleton({ variant = 'default' }: ArticleCardSkeletonProps) {
+  const heights = {
+    default: 'aspect-[4/5]',
+    short: 'aspect-[4/3]',
+    tall: 'aspect-[4/7]'
+  };
+
   return (
-    <div className="rounded-lg border border-glass-border bg-glass p-4 sm:p-6 space-y-3 sm:space-y-4">
-      {/* 标题骨架 */}
-      <div className="h-5 sm:h-6 w-3/4 bg-gradient-to-r from-tech-cyan/20 to-tech-cyan/10 rounded animate-pulse" />
-
-      {/* 摘要骨架 */}
-      <div className="space-y-2">
-        <div className="h-3 sm:h-4 w-full bg-gradient-to-r from-tech-cyan/10 to-transparent rounded animate-pulse" />
-        <div className="h-3 sm:h-4 w-2/3 bg-gradient-to-r from-tech-cyan/10 to-transparent rounded animate-pulse" />
-      </div>
-
-      {/* 元信息骨架 */}
-      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-        <div className="h-3 sm:h-4 w-14 sm:w-16 bg-gradient-to-r from-tech-cyan/10 to-transparent rounded animate-pulse" />
-        <div className="h-3 sm:h-4 w-10 sm:w-12 bg-gradient-to-r from-tech-cyan/10 to-transparent rounded animate-pulse" />
-        <div className="h-3 sm:h-4 w-10 sm:w-12 bg-gradient-to-r from-tech-cyan/10 to-transparent rounded animate-pulse" />
+    <div className={cn(
+      'rounded-2xl bg-white/5 border border-white/10 overflow-hidden',
+      'animate-pulse'
+    )}>
+      <div className={cn('w-full', heights[variant])}>
+        <div className="p-4 space-y-3 h-full flex flex-col">
+          <div className="w-3/4 h-4 bg-white/10 rounded-lg" />
+          <div className="space-y-2 flex-1">
+            <div className="h-6 bg-white/10 rounded w-3/4" />
+            <div className="h-6 bg-white/10 rounded w-full" />
+          </div>
+          <div className="h-3 bg-white/10 rounded w-2/3" />
+          <div className="h-3 bg-white/10 rounded w-full" />
+          <div className="h-3 bg-white/10 rounded w-1/2" />
+          <div className="space-y-2 flex items-center justify-between mt-2">
+            <div className="h-3 w-24 bg-white/10 rounded" />
+            <div className="flex gap-2">
+              <div className="h-8 w-8 bg-white/10 rounded-full" />
+              <div className="h-8 w-16 bg-white/10 rounded" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
-
