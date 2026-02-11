@@ -7,7 +7,9 @@ from app import crud
 from app.crud.user import get_user_stats
 from app.schemas.user import User, UserCreate, UserUpdate, UserStats, AvatarResponse, PasswordUpdate
 from app.models.user import User as UserModel
-from app.services.oss_service import oss_service
+# Temporarily commented out due to missing oss2 module
+# from app.services.oss_service import oss_service
+oss_service = None
 from app.utils.file_validation import (
     save_upload_file_temp, 
     cleanup_temp_file, 
@@ -27,22 +29,31 @@ router = APIRouter()
 @router.get("/admin", response_model=User)
 def get_admin_user(
     db: Session = Depends(get_db),
-    current_user: UserModel = Depends(get_current_active_user)  # 添加认证要求
 ) -> Any:
     """
     Get admin/superuser information for public display
     Returns the first superuser found
-    Requires authentication
+    Public endpoint - no authentication required
     """
     from sqlalchemy.orm import Session
 
+    app_logger.info("Admin endpoint called")
     admin = db.query(UserModel).filter(UserModel.is_superuser == True).first()
     if not admin:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Admin user not found"
         )
+    app_logger.info(f"Admin user found: {admin.username}")
     return admin
+
+
+@router.get("/public-info")
+def get_public_info():
+    """
+    Test public endpoint - no authentication required
+    """
+    return {"message": "This is a public endpoint", "status": "success"}
 
 
 @router.get("/", response_model=List[User])

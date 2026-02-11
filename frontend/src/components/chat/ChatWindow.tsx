@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { streamChat, LLMMessage, getModels } from '@/lib/api/llm';
 import { MessageBubble } from './MessageBubble';
 import { ChatInput } from './ChatInput';
@@ -21,12 +22,13 @@ interface ChatWindowProps {
 }
 
 const DEFAULT_MODELS: Model[] = [
-  { id: 'deepseek-chat', name: 'DeepSeek V3', provider: 'deepseek', description: 'Smart & Fast' },
-  { id: 'glm-4', name: 'GLM-4', provider: 'zhipu', description: 'Balanced' },
-  { id: 'qwen-turbo', name: 'Qwen Turbo', provider: 'dashscope', description: 'Efficient' },
+  { id: 'deepseek_deepseek-chat', name: 'DeepSeek V3', provider: 'deepseek', description: 'Smart & Fast' },
+  { id: 'zhipu_glm-4', name: 'GLM-4', provider: 'zhipu', description: 'Balanced' },
+  { id: 'dashscope_qwen-turbo', name: 'Qwen Turbo', provider: 'dashscope', description: 'Efficient' },
 ];
 
 export function ChatWindow({ onToggleSidebar, sessionMessages, onMessagesChange, onNewSession }: ChatWindowProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>(sessionMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [currentModel, setCurrentModel] = useState(DEFAULT_MODELS[0].id);
@@ -46,7 +48,7 @@ export function ChatWindow({ onToggleSidebar, sessionMessages, onMessagesChange,
         const response = await getModels();
         if (response.models && response.models.length > 0) {
           const mappedModels = response.models.map(m => ({
-            id: m.name, // Using name as ID for simplicity as per API
+            id: `${m.provider}_${m.name}`, // Unique composite key
             name: m.display_name || m.name,
             provider: m.provider,
             description: m.is_available ? 'Available' : 'Unavailable'
@@ -131,12 +133,17 @@ export function ChatWindow({ onToggleSidebar, sessionMessages, onMessagesChange,
         (error) => {
           console.error('Stream error:', error);
           setIsLoading(false);
-          // Add error message?
+          if (error instanceof Error && error.message.includes('401')) {
+            router.push('/unauthorized');
+          }
         }
       );
     } catch (error) {
       console.error('Chat error:', error);
       setIsLoading(false);
+      if (error instanceof Error && error.message.includes('401')) {
+        router.push('/unauthorized');
+      }
     }
   };
 

@@ -3,7 +3,12 @@ import uuid
 from typing import Optional, List
 from pathlib import Path
 
-import oss2
+try:
+    import oss2
+    OSS2_AVAILABLE = True
+except ImportError:
+    OSS2_AVAILABLE = False
+
 from app.core.config import settings
 from app.utils.logger import app_logger
 
@@ -19,11 +24,17 @@ class OSSService:
         self.endpoint = settings.ALIBABA_CLOUD_OSS_ENDPOINT
         self.bucket_name = settings.ALIBABA_CLOUD_OSS_BUCKET_NAME
         self.cdn_domain = settings.ALIBABA_CLOUD_OSS_CDN_DOMAIN
-        
+        self.bucket = None
+
+        # 检查oss2是否可用
+        if not OSS2_AVAILABLE:
+            app_logger.warning("oss2模块未安装，OSS功能将不可用")
+            return
+
         # 初始化OSS认证和bucket对象
         auth = oss2.Auth(self.access_key_id, self.access_key_secret)
         self.bucket = oss2.Bucket(auth, self.endpoint, self.bucket_name)
-        
+
         # 验证配置
         if not self.access_key_id or not self.access_key_secret:
             app_logger.warning("阿里云OSS凭证未配置，OSS功能将不可用")

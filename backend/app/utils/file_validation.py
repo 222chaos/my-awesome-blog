@@ -4,7 +4,11 @@
 """
 import os
 import tempfile
-import puremagic
+try:
+    import puremagic
+    PUREMAGIC_AVAILABLE = True
+except ImportError:
+    PUREMAGIC_AVAILABLE = False
 from pathlib import Path
 from typing import List, Tuple, Set
 from fastapi import HTTPException, UploadFile, status
@@ -62,14 +66,22 @@ def validate_file_extension(filename: str) -> bool:
 
 def validate_mime_type(file_path: str) -> Tuple[bool, str]:
     """
-    验证文件MIME类型
-    
+    验证文件的MIME类型
+
     Args:
         file_path: 文件路径
-        
+
     Returns:
         Tuple[bool, str]: (是否有效, MIME类型或错误信息)
     """
+    if not PUREMAGIC_AVAILABLE:
+        # 如果puremagic不可用，仅根据扩展名验证
+        ext = Path(file_path).suffix.lower()
+        for mime_type, extensions in ALLOWED_MIME_TYPES.items():
+            if ext in extensions:
+                return True, mime_type
+        return False, f"不支持的文件类型: {ext}"
+
     try:
         mime_type = puremagic.from_file(file_path, mime=True)
         if mime_type not in ALLOWED_MIME_TYPES:

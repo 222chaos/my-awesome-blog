@@ -24,12 +24,14 @@ const ClientLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <LoadingProvider>
       <ThemeWrapper>
-        <Navbar />
-        <main className="bg-background min-h-screen">
-          <LoadingHandler>{children}</LoadingHandler>
-        </main>
-        <Footer />
-        <Toaster />
+<div className="flex flex-col min-h-screen bg-background overflow-hidden">
+  <Navbar />
+  <main className="flex-1 pt-16">
+    <LoadingHandler>{children}</LoadingHandler>
+  </main>
+  <Footer />
+  <Toaster />
+</div>
       </ThemeWrapper>
     </LoadingProvider>
   );

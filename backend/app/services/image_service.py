@@ -2,7 +2,12 @@ import os
 import time
 from pathlib import Path
 from typing import Dict, List, Optional
-from PIL import Image as PILImage
+try:
+    from PIL import Image as PILImage
+    PILLOW_AVAILABLE = True
+except ImportError:
+    PILLOW_AVAILABLE = False
+    PILImage = None
 from app.schemas.image import ImageUploadResponse, ImageVariant
 
 

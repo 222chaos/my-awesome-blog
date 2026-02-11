@@ -89,6 +89,14 @@ def read_featured_articles(
     return articles
 
 
+@router.get("/test-public")
+def test_public():
+    """
+    Test public endpoint in articles route
+    """
+    return {"message": "This is a test public endpoint in articles route", "status": "success"}
+
+
 @router.get("/popular", response_model=List[ArticleWithAuthor])
 def read_popular_articles(
     limit: int = Query(10, ge=1, le=50, description="Number of popular articles to return"),

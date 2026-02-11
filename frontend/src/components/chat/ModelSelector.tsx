@@ -61,14 +61,14 @@ export function ModelSelector({ models, currentModel, onSelect, disabled }: Mode
             <div className="space-y-0.5">
               {models.map((model) => (
                 <button
-                  key={model.id}
+                  key={`${model.provider}_${model.name}`}
                   onClick={() => {
-                    onSelect(model.id);
+                    onSelect(`${model.provider}_${model.name}`);
                     setIsOpen(false);
                   }}
                   className={cn(
                     "flex w-full items-center justify-between rounded-lg px-2 py-2 text-left text-sm transition-colors",
-                    currentModel === model.id
+                    currentModel === `${model.provider}_${model.name}`
                       ? "bg-cyan-500/10 text-cyan-400"
                       : "text-zinc-300 hover:bg-white/5 hover:text-white"
                   )}

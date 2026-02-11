@@ -44,8 +44,16 @@ class DeepSeekProvider(LLMProvider):
             'Content-Type': 'application/json',
         }
 
+        # Fix model name - remove provider prefix if present
+        model_name = request.model or self.model
+        if model_name and '_' in model_name:
+            # Handle cases like "deepseek_deepseek-chat" -> "deepseek-chat"
+            parts = model_name.split('_')
+            if len(parts) >= 2 and parts[0].lower() in ['deepseek', 'glm', 'qwen']:
+                model_name = '_'.join(parts[1:])
+
         payload = {
-            'model': request.model or self.model,
+            'model': model_name,
             'messages': [msg.dict() for msg in request.messages],
             'temperature': request.temperature,
             'top_p': request.top_p,
@@ -92,8 +100,20 @@ class DeepSeekProvider(LLMProvider):
             'Content-Type': 'application/json',
         }
 
+        # Fix model name - remove provider prefix if present
+        model_name = request.model or self.model
+        app_logger.info(f"DeepSeek stream - Raw model: request.model={request.model}, self.model={self.model}, using={model_name}")
+
+        if model_name and '_' in model_name:
+            # Handle cases like "deepseek_deepseek-chat" -> "deepseek-chat"
+            parts = model_name.split('_')
+            if len(parts) >= 2 and parts[0].lower() in ['deepseek', 'glm', 'qwen']:
+                model_name = '_'.join(parts[1:])
+
+        app_logger.info(f"DeepSeek stream - Final model_name: {model_name}")
+
         payload = {
-            'model': request.model or self.model,
+            'model': model_name,
             'messages': [msg.dict() for msg in request.messages],
             'temperature': request.temperature,
             'top_p': request.top_p,
@@ -111,7 +131,13 @@ class DeepSeekProvider(LLMProvider):
                     headers=headers,
                     json=payload
                 ) as response:
-                    response.raise_for_status()
+                    # Check status before iterating
+                    if response.status_code >= 400:
+                        error_content = await response.aread()
+                        error_text = error_content.decode('utf-8', errors='replace')
+                        app_logger.error(f"DeepSeek stream API error: {response.status_code} - {error_text}")
+                        response.raise_for_status()
+
                     async for line in response.aiter_lines():
                         if line.startswith('data: '):
                             data_str = line[6:]

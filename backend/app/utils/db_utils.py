@@ -57,28 +57,31 @@ def get_popular_articles_optimized(db: Session, limit: int = 5, days: int = 30):
     from app.utils.logger import app_logger
     
     try:
-        # 使用原生SQL查询优化性能
+        # 使用原生SQL查询优化性能 - 只要求已发布，不限制发布时间
         query = text("""
             SELECT
-                a.*,
+                a.id,
                 COUNT(c.id) as comment_count
             FROM articles a
             LEFT JOIN comments c ON a.id = c.article_id
-            WHERE a.is_published = TRUE
-            AND a.published_at >= :since_date
+            WHERE a.is_published = true
             GROUP BY a.id
-            ORDER BY a.view_count DESC, comment_count DESC, a.published_at DESC
+            ORDER BY a.view_count DESC, COUNT(c.id) DESC, a.published_at DESC
             LIMIT :limit
         """)
         
-        since_date = datetime.now() - timedelta(days=days)
-        result = db.execute(query, {"since_date": since_date, "limit": limit})
+        app_logger.info(f"Popular articles query: limit={limit}")
+        result = db.execute(query, {"limit": limit})
         
         # 将结果转换为Article对象，并预加载关系数据
         articles = []
-        article_ids = [str(row.id) for row in result]
+        rows = list(result)
+        app_logger.info(f"SQL query returned {len(rows)} rows")
         
-        if article_ids:
+        if rows:
+            # 直接从结果中获取UUID对象
+            article_ids = [row.id for row in rows]
+            
             # 一次性获取所有文章及其关系数据，避免N+1查询
             articles = (
                 db.query(Article)
@@ -92,13 +95,12 @@ def get_popular_articles_optimized(db: Session, limit: int = 5, days: int = 30):
             )
             
             # 按查询结果的顺序排序
-            articles_dict = {str(article.id): article for article in articles}
+            articles_dict = {article.id: article for article in articles}
             ordered_articles = []
-            for row in result:
-                row_id_str = str(row.id)
-                if row_id_str in articles_dict:
-                    ordered_articles.append(articles_dict[row_id_str])
-            
+            for row in rows:
+                if row.id in articles_dict:
+                    ordered_articles.append(articles_dict[row.id])
+
             return ordered_articles
         
         return articles

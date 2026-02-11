@@ -47,7 +47,7 @@ export function ChatSidebar({
       {/* Sidebar Container */}
       <motion.aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-black/80 backdrop-blur-xl transition-transform duration-300 md:translate-x-0",
+          "fixed top-16 bottom-0 left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-black/80 backdrop-blur-xl transition-transform duration-300 md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

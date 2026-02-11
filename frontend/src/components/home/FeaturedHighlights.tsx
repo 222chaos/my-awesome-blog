@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Pin, Star, TrendingUp, ArrowRight, Eye, Heart, Flame, Clock, AlertCircle, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getArticles } from '@/lib/api/articles'
+import { getPopularArticles } from '@/lib/api/articles'
 
 interface HighlightItem {
   id: string
@@ -74,9 +74,11 @@ export default function FeaturedHighlights() {
       try {
         setLoading(true)
         setError(null)
-        const articles = await getArticles({ limit: 6, published_only: true })
-        
+        const articles = await getPopularArticles({ limit: 6 })
+        console.log('获取到的文章数据:', articles)
+
         const mappedHighlights: HighlightItem[] = articles.map((article, index) => {
+          console.log(`处理文章 ${index + 1}:`, article.title)
           const type: HighlightItem['type'] = index === 0 ? 'pinned' : index === 1 ? 'featured' : index === 2 ? 'trending' : 'latest'
           const badgeMap = { pinned: '置顶', featured: '精选', trending: '热门', latest: '最新' }
           const colorMap = { 
@@ -100,8 +102,8 @@ export default function FeaturedHighlights() {
             readTime: formatReadTime(article.content),
             stats: {
               views: article.view_count,
-              likes: article.like_count,
-              comments: article.comment_count
+              likes: article.likes_count,
+              comments: article.comments_count
             }
           }
         })
@@ -138,6 +140,18 @@ export default function FeaturedHighlights() {
           <div className="flex items-center justify-center py-12">
             <RefreshCw className="w-12 h-12 text-tech-cyan animate-spin" />
             <p className="text-gray-400 ml-4">加载中...</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (highlights.length === 0 && !loading) {
+    return (
+      <section className="relative overflow-hidden py-6 sm:py-8 lg:py-10 bg-gradient-to-b from-tech-darkblue to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <p className="text-gray-400">暂无精选文章</p>
           </div>
         </div>
       </section>

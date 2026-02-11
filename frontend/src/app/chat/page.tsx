@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ChatLayout } from '@/components/chat/ChatLayout';
 import { ChatSidebar, ChatSession } from '@/components/chat/ChatSidebar';
 import { ChatWindow, ChatMessage } from '@/components/chat/ChatWindow';
+import { useAuthCheck } from '@/hooks/useAuthCheck';
 
 // Local storage key
 const STORAGE_KEY = 'chat_sessions_v1';
@@ -14,6 +15,8 @@ interface StoredData {
 }
 
 export default function ChatPage() {
+  useAuthCheck();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
