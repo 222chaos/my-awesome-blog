@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, UUID, Index
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, UUID, Index, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import uuid
@@ -12,9 +12,11 @@ class User(Base):
     __table_args__ = (
         Index('idx_user_active_created', 'is_active', 'created_at'),  # 按状态和时间查询
         Index('idx_user_superuser', 'is_superuser'),                  # 管理员查询
+        Index('idx_user_tenant', 'tenant_id'),                   # 租户查询
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    tenant_id = Column(UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
@@ -32,6 +34,7 @@ class User(Base):
     linkedin = Column(String(100), index=True)  # 添加索引以加快搜索
 
     # Relationships
+    tenant = relationship("Tenant", back_populates="users")
     articles = relationship("Article", back_populates="author", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")

@@ -83,3 +83,47 @@ from app.crud.message import (
     get_message_activity,
 )
 
+from app.crud.prompt import (
+    get_prompt,
+    get_prompt_by_name_and_version,
+    get_prompts,
+    get_prompt_versions,
+    get_ab_test_prompts,
+    create_prompt,
+    update_prompt,
+    delete_prompt,
+    increment_prompt_usage,
+    update_prompt_success_rate,
+    count_prompts,
+)
+
+from app.crud.memory import (
+    get_memory,
+    get_memories,
+    search_memories,
+    get_expired_memories,
+    create_memory,
+    create_memories_batch,
+    update_memory,
+    delete_memory,
+    increment_memory_access,
+    count_memories,
+    get_memory_stats,
+    cleanup_expired_memories,
+)
+
+from app.crud.conversation import (
+    get_conversation,
+    get_conversations,
+    create_conversation,
+    update_conversation,
+    delete_conversation,
+    get_conversation_messages,
+    create_conversation_message,
+    delete_conversation_messages,
+    update_conversation_stats,
+    count_conversations,
+)
+
+from app.crud.tenant import tenant
+

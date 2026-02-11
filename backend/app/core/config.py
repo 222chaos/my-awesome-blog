@@ -107,6 +107,44 @@ class Settings(BaseSettings):
     QWEN_BASE_URL: str = Field(default="https://dashscope.aliyuncs.com/compatible-mode/v1", description="通义千问API基础URL")
     QWEN_MODEL: str = Field(default="qwen-plus", description="通义千问模型名称")
 
+    # LangChain Configuration
+    LANGCHAIN_ENABLED: bool = Field(default=True, description="是否启用LangChain集成")
+    LANGCHAIN_VERBOSE: bool = Field(default=False, description="是否启用LangChain详细日志")
+    LANGCHAIN_TRACING_V2: bool = Field(default=False, description="是否启用LangChain Tracing v2")
+    LANGCHAIN_API_KEY: str = Field(default="", description="LangSmith API密钥（用于追踪和调试）")
+    LANGCHAIN_PROJECT: str = Field(default="my-awesome-blog", description="LangSmith项目名称")
+
+    # Prompt Management
+    PROMPT_DEFAULT_VERSION: str = Field(default="v1", description="默认提示词版本")
+    PROMPT_MAX_VERSIONS: int = Field(default=10, description="每个提示词最多保留的版本数")
+    PROMPT_AB_TEST_ENABLED: bool = Field(default=True, description="是否启用A/B测试")
+    PROMPT_AB_TEST_TRAFFIC_SPLIT: float = Field(default=0.5, description="A/B测试流量分配比例（0-1）")
+
+    # Context Management
+    CONTEXT_DEFAULT_WINDOW_SIZE: int = Field(default=10, description="默认上下文窗口大小（消息数）")
+    CONTEXT_MAX_WINDOW_SIZE: int = Field(default=50, description="最大上下文窗口大小")
+    CONTEXT_SUMMARIZATION_ENABLED: bool = Field(default=True, description="是否启用上下文摘要")
+    CONTEXT_SUMMARIZATION_THRESHOLD: int = Field(default=20, description="触发摘要的消息数阈值")
+    CONTEXT_SUMMARIZATION_MODEL: str = Field(default="deepseek-chat", description="上下文摘要使用的模型")
+
+    # Memory Management
+    MEMORY_SHORT_TERM_ENABLED: bool = Field(default=True, description="是否启用短期记忆（Redis）")
+    MEMORY_SHORT_TERM_TTL: int = Field(default=3600, description="短期记忆过期时间（秒）")
+    MEMORY_LONG_TERM_ENABLED: bool = Field(default=True, description="是否启用长期记忆（PGVector）")
+    MEMORY_LONG_TERM_MAX_RESULTS: int = Field(default=5, description="长期记忆检索最大结果数")
+    MEMORY_LONG_TERM_THRESHOLD: float = Field(default=0.7, description="长期记忆相似度阈值（0-1）")
+    MEMORY_VECTOR_DIMENSION: int = Field(default=1536, description="向量维度")
+
+    # Conversation Management
+    CONVERSATION_MAX_MESSAGES: int = Field(default=1000, description="单个会话最大消息数")
+    CONVERSATION_AUTO_TITLE_ENABLED: bool = Field(default=True, description="是否自动生成会话标题")
+    CONVERSATION_TITLE_MODEL: str = Field(default="deepseek-chat", description="生成会话标题使用的模型")
+
+    # Tenant Management
+    TENANT_ENABLED: bool = Field(default=True, description="是否启用多租户功能")
+    TENANT_DEFAULT_MAX_STORAGE_MB: int = Field(default=1024, description="默认租户最大存储空间（MB）")
+    TENANT_DEFAULT_CONTEXT_WINDOW_SIZE: int = Field(default=10, description="默认租户上下文窗口大小")
+
     # Pagination
     DEFAULT_PAGE_SIZE: int = Field(default=20, description="默认页面大小")
     MAX_PAGE_SIZE: int = Field(default=100, description="最大页面大小")

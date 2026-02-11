@@ -98,7 +98,8 @@ class LLMService:
         try:
             provider = get_llm_provider(request.provider)
             if provider is None:
-                yield f"data: {self._format_sse_error(f\"LLM provider not found or not configured: {request.provider or 'default'}\")}\n\n"
+                error_msg = f"LLM provider not found or not configured: {request.provider or 'default'}"
+                yield f"data: {self._format_sse_error(error_msg)}\n\n"
                 return
 
             chat_request = ChatCompletionRequest(
