@@ -16,6 +16,7 @@ from app.utils.perf_monitor import PerformanceMonitoringMiddleware
 from app.utils.api_docs import customize_openapi
 from app.utils.config_validator import validate_and_log_config
 from app.middleware.request_size_limit import RequestSizeLimitMiddleware
+from app.services.weather_update_service import weather_update_service
 
 # Validate configuration on startup
 validate_and_log_config()
@@ -67,6 +68,11 @@ add_exception_handlers(app)
 async def startup_event():
     app_logger.info("Connecting to Redis...")
     await cache_service.connect()
+    
+    app_logger.info("Starting weather update scheduler...")
+    weather_update_service.start()
+    await weather_update_service.initial_update()
+    
     app_logger.info("Application startup complete")
 
 
@@ -74,6 +80,10 @@ async def startup_event():
 async def shutdown_event():
     app_logger.info("Closing Redis connection...")
     await cache_service.close()
+    
+    app_logger.info("Stopping weather update scheduler...")
+    weather_update_service.shutdown()
+    
     app_logger.info("Application shutdown complete")
 
 # Health check endpoint

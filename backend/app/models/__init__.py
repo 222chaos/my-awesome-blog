@@ -21,3 +21,4 @@ from app.models.prompt import Prompt
 from app.models.conversation import Conversation, ConversationMessage
 from app.models.memory import Memory
 from app.models.context_history import ContextHistory
+from app.models.weather import Weather

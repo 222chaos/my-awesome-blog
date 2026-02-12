@@ -145,6 +145,9 @@ class Settings(BaseSettings):
     TENANT_DEFAULT_MAX_STORAGE_MB: int = Field(default=1024, description="默认租户最大存储空间（MB）")
     TENANT_DEFAULT_CONTEXT_WINDOW_SIZE: int = Field(default=10, description="默认租户上下文窗口大小")
 
+    # Weather API (ALAPI)
+    ALAPI_TOKEN: str = Field(default="", description="ALAPI 天气服务密钥")
+
     # Pagination
     DEFAULT_PAGE_SIZE: int = Field(default=20, description="默认页面大小")
     MAX_PAGE_SIZE: int = Field(default=100, description="最大页面大小")

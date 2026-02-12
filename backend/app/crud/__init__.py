@@ -127,3 +127,14 @@ from app.crud.conversation import (
 
 from app.crud.tenant import tenant
 
+from app.crud.weather import (
+    get_weather_by_city,
+    get_weather_by_id,
+    get_all_weathers,
+    get_weather_history,
+    create_weather,
+    update_weather,
+    create_or_update_weather,
+    delete_weather,
+)
+

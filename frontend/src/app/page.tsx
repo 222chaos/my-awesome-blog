@@ -11,6 +11,7 @@ import SubscribeCard from '@/components/home/SubscribeCard'
 import ScrollProgress from '@/components/home/ScrollProgress'
 import BackToTop from '@/components/home/BackToTop'
 import MobileDrawer from '@/components/home/MobileDrawer'
+import WeatherCard from '@/components/home/WeatherCard'
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <ScrollProgress />
       <BackToTop />
       <MobileDrawer />
+      <WeatherCard />
 
       <div id="content" className="bg-background">
         <HeroSection />

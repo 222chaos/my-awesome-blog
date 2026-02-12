@@ -51,8 +51,12 @@ class LLMService:
                     detail=f"LLM provider not found or not configured: {request.provider or 'default'}"
                 )
 
+            messages = request.messages
+            if request.message:
+                messages = [ChatMessage(role="user", content=request.message)]
+
             chat_request = ChatCompletionRequest(
-                messages=[ChatMessage(**msg.dict()) for msg in request.messages],
+                messages=messages,
                 model=request.model,
                 temperature=request.temperature,
                 max_tokens=request.max_tokens,
@@ -102,13 +106,17 @@ class LLMService:
                 yield f"data: {self._format_sse_error(error_msg)}\n\n"
                 return
 
+            messages = request.messages
+            if request.message:
+                messages = [ChatMessage(role="user", content=request.message)]
+
             chat_request = ChatCompletionRequest(
-                messages=[ChatMessage(**msg.dict()) for msg in request.messages],
+                messages=messages,
                 model=request.model,
                 temperature=request.temperature,
                 max_tokens=request.max_tokens,
                 top_p=request.top_p,
-                stream=True
+                stream=request.stream if request.stream is not None else True
             )
 
             async for chunk in provider.stream_chat(chat_request):
