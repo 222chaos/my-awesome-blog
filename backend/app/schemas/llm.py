@@ -23,12 +23,15 @@ class LLMChatRequest(BaseModel):
     """
     LLM 聊天请求 Schema
     """
-    messages: List[LLMMessage] = Field(..., description="消息列表", min_length=1)
+    message: Optional[str] = Field(default=None, description="单条消息内容")
+    messages: Optional[List[LLMMessage]] = Field(default=None, description="消息列表")
+    conversation_id: Optional[str] = Field(default=None, description="对话ID")
     provider: Optional[str] = Field(default=None, description="提供商: deepseek, glm, qwen")
     model: Optional[str] = Field(default=None, description="模型名称，不指定则使用默认模型")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="温度参数，控制随机性")
     max_tokens: Optional[int] = Field(default=None, description="最大生成token数")
     top_p: float = Field(default=1.0, ge=0.0, le=1.0, description="核采样参数")
+    stream: Optional[bool] = Field(default=False, description="是否使用流式输出")
 
     class Config:
         from_attributes = True

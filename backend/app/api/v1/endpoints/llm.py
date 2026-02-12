@@ -11,8 +11,6 @@ from app.schemas.llm import (
     LLMChatResponse,
     LLMModelsResponse
 )
-from app.core.dependencies import get_current_active_user
-from app.models.user import User
 from app.utils.logger import app_logger
 
 router = APIRouter()
@@ -22,7 +20,6 @@ router = APIRouter()
 async def chat(
     *,
     request: LLMChatRequest,
-    current_user: User = Depends(get_current_active_user),
 ) -> LLMChatResponse:
     """
     LLM 聊天接口
@@ -34,7 +31,7 @@ async def chat(
     - **max_tokens**: 最大生成 token 数
     - **top_p**: 核采样参数 (0.0-1.0)
     """
-    app_logger.info(f"User {current_user.username} requested LLM chat with provider: {request.provider or 'default'}")
+    app_logger.info(f"LLM chat request with provider: {request.provider or 'default'}")
     response = await llm_service.chat(request)
     return response
 
@@ -43,7 +40,6 @@ async def chat(
 async def stream_chat(
     *,
     request: LLMChatRequest,
-    current_user: User = Depends(get_current_active_user),
 ):
     """
     LLM 流式聊天接口
@@ -62,7 +58,7 @@ async def stream_chat(
     - data: {"content": "更多内容", "finish_reason": null}
     - data: [DONE]
     """
-    app_logger.info(f"User {current_user.username} requested LLM stream chat with provider: {request.provider or 'default'}")
+    app_logger.info(f"LLM stream chat request with provider: {request.provider or 'default'}")
 
     async def generate():
         async for chunk in llm_service.stream_chat(request):

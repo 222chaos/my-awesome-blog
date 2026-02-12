@@ -326,13 +326,8 @@ export interface LLMChatResponse {
 }
 
 export interface LLMStreamChunk {
-  id?: string;
-  conversation_id?: string;
-  delta?: string;
-  role?: 'assistant' | 'user';
-  tokens?: number;
-  done?: boolean;
-  error?: string;
+  content: string;
+  finish_reason: string | null;
 }
 
 export interface LLMProviderInfo {

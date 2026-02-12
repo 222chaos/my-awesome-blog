@@ -24,7 +24,7 @@ export const llmService = {
   async chatStream(
     request: LLMChatRequest,
     onChunk: (chunk: LLMStreamChunk) => void,
-    onComplete?: () => void,
+    onComplete?: (fullContent: string) => void,
     onError?: (error: string) => void
   ): Promise<void> {
     const token = localStorage.getItem('auth_token');
@@ -51,11 +51,12 @@ export const llmService = {
 
       const decoder = new TextDecoder();
       let buffer = '';
+      let fullContent = '';
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          onComplete?.();
+          onComplete?.(fullContent);
           break;
         }
 
@@ -65,14 +66,15 @@ export const llmService = {
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = line.slice(6);
+            const data = line.slice(6).trim();
             if (data === '[DONE]') {
-              onComplete?.();
+              onComplete?.(fullContent);
               return;
             }
 
             try {
               const chunk: LLMStreamChunk = JSON.parse(data);
+              fullContent += chunk.content;
               onChunk(chunk);
             } catch (e) {
               console.error('Failed to parse SSE chunk:', data, e);
